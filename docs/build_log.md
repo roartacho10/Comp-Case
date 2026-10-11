@@ -27,7 +27,11 @@ Construção conduzida com AI (Claude), uma fase por vez. Antes de cada fase, as
 
 - `pytest`: 5 testes passando.
 - App executado localmente e verificado visualmente.
+- App publicado no Streamlit Community Cloud (https://comp-case-whvmhuagjmfytrjxadlqsx.streamlit.app/); autor confirmou as quatro páginas e o aviso de dados sintéticos no ar.
 
-**Pendências**
+**Ocorrências**
 
-- Publicação no Streamlit Community Cloud (depende do login do autor).
+- O push foi inicialmente recusado: o conector do GitHub estava ativo, mas o app do Claude no GitHub não tinha acesso de escrita ao repositório. Resolvido com a instalação do app restrita ao repositório `Comp-Case`.
+- O Streamlit não encontrou a branch `main` na primeira tentativa, por ter lido o repositório ainda vazio. Resolvido ao recarregar o formulário.
+
+**Status:** concluída e aprovada pelo autor.

@@ -4,13 +4,15 @@ Protótipo construído para o case *Forward Deployed* da Comp. Demonstra o ciclo
 
 > **Dados sintéticos e ilustrativos.** Todos os dados são gerados por regras explícitas de causa e efeito, com semente fixa. Não representam pessoas, empresas ou resultados reais. Ilustram o mecanismo, não provam o resultado.
 
+**App publicado:** https://comp-case-whvmhuagjmfytrjxadlqsx.streamlit.app/
+
 ## Status
 
 Construção em fases, cada uma revisada e aprovada antes da seguinte. O histórico detalhado está em [`docs/build_log.md`](docs/build_log.md).
 
 | Fase | Conteúdo | Status |
 |---|---|---|
-| 0 | Fundação: repositório, estrutura e publicação | Em validação |
+| 0 | Fundação: repositório, estrutura e publicação | Concluída |
 | 1 | Mundo e dados sintéticos | A fazer |
 | 2 | Personagens e motor de regras | A fazer |
 | 3 | Fluxo 1: caso do gestor | A fazer |
