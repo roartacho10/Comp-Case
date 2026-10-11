@@ -1,0 +1,6 @@
+streamlit==1.63.0
+pandas==2.3.3
+numpy==2.3.5
+anthropic==1.12.1
+pyyaml==6.0.3
+pytest==9.0.3
