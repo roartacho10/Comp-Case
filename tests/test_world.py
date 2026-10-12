@@ -54,7 +54,7 @@ def test_committed_snapshot_matches_assumptions(world, tmp_path, monkeypatch):
 
 def test_system_modules_never_read_hidden_truth():
     """Only the generator, the checks and the tests may touch the hidden truth."""
-    allowed = {"generator.py", "checks.py", "world_store.py"}
+    allowed = {"generator.py", "checks.py", "world_store.py", "simulation.py", "personas.py"}
     for path in list((ROOT / "src").glob("*.py")) + list((ROOT / "app_pages").glob("*.py")) + [ROOT / "app.py"]:
         if path.name in allowed:
             continue

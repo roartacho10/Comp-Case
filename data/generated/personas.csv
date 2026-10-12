@@ -1,0 +1,4 @@
+persona_id,employee_id,name,team_id,decision_maker_id,story,other_cases_in_team
+P1,C0252,Mariana Costa,T009,C0134,Remuneração: previsão confirmada,4
+P2,C0692,Diego Ramírez,T074,C0945,"Crescimento: decisão boa, resultado ruim",5
+P3,C0148,Lucía Fernández,T051,C0341,Gestor: recomendação rejeitada,5

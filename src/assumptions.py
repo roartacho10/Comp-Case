@@ -16,16 +16,29 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 ASSUMPTIONS_PATH = DATA_DIR / "assumptions.csv"
 SIGNALS_PATH = DATA_DIR / "signals.csv"
 INTERVENTIONS_PATH = DATA_DIR / "interventions.csv"
+PERSONAS_PATH = DATA_DIR / "personas.csv"
+PERSONA_OUTCOMES_PATH = DATA_DIR / "persona_outcomes.csv"
 
 
 class Assumptions:
-    def __init__(self, table: pd.DataFrame, signals: pd.DataFrame, interventions: pd.DataFrame):
+    def __init__(
+        self,
+        table: pd.DataFrame,
+        signals: pd.DataFrame,
+        interventions: pd.DataFrame,
+        personas: pd.DataFrame | None = None,
+        persona_outcomes: pd.DataFrame | None = None,
+    ):
         if not table["key"].is_unique:
             dupes = table.loc[table["key"].duplicated(), "key"].tolist()
             raise ValueError(f"Premissas duplicadas: {dupes}")
         self.table = table.copy()
         self.signals = signals.copy()
         self.interventions = interventions.fillna("").copy()
+        self.personas = personas.copy() if personas is not None else pd.read_csv(PERSONAS_PATH)
+        self.persona_outcomes = (
+            persona_outcomes.copy() if persona_outcomes is not None else pd.read_csv(PERSONA_OUTCOMES_PATH)
+        )
         self._values = dict(zip(table["key"], table["value"]))
         self.used: set[str] = set()
 
@@ -44,7 +57,8 @@ class Assumptions:
 
     def fingerprint(self) -> str:
         """Hash of the rules, used to cache generated data and detect stale snapshots."""
-        payload = "".join(t.to_csv(index=False) for t in (self.table, self.signals, self.interventions))
+        tables = (self.table, self.signals, self.interventions, self.personas, self.persona_outcomes)
+        payload = "".join(t.to_csv(index=False) for t in tables)
         return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
     def _raw(self, key: str) -> str:

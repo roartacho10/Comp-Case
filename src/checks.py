@@ -145,4 +145,29 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     cell_min = int(net.groupby(["attributed_cause", "intervention"]).size().min())
     add("Rede", "Menor número de casos por combinação causa × intervenção", "≥ 30", str(cell_min), cell_min >= 30)
 
+    # Personas and engine ------------------------------------------------------------
+    from src.engine import run_engine
+
+    engine = run_engine(pub, a)
+    cases = engine.cases.set_index("employee_id")
+    comp = dict(zip(a.signals["signal"], a.signals["component"]))
+    by_cause = dict(zip(a.interventions["target_cause"], a.interventions["intervention"]))
+    for _, p in pub["personas"].iterrows():
+        emp, label = p["employee_id"], p["name"]
+        cause = a.personas.set_index("persona_id").loc[p["persona_id"], "cause"]
+        expected = sorted(s for s in comp if comp[s] == cause)
+        found = sorted(s for s in engine.signals.columns if engine.signals.loc[emp, s])
+        add("Personagens", f"{label}: sinais encontrados pelo motor", ", ".join(expected), ", ".join(found), found == expected)
+        ok_case = emp in cases.index
+        add("Personagens", f"{label}: causa provável", cause, cases.loc[emp, "cause"] if ok_case else "sem caso",
+            ok_case and cases.loc[emp, "cause"] == cause and not cases.loc[emp, "tie"])
+        add("Personagens", f"{label}: recomendação", by_cause[cause], cases.loc[emp, "recommended"] if ok_case else "—",
+            ok_case and cases.loc[emp, "recommended"] == by_cause[cause])
+        others = int((cases["decision_maker_id"] == p["decision_maker_id"]).sum()) - 1
+        add("Personagens", f"{label}: outros casos com o mesmo decisor", "≥ 3", str(others), others >= 3)
+    accuracy = (hid["truth"].set_index("employee_id").loc[cases.index, "cause"] == cases["cause"]).mean()
+    add("Motor", "Casos abertos em T0", "—", str(len(cases)), True)
+    add("Motor", "Causa provável igual à causa verdadeira (informativo)", "—", _pct(accuracy), True,
+        "O motor não vê a causa verdadeira; ela só é usada aqui para medir o acerto")
+
     return pd.DataFrame(rows)

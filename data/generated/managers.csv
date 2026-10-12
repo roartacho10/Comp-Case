@@ -1,101 +1,101 @@
 manager_id,name,area,team_id,role,superior_id,n_reports,team_start_date
-C0105,Pedro Carvalho,Engenharia,T001,Gestor de time,C0998,11,2024-09-21
-C0550,Beatriz Alves,Engenharia,T002,Gestor de time,C0151,11,2024-05-28
-C0701,Mariana Moreira,Engenharia,T003,Gestor de time,C0585,11,2026-07-09
-C0263,Mateus Moreira,Engenharia,T004,Gestor de time,C0438,11,2023-04-03
-C0904,Camila Rocha,Engenharia,T005,Gestor de time,C0201,11,2024-09-06
-C0729,Isabela Costa,Engenharia,T006,Gestor de time,C0381,11,2025-12-07
-C0796,Mariana Pereira,Engenharia,T007,Gestor de time,C0998,11,2022-10-11
-C0659,Natalia Castro,Engenharia,T008,Gestor de time,C0151,11,2026-05-06
-C0134,Ana Almeida,Engenharia,T009,Gestor de time,C0585,11,2023-12-06
-C0874,Larissa Moreira,Engenharia,T010,Gestor de time,C0438,11,2023-08-06
-C0285,Catalina Rojas,Engenharia,T011,Gestor de time,C0201,11,2025-10-11
-C0742,Fernanda Gomes,Engenharia,T012,Gestor de time,C0381,11,2023-07-25
-C0509,Fernanda Ramírez,Engenharia,T013,Gestor de time,C0998,11,2025-07-02
-C0661,José Ortiz,Engenharia,T014,Gestor de time,C0151,11,2024-07-10
-C0885,Camila Santos,Engenharia,T015,Gestor de time,C0585,11,2025-08-09
-C0938,Isabela Dias,Engenharia,T016,Gestor de time,C0438,11,2026-05-20
-C0497,Ana Araújo,Engenharia,T017,Gestor de time,C0201,11,2026-08-08
-C0243,Renata Costa,Engenharia,T018,Gestor de time,C0381,11,2025-05-05
-C0744,Bruno Santos,Engenharia,T019,Gestor de time,C0998,11,2025-11-04
-C0841,Carlos Alves,Engenharia,T020,Gestor de time,C0151,11,2023-09-20
-C0971,Rodrigo Ribeiro,Engenharia,T021,Gestor de time,C0585,11,2025-03-12
-C0422,Pedro Teixeira,Engenharia,T022,Gestor de time,C0438,11,2024-06-03
-C0036,Daniela Ribeiro,Engenharia,T023,Gestor de time,C0201,11,2025-01-25
-C0584,Santiago Ospina,Engenharia,T024,Gestor de time,C0381,11,2023-07-14
-C0911,João Santos,Engenharia,T025,Gestor de time,C0998,11,2025-06-08
-C0002,Vinícius Araújo,Engenharia,T026,Gestor de time,C0151,10,2022-12-15
-C0623,Facundo González,Engenharia,T027,Gestor de time,C0585,10,2025-02-08
-C0053,Paulo Alves,Engenharia,T028,Gestor de time,C0438,10,2025-11-11
-C0113,Florencia Medina,Engenharia,T029,Gestor de time,C0201,10,2025-05-22
-C0999,Juliana Pereira,Vendas,T030,Gestor de time,C0485,11,2025-12-19
-C0833,Vinícius Barbosa,Vendas,T031,Gestor de time,C0759,11,2024-08-05
-C0332,Joaquín Acosta,Vendas,T032,Gestor de time,C0059,11,2025-05-09
-C0042,Juliana Araújo,Vendas,T033,Gestor de time,C0485,11,2023-02-23
-C0014,Lucas Santos,Vendas,T034,Gestor de time,C0759,11,2026-06-26
-C0163,Juan Vargas,Vendas,T035,Gestor de time,C0059,11,2025-05-30
-C0471,Vinícius Araújo,Vendas,T036,Gestor de time,C0485,11,2024-08-27
-C0864,Ana Martins,Vendas,T037,Gestor de time,C0759,11,2025-07-17
-C0293,Joaquín Acosta,Vendas,T038,Gestor de time,C0059,11,2026-08-19
-C0382,Matías Benítez,Vendas,T039,Gestor de time,C0485,11,2025-03-06
-C0091,Laura Ospina,Vendas,T040,Gestor de time,C0759,11,2025-11-05
-C0294,Isabela Carvalho,Vendas,T041,Gestor de time,C0059,11,2025-07-26
-C0044,Bruno Oliveira,Vendas,T042,Gestor de time,C0485,10,2022-12-19
-C0199,Miguel Cruz,Vendas,T043,Gestor de time,C0759,10,2023-11-28
-C0004,Lucas Barbosa,Vendas,T044,Gestor de time,C0059,10,2023-01-09
-C0579,Rodrigo Araújo,Customer Success,T045,Gestor de time,C0341,11,2025-05-01
-C0111,Paulo Ferreira,Customer Success,T046,Gestor de time,C0187,11,2023-03-31
-C0001,Bruno Melo,Customer Success,T047,Gestor de time,C0573,11,2024-12-18
-C0012,Vanessa Cardoso,Customer Success,T048,Gestor de time,C0341,11,2025-09-20
-C0222,Camila Sosa,Customer Success,T049,Gestor de time,C0187,11,2023-06-06
-C0476,Natália Barbosa,Customer Success,T050,Gestor de time,C0573,11,2026-01-06
-C0137,Rodrigo Cardoso,Customer Success,T051,Gestor de time,C0341,11,2026-07-14
-C0558,Felipe Restrepo,Customer Success,T052,Gestor de time,C0187,11,2023-05-18
-C0951,Gustavo Ferreira,Customer Success,T053,Gestor de time,C0573,11,2024-01-30
-C0140,Gabriel Martins,Customer Success,T054,Gestor de time,C0341,11,2024-06-03
-C0369,Miguel Ortiz,Customer Success,T055,Gestor de time,C0187,11,2024-12-29
-C0038,Mateus Oliveira,Customer Success,T056,Gestor de time,C0573,11,2025-12-17
-C0990,Laura Ospina,Customer Success,T057,Gestor de time,C0341,11,2022-10-12
-C0705,Sofía Hernández,Customer Success,T058,Gestor de time,C0187,10,2025-08-13
-C0390,Mariana Pérez,G&A,T059,Gestor de time,C0693,12,2025-05-03
-C0630,Isabela Araújo,G&A,T060,Gestor de time,C0789,11,2025-05-27
-C0942,Beatriz Ribeiro,G&A,T061,Gestor de time,C0662,11,2023-01-26
-C0901,Larissa Martins,G&A,T062,Gestor de time,C0693,11,2023-07-28
-C0600,Rafael Costa,G&A,T063,Gestor de time,C0789,11,2024-08-19
-C0094,Martina Paz,G&A,T064,Gestor de time,C0662,11,2022-11-27
-C0713,Rafael Melo,G&A,T065,Gestor de time,C0693,11,2026-01-14
-C0966,Lucas Alves,G&A,T066,Gestor de time,C0789,11,2023-02-13
-C0508,Cristóbal Fuentes,G&A,T067,Gestor de time,C0662,11,2026-01-05
-C0587,Daniela Santos,G&A,T068,Gestor de time,C0693,11,2024-11-11
-C0399,Martina Acosta,G&A,T069,Gestor de time,C0789,11,2026-01-13
-C0652,Rodrigo Barbosa,G&A,T070,Gestor de time,C0662,11,2022-10-02
-C0533,Gabriel Moreira,G&A,T071,Gestor de time,C0693,11,2023-01-18
-C0139,Camila Ferreira,Produto,T072,Gestor de time,C0574,11,2024-03-11
-C0547,Renata Oliveira,Produto,T073,Gestor de time,C0574,11,2025-06-19
-C0945,Natalia Herrera,Produto,T074,Gestor de time,C0574,10,2025-04-05
-C0068,Mateus Dias,Produto,T075,Gestor de time,C0574,10,2024-08-29
-C0752,Fernanda Melo,Produto,T076,Gestor de time,C0574,10,2025-02-06
-C0538,Carlos Lima,Produto,T077,Gestor de time,C0574,10,2026-02-23
-C0917,Sofía Cruz,Produto,T078,Gestor de time,C0574,10,2023-12-11
-C0029,Camila Ruiz,Marketing,T079,Gestor de time,C0741,11,2024-02-03
-C0322,Eduardo Moreira,Marketing,T080,Gestor de time,C0741,11,2023-01-30
-C0427,Beatriz Pereira,Marketing,T081,Gestor de time,C0741,11,2024-07-26
-C0407,Isabela Oliveira,Marketing,T082,Gestor de time,C0741,11,2025-01-09
-C0898,Marcelo Santos,Marketing,T083,Gestor de time,C0741,10,2024-06-12
-C0998,Constanza Espinoza,Engenharia,,Liderança,,5,
-C0151,Paulo Araújo,Engenharia,,Liderança,,5,
-C0585,Camila Rocha,Engenharia,,Liderança,,5,
-C0438,Camila Silva,Engenharia,,Liderança,,5,
-C0201,Mateus Almeida,Engenharia,,Liderança,,5,
-C0381,Vinícius Costa,Engenharia,,Liderança,,4,
-C0759,Pedro Ribeiro,Vendas,,Liderança,,5,
-C0059,Renata Dias,Vendas,,Liderança,,5,
-C0485,Florencia Ruiz,Vendas,,Liderança,,5,
-C0187,Carlos Melo,Customer Success,,Liderança,,5,
-C0573,Rafael Souza,Customer Success,,Liderança,,4,
-C0341,Pedro Carvalho,Customer Success,,Liderança,,5,
-C0662,Renata Alves,G&A,,Liderança,,4,
-C0693,Daniela Martínez,G&A,,Liderança,,5,
-C0789,Valentina Castro,G&A,,Liderança,,4,
-C0574,Laura Moreno,Produto,,Liderança,,7,
-C0741,Fernanda Melo,Marketing,,Liderança,,5,
+C0105,Patrícia Dias,Engenharia,T001,Gestor de time,C0998,11,2023-06-16
+C0550,Aline Silva,Engenharia,T002,Gestor de time,C0151,11,2026-01-11
+C0701,Renata Nascimento,Engenharia,T003,Gestor de time,C0585,11,2023-11-18
+C0263,Jéssica Ramos,Engenharia,T004,Gestor de time,C0438,11,2023-03-22
+C0904,Carolina Batista,Engenharia,T005,Gestor de time,C0201,11,2024-06-29
+C0729,Igor Freitas,Engenharia,T006,Gestor de time,C0381,11,2025-12-23
+C0796,Camila Correia,Engenharia,T007,Gestor de time,C0998,11,2024-09-25
+C0659,Valentina Moreno,Engenharia,T008,Gestor de time,C0151,11,2025-01-11
+C0134,Daniela Gomes,Engenharia,T009,Gestor de time,C0585,11,2022-10-19
+C0874,Ana Gomes,Engenharia,T010,Gestor de time,C0438,11,2023-10-28
+C0285,Trinidad Fuentes,Engenharia,T011,Gestor de time,C0201,11,2026-05-25
+C0742,Victor Dias,Engenharia,T012,Gestor de time,C0381,11,2024-06-06
+C0509,José Hernández,Engenharia,T013,Gestor de time,C0998,11,2023-10-05
+C0661,Ximena Pérez,Engenharia,T014,Gestor de time,C0151,11,2026-05-25
+C0885,Carolina Freitas,Engenharia,T015,Gestor de time,C0585,11,2025-12-28
+C0938,Igor Mendes,Engenharia,T016,Gestor de time,C0438,11,2025-06-13
+C0497,Eduardo Oliveira,Engenharia,T017,Gestor de time,C0201,11,2026-03-06
+C0243,Ricardo Mendes,Engenharia,T018,Gestor de time,C0381,11,2024-06-14
+C0744,Thiago Cardoso,Engenharia,T019,Gestor de time,C0998,11,2023-03-08
+C0841,Fernanda Correia,Engenharia,T020,Gestor de time,C0151,11,2024-02-08
+C0971,Bruno Souza,Engenharia,T021,Gestor de time,C0585,11,2024-06-26
+C0422,Igor Azevedo,Engenharia,T022,Gestor de time,C0438,11,2026-04-23
+C0036,Isabela Correia,Engenharia,T023,Gestor de time,C0201,11,2025-08-16
+C0584,Laura Rojas,Engenharia,T024,Gestor de time,C0381,11,2025-12-18
+C0911,Rafael Araújo,Engenharia,T025,Gestor de time,C0998,11,2023-01-14
+C0002,Victor Barbosa,Engenharia,T026,Gestor de time,C0151,10,2023-02-01
+C0623,Tomás Suárez,Engenharia,T027,Gestor de time,C0585,10,2023-11-07
+C0053,Gabriela Araújo,Engenharia,T028,Gestor de time,C0438,10,2025-05-14
+C0113,Lucas Sosa,Engenharia,T029,Gestor de time,C0201,10,2022-11-08
+C0999,Marina Pereira,Vendas,T030,Gestor de time,C0485,11,2023-07-26
+C0833,Beatriz Nascimento,Vendas,T031,Gestor de time,C0759,11,2023-11-19
+C0332,Florencia Acosta,Vendas,T032,Gestor de time,C0059,11,2025-06-13
+C0042,Rodrigo Barbosa,Vendas,T033,Gestor de time,C0485,11,2024-06-10
+C0014,Vinícius Monteiro,Vendas,T034,Gestor de time,C0759,11,2023-05-14
+C0163,Manuela Muñoz,Vendas,T035,Gestor de time,C0059,11,2023-03-27
+C0471,Ana Araújo,Vendas,T036,Gestor de time,C0485,11,2024-04-09
+C0864,Pedro Dias,Vendas,T037,Gestor de time,C0759,11,2024-05-28
+C0293,Nicolás Fernández,Vendas,T038,Gestor de time,C0059,11,2023-10-19
+C0382,Nicolás Benítez,Vendas,T039,Gestor de time,C0485,11,2024-05-21
+C0091,Camilo Díaz,Vendas,T040,Gestor de time,C0759,11,2024-10-09
+C0294,Luana Azevedo,Vendas,T041,Gestor de time,C0059,11,2025-12-04
+C0044,Carlos Teixeira,Vendas,T042,Gestor de time,C0485,10,2025-10-13
+C0199,Paola Jiménez,Vendas,T043,Gestor de time,C0759,10,2023-08-01
+C0004,Vinícius Carvalho,Vendas,T044,Gestor de time,C0059,10,2026-02-19
+C0579,Juliana Correia,Customer Success,T045,Gestor de time,C0341,11,2026-01-15
+C0111,Marcelo Mendes,Customer Success,T046,Gestor de time,C0187,11,2023-01-30
+C0001,Carlos Silva,Customer Success,T047,Gestor de time,C0573,11,2023-10-11
+C0012,Sabrina Dias,Customer Success,T048,Gestor de time,C0341,11,2026-03-17
+C0222,Facundo Romero,Customer Success,T049,Gestor de time,C0187,11,2025-02-20
+C0476,Thiago Costa,Customer Success,T050,Gestor de time,C0573,11,2023-07-28
+C0137,Vinícius Almeida,Customer Success,T051,Gestor de time,C0341,11,2026-06-01
+C0558,Felipe Castro,Customer Success,T052,Gestor de time,C0187,11,2024-08-05
+C0951,Natália Azevedo,Customer Success,T053,Gestor de time,C0573,11,2024-08-17
+C0140,Marcelo Santos,Customer Success,T054,Gestor de time,C0341,11,2025-07-09
+C0369,Andrea Ramírez,Customer Success,T055,Gestor de time,C0187,11,2023-09-19
+C0038,Diego Azevedo,Customer Success,T056,Gestor de time,C0573,11,2025-11-12
+C0990,Catalina Cárdenas,Customer Success,T057,Gestor de time,C0341,11,2024-06-17
+C0705,Fernanda Gómez,Customer Success,T058,Gestor de time,C0187,10,2025-08-19
+C0390,Alejandro Pérez,G&A,T059,Gestor de time,C0693,12,2026-01-22
+C0630,Mateus Almeida,G&A,T060,Gestor de time,C0789,11,2025-09-22
+C0942,Carlos Mendes,G&A,T061,Gestor de time,C0662,11,2023-03-16
+C0901,Camila Souza,G&A,T062,Gestor de time,C0693,11,2025-08-11
+C0600,Larissa Nascimento,G&A,T063,Gestor de time,C0789,11,2025-04-03
+C0094,Micaela Ruiz,G&A,T064,Gestor de time,C0662,11,2025-09-28
+C0713,Patrícia Costa,G&A,T065,Gestor de time,C0693,11,2023-09-01
+C0966,Isabela Nascimento,G&A,T066,Gestor de time,C0789,11,2024-09-03
+C0508,Catalina Vergara,G&A,T067,Gestor de time,C0662,11,2022-12-11
+C0587,Bruno Nascimento,G&A,T068,Gestor de time,C0693,11,2023-12-01
+C0399,Joaquín Acosta,G&A,T069,Gestor de time,C0789,11,2024-05-17
+C0652,Sabrina Nascimento,G&A,T070,Gestor de time,C0662,11,2023-12-11
+C0533,Rodrigo Gomes,G&A,T071,Gestor de time,C0693,11,2026-01-30
+C0139,Gustavo Barbosa,Produto,T072,Gestor de time,C0574,11,2022-12-03
+C0547,Vanessa Barbosa,Produto,T073,Gestor de time,C0574,11,2022-11-25
+C0945,Carolina Moreno,Produto,T074,Gestor de time,C0574,10,2025-04-06
+C0068,André Campos,Produto,T075,Gestor de time,C0574,10,2024-01-15
+C0752,Marina Lima,Produto,T076,Gestor de time,C0574,10,2025-07-09
+C0538,Aline Nunes,Produto,T077,Gestor de time,C0574,10,2024-04-27
+C0917,Miguel López,Produto,T078,Gestor de time,C0574,10,2026-05-18
+C0029,Camila Ruiz,Marketing,T079,Gestor de time,C0741,11,2022-12-16
+C0322,Ricardo Costa,Marketing,T080,Gestor de time,C0741,11,2025-01-16
+C0427,Isabela Barbosa,Marketing,T081,Gestor de time,C0741,11,2023-10-25
+C0407,Beatriz Alves,Marketing,T082,Gestor de time,C0741,11,2023-09-26
+C0898,Jéssica Mendes,Marketing,T083,Gestor de time,C0741,10,2025-06-15
+C0998,Matías Araya,Engenharia,,Liderança,,5,
+C0151,Carolina Souza,Engenharia,,Liderança,,5,
+C0585,Rafael Rocha,Engenharia,,Liderança,,5,
+C0438,Beatriz Correia,Engenharia,,Liderança,,5,
+C0201,Vinícius Mendes,Engenharia,,Liderança,,5,
+C0381,Lucas Melo,Engenharia,,Liderança,,4,
+C0759,Priscila Teixeira,Vendas,,Liderança,,5,
+C0059,Vinícius Batista,Vendas,,Liderança,,5,
+C0485,Facundo Paz,Vendas,,Liderança,,5,
+C0187,André Dias,Customer Success,,Liderança,,5,
+C0573,Vanessa Oliveira,Customer Success,,Liderança,,4,
+C0341,Bruno Azevedo,Customer Success,,Liderança,,5,
+C0662,Beatriz Silva,G&A,,Liderança,,4,
+C0693,Paola Martínez,G&A,,Liderança,,5,
+C0789,Natalia Fernández,G&A,,Liderança,,4,
+C0574,Camilo Fernández,Produto,,Liderança,,7,
+C0741,Ana Rocha,Marketing,,Liderança,,5,

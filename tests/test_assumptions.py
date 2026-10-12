@@ -20,8 +20,18 @@ def test_missing_assumption_raises():
 
 def test_every_assumption_is_used():
     """No orphan rule: every row of the base is read by the generator or the checks."""
+    from src import simulation
+    from src.engine import comparable_cases, run_engine
+
     a = Assumptions.load()
-    run_checks(generate_world(a), a)
+    world = generate_world(a)
+    run_checks(world, a)
+    engine = run_engine(world.public, a)
+    ctx = simulation.make_context(world, a)
+    decisions = simulation.simulated_decisions(ctx, engine, a)
+    simulation.advance_six_months(ctx, decisions, a)
+    first = engine.cases.iloc[0]
+    comparable_cases(world.public["network_cases"], a, first["cause"], first["level"], first["recommended"])
     assert a.unused() == []
 
 

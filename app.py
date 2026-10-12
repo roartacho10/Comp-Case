@@ -10,6 +10,7 @@ pages = [
     st.Page("app_pages/learning.py", title="2. Retorno e aprendizado"),
     st.Page("app_pages/leadership.py", title="3. Visão da liderança"),
     st.Page("app_pages/data.py", title="Como os dados foram gerados"),
+    st.Page("app_pages/engine_debug.py", title="Bastidores do motor (provisório)"),
 ]
 
 st.navigation(pages).run()

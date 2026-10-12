@@ -109,3 +109,51 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Permanência em 6 meses na rede, intervenção certa contra monitorar: remuneração 90,0% × 81,8%; crescimento 90,5% × 82,9%; gestor 91,3% × 81,1%. Menor grupo de comparação: 922 casos.
 
 **Status:** concluída e aprovada pelo autor.
+
+---
+
+## Fase 2 — Personagens e motor de regras
+
+**Objetivo:** construir o motor de regras e os três personagens, de ponta a ponta e sem AI, para validar a lógica antes da interface definitiva.
+
+**Decisões validadas antes da execução**
+
+| Decisão | Escolha | Racional |
+|---|---|---|
+| Valor esperado (VE) | Horizonte = tempo que a pessoa ainda ficaria sem ação (1 ÷ chance anual de saída), com teto de 5 anos; resultado medido em 6 meses | O valor de reter alguém se estende pelo tempo que a pessoa ainda ficaria; 6 meses é o horizonte verificável |
+| Duração do efeito | Ações pontuais (carreira e projeto, escalar): 12 meses; ajuste salarial: enquanto for pago | Sem isso, uma ação de R$ 3 mil seria tratada como permanente e venceria o ajuste da Mariana |
+| Custo da saída | 75% do custo anual (seção 3.3, com decomposição e fatores na explicação da premissa) + diferença de mercado paga ao substituto | O substituto é contratado pela mediana: parte do custo do ajuste seria paga de qualquer jeito |
+| Risco | Chance de sair em 6 meses sem ação, nos casos monitorados da rede com mesma causa e número de sinais; com múltiplo da média da empresa | Risco é o que acontece se nada for feito |
+| Empate de causa | Mostrar as duas causas e o empate; a decisão final é humana | Pedido do autor |
+| Casos comparáveis | 3 mais recentes com mesma causa, nível e intervenção recomendada, incluindo quem saiu | Precedente concreto, não só sucessos |
+| Quem decide | Causa gestor → gestor do gestor; demais → gestor do time | Como no documento |
+| Personagens | Em `data/personas.csv` e `data/persona_outcomes.csv`, substituindo 3 colaboradores; times com 3 ou mais outros casos | Roteiro registrado e editável; calibração com mais de um caso |
+| Aprendizado | Taxas antes e depois separando rede e cliente; calibração por gestor e do sistema | O ativo é a rede; o que se move é o aprendizado do cliente e de cada gestor |
+
+**Decisão tomada durante a execução (a validar)**
+
+- **O efeito de cada intervenção é estimado com todos os casos da mesma causa, sem separar por número de sinais; o risco continua separado.** No teste de mutabilidade (sinal com 45% em vez de 60%), a recomendação do Diego virou "monitorar" porque o subgrupo com 3 sinais tinha poucos casos e o efeito sumiu no ruído. Juntando os casos da mesma causa, o efeito fica estável e as três recomendações se mantêm nos dois cenários.
+
+**O que foi construído**
+
+- Personagens injetados com exatamente os 3 sinais da sua causa; o time da Lucía recebe troca de gestor há 4 meses e 3 saídas em 6 meses, herdadas pelos colegas.
+- Motor: sinais com evidência, abertura de caso, causa provável com empate, risco, VE com incerteza (intervalo de 80%), recomendação, casos comparáveis e roteamento.
+- Simulação dos 6 meses: decisões dos demais gestores (adesão de 60%, status quo, previsões com viés), resultados pelas regras do mundo para toda a empresa e roteiro para os personagens. A simulação é a única parte, além do gerador, que lê a verdade oculta.
+- Aprendizado: taxas antes e depois (rede e cliente) e calibração de gestores e do sistema.
+- Página provisória "Bastidores do motor".
+- Nomes fictícios únicos (antes havia homônimos).
+
+**Checagens**
+
+- 45 de 45 checagens passaram, incluindo, para cada personagem: sinais encontrados, causa, recomendação e pelo menos 3 outros casos com o mesmo decisor.
+- 191 casos abertos em T0; causa provável igual à verdadeira em 84%.
+- Recomendações dos personagens: Mariana → ajuste salarial (VE +R$ 22 mil); Diego → carreira e projeto (+R$ 13 mil); Lucía → escalar (+R$ 11 mil).
+- Testes: 25 passando, incluindo roteamento da causa gestor, recomendação com maior VE, determinismo da simulação, independência entre a escolha do personagem e o resto da empresa, roteiros dos personagens e o fluxo completo da página.
+- Fluxo percorrido no navegador: Lucía com a recomendação rejeitada (ajuste salarial com justificativa) → sai no mês 5.
+
+**Pontos levantados para o autor**
+
+- A calibração individual dos gestores sai fraca: com permanência de ~90% em 6 meses, o viés de +15 p.p. bate no teto de 95% e, com 5 a 13 casos por gestor, o realizado é dominado pelo acaso.
+- Os casos comparáveis mais recentes caem quase sempre na mesma data (a rede tem ~130 decisões por dia).
+
+**Status:** em validação pelo autor.

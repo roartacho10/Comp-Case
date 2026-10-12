@@ -66,7 +66,7 @@ intervenções,cost.compensation_share,0.1,fração do custo anual,"Custo do aju
 intervenções,cost.growth,5000,R$,Custo de carreira e projeto,"Tempo de gestor e mentoria, sem aumento imediato",premissa
 intervenções,cost.escalate,3000,R$,Custo de escalar para a liderança acima,Algumas horas de liderança e RH,premissa
 intervenções,cost.monitor,0,R$,Custo de monitorar,Nenhuma ação,premissa
-intervenções,cost.replacement_share,0.75,fração do custo anual,"Custo de reposição de quem sai, em fração do custo anual",Seção 3.3: 75% do custo anual,documento
+intervenções,cost.replacement_share,0.75,fração do custo anual,"Custo de reposição de quem sai, em fração do custo anual","Seção 3.3. Agrega recrutamento (~20%), vaga aberta (~20%, cerca de 2,5 meses), rampa até a produtividade plena (~25%, cerca de 6 meses a meio rendimento) e tempo de gestor e time (~10%). Sobe com: cargo sênior ou escasso, vaga aberta por mais tempo, rampa longa, conhecimento concentrado na pessoa. Desce com: mercado com muitos candidatos, sucessor preparado, processos documentados. O Gallup estima de 0,5 a 2 vezes o salário anual",documento
 resultado,outcome.performing_if_treated,0.9,prob.,"Chance de seguir performando, se ficou e a causa foi tratada (ou não havia causa)",Resolver a causa preserva o engajamento,premissa
 resultado,outcome.performing_if_untreated,0.75,prob.,"Chance de seguir performando, se ficou e a causa não foi tratada",Ficar com a causa sem solução tende a reduzir a entrega,premissa
 comportamento,behavior.status_quo_prob_right,0.3333,prob.,Chance de o gestor escolher a intervenção certa sem o sistema,"Equivale a escolher ao acaso entre as 3 intervenções ativas: sem diagnóstico, a escolha não usa a causa",premissa
@@ -86,3 +86,10 @@ geração,generation.project_end_share,0.5,fração,"Entre sinais de crescimento
 geração,generation.network_company_min_employees,100,pessoas,Porte mínimo dos clientes da rede,Média de 500 colaboradores por cliente (referência do autor),premissa (detalhe de geração)
 geração,generation.network_company_max_employees,900,pessoas,Porte máximo dos clientes da rede,Média de 500 colaboradores por cliente (referência do autor),premissa (detalhe de geração)
 geração,generation.network_min_months_ago,6.0,meses,Idade mínima das decisões da rede,O resultado só é conhecido 6 meses depois,premissa (detalhe de geração)
+valor esperado,ev.horizon_cap_years,5,anos,Teto do horizonte do valor esperado,O horizonte é o tempo que a pessoa ainda ficaria sem ação (1 ÷ chance anual de saída); o teto evita horizontes de décadas para quem tem risco baixo,premissa
+intervenções,intervention.one_off_effect_months,12,meses,"Duração do efeito das intervenções pontuais (carreira e projeto, escalar)",Ações pontuais perdem força se não forem renovadas; o ajuste salarial dura enquanto for pago,premissa
+intervenções,cost.replacement_hire_compa,1.0,x,Compa-ratio de quem é contratado para substituir quem sai,O substituto é contratado pela mediana de mercado: a diferença para o salário atual é um custo recorrente da saída,premissa
+valor esperado,ev.uncertainty_draws,500,sorteios,Sorteios usados para estimar a incerteza do valor esperado,Suficiente para um intervalo estável; mais sorteios só deixariam o cálculo mais lento,premissa (detalhe de cálculo)
+valor esperado,ev.interval_level,0.8,prob.,Nível do intervalo mostrado para taxas e valores esperados,80% é um intervalo legível para decisão gerencial; 95% seria largo demais para orientar escolhas,premissa (detalhe de cálculo)
+casos,case.comparable_cases,3,casos,Casos comparáveis da rede mostrados em cada caso,Suficiente para dar exemplos concretos sem poluir o caso,premissa (detalhe de cálculo)
+geral,general.simulation_seed,7,-,Semente da simulação dos 6 meses seguintes,"Separada da semente dos dados: avançar 6 meses dá sempre o mesmo resultado, sem alterar os dados de T0",premissa (detalhe de cálculo)

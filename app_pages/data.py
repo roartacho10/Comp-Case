@@ -82,6 +82,7 @@ with tab_tables:
         "context": "Contexto (anotações e atas)",
         "network_companies": "Rede: empresas",
         "network_cases": "Rede: casos fechados",
+        "personas": "Personagens",
     }
     name = st.selectbox("Tabela", list(labels), format_func=labels.get)
     df: pd.DataFrame = world["public"][name]

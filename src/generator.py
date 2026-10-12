@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
-from src.names import random_name
+from src.names import unique_name
 from src.signals import DAYS_PER_MONTH, DAYS_PER_YEAR, milestone_active, milestones
 
 CAUSES = ["remuneração", "crescimento", "gestor"]
@@ -140,7 +140,8 @@ def generate_world(a: Assumptions) -> World:
             role[person], areas[person] = LEADER, ar
 
     ids = np.array([f"C{i + 1:04d}" for i in range(n)], dtype=object)
-    names = np.array([random_name(rng, c) for c in countries], dtype=object)
+    taken_names = set(a.personas["name"])
+    names = np.array([unique_name(rng, c, taken_names) for c in countries], dtype=object)
     manager_id = np.empty(n, dtype=object)
     for person in ic_idx:
         manager_id[person] = ids[manager_of_team[team_of[person]]]
@@ -317,7 +318,7 @@ def generate_world(a: Assumptions) -> World:
         eid = f"X{j + 1:04d}"
         former.append(
             dict(
-                employee_id=eid, name=random_name(rng, ctry), country=ctry, area=team_area[tid], team_id=tid,
+                employee_id=eid, name=unique_name(rng, ctry, taken_names), country=ctry, area=team_area[tid], team_id=tid,
                 level=lvl, role=IC, manager_id=ids[manager_of_team[tid]], hire_date=hire.date(),
                 last_promotion_date=hire.date(), last_pay_change_date=hire.date(),
                 annual_cost_brl=round(compa * medians[lvl] * factors[ctry], -2), status="desligado",
@@ -397,8 +398,13 @@ def generate_world(a: Assumptions) -> World:
     world.notes = dict(expected_turnover=expected_turnover, expected_manager_share=expected_manager_share)
 
     # 6. Network ----------------------------------------------------------------
+    # Scripted personas replace three generated employees (data/personas.csv).
+    from src.personas import apply_personas
+
+    apply_personas(world, a)
+    final = world.hidden["truth"]
     comp_of = dict(zip(signals["signal"], signals["component"]))
-    per_cause = np.stack([drawn[[s for s in drawn.columns if comp_of[s] == c]].sum(axis=1) for c in CAUSES], axis=1)
+    per_cause = np.stack([final[[s for s in comp_of if comp_of[s] == c]].sum(axis=1) for c in CAUSES], axis=1)
     case_rate = float((per_cause.max(axis=1) >= a.int("case.min_signals_same_cause")).mean())
     world.notes["case_rate"] = case_rate
     network, network_truth, companies = generate_network(a, rng, expected_manager_share, case_rate)
