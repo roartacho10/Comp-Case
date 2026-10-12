@@ -31,11 +31,23 @@ tab_assumptions, tab_checks, tab_tables = st.tabs(["Premissas", "Checagens", "Ta
 
 with tab_assumptions:
     table = world["assumptions"].rename(
-        columns=dict(group="Grupo", description="Premissa", value="Valor", unit="Unidade", origin="Origem", key="Chave")
-    )[["Grupo", "Premissa", "Valor", "Unidade", "Origem", "Chave"]]
+        columns=dict(
+            group="Grupo", description="O que é", value="Valor", unit="Unidade",
+            rationale="Racional do valor", origin="Origem", key="Chave",
+        )
+    )[["Grupo", "O que é", "Valor", "Unidade", "Racional do valor", "Origem", "Chave"]]
     origins = sorted(table["Origem"].unique())
     chosen = st.multiselect("Filtrar por origem", origins, default=origins)
-    st.dataframe(table[table["Origem"].isin(chosen)], hide_index=True, width="stretch", height=520)
+    st.dataframe(
+        table[table["Origem"].isin(chosen)],
+        hide_index=True,
+        width="stretch",
+        height=560,
+        column_config={
+            "O que é": st.column_config.TextColumn(width="large"),
+            "Racional do valor": st.column_config.TextColumn(width="large"),
+        },
+    )
     st.caption(f"{len(table)} premissas. Editáveis em `data/assumptions.csv`; qualquer mudança regenera os dados.")
     with st.expander("Catálogo de sinais e de intervenções"):
         st.dataframe(world["signals"], hide_index=True, width="stretch")
