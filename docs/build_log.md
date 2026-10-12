@@ -312,7 +312,7 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 
 | Decisão | Escolha | Racional |
 |---|---|---|
-| Causa gestão | Retirada do protótipo e dos dados; o peso (~5,5% das pessoas) foi dividido entre remuneração (10% → 13%) e crescimento (8% → 10,5%), na proporção atual | Decisão do autor: é uma causa possível, mas não é necessária para provar o ponto e desviava o foco. Ela concentrava 27% dos casos em 5 times, e os diretores recebiam 10 ou 11 mensagens quase iguais. Manter a fração total com causa preserva a calibração do turnover (~15%) |
+| Causa gestão | Retirada do protótipo e dos dados; o peso (~5,5% das pessoas) foi dividido entre remuneração (10% → 13%) e crescimento (8% → 10,5%), na proporção atual | Decisão do autor: é uma causa possível, mas não é necessária para provar o ponto e desviava o foco. Ela respondia por 27% dos casos, quase todos em 5 times, e alguns diretores recebiam 10 ou 11 mensagens quase iguais. Manter a fração total com causa preserva a calibração do turnover (~15%) |
 | Lucía | Passa a ser um caso de crescimento com dois sinais; o roteiro mantém o papel dela (recomendação rejeitada): se o gestor dá um aumento em vez de carreira e projeto, ela sai | Mostra que dinheiro não resolve falta de perspectiva, e com números diferentes dos do Diego |
 | Página inicial | Roteiro de navegação para quem avalia; o status das fases fica só no README | Quem abre o link é a Comp; o status é informação interna |
 | README | Roteiro, ligação com as seções 4.1 a 4.3, cálculo dos números, limitações; também em .docx | Deixar claro o que o protótipo prova e o que não prova |
@@ -321,11 +321,11 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 
 **O que foi construído**
 
-- Causa gestão retirada: sinais de time (troca de gestor, saídas no time, pulso sobre o gestor), tabela de pulso, intervenção "Escalar para a liderança", encaminhamento para a liderança acima, perguntas e textos ligados a ela. Sinais e personagens passam a ter os sinais listados explicitamente (`data/personas.csv`).
+- Causa gestão retirada: sinais de time (troca de gestor, saídas no time, pulso sobre o gestor), tabela de pulso, intervenção "Escalar para a liderança", encaminhamento para a liderança acima, perguntas e textos ligados a ela. Os sinais de cada personagem passam a ser listados explicitamente em `data/personas.csv`.
 - Semente da simulação revista (14): com as sementes 1 a 20, as saídas nos casos abertos variaram de 26 a 52 (média 41; o sistema esperava ~39); a 14 dá 40.
 - Página inicial com roteiro; tabela de opções que quebra linha em telas menores; visão da liderança sem cortes em 1.280 px; números no padrão brasileiro.
 - Teste de ponta a ponta no navegador (`tests/test_e2e_browser.py`).
-- README final e versão .docx.
+- README final e versão .docx (`docs/README.docx`).
 
 **Checagens**
 
