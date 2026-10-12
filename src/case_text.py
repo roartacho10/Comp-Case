@@ -16,7 +16,6 @@ from src.format import brl, num, pct
 CAUSE_PHRASE = {
     "remuneração": "remuneração",
     "crescimento": "crescimento na carreira",
-    "gestor": "dinâmica de gestão do time",
 }
 
 
@@ -44,7 +43,6 @@ def build_case_message(
     evidence: list[dict],
     network_stats: pd.DataFrame,
     a: Assumptions,
-    team_manager_name: str | None,
 ) -> dict:
     """Plain-language case message. Only numbers that change the decision; the detail stays on the engine page."""
     window = a.int("outcome.window_months")
@@ -52,18 +50,10 @@ def build_case_message(
     opts = options.set_index("intervention")
     rec = case["recommended"]
 
-    if case["escalated"]:
-        intro = (
-            f"Oi, {decider}. Trazemos para você um caso do time {case['team_id']}"
-            + (f", liderado por {team_manager_name}" if team_manager_name else "")
-            + f". Os sinais sobre {case['name']} ({case['level']}, {case['area']}) apontam para a dinâmica de gestão do time, "
-            "e não para uma questão individual. Por isso o caso veio para a liderança acima, e não para o gestor direto."
-        )
-    else:
-        intro = (
-            f"Oi, {decider}. Os dados desta semana trouxeram um ponto de atenção sobre **{case['name']}** "
-            f"({case['level']}, {case['area']}) que pode valer uma conversa nas próximas semanas."
-        )
+    intro = (
+        f"Oi, {decider}. Os dados desta semana trouxeram um ponto de atenção sobre **{case['name']}** "
+        f"({case['level']}, {case['area']}) que pode valer uma conversa nas próximas semanas."
+    )
 
     signals = [f"**{e['label']}:** {e['plain']}" for e in evidence]
 
@@ -117,14 +107,9 @@ def build_case_message(
                 "Carreira e projeto": ("Conversar sobre um próximo passo de carreira e um novo projeto. Isso tem custo "
                                        f"(o seu tempo e o de outras pessoas para desenhar e acompanhar o escopo, e tirar "
                                        f"{person} do que faz hoje), e você o estima melhor do que nós."),
-                "Escalar para a liderança": ("Olhar de perto para o time: uma conversa direta com a equipe e com o "
-                                             "gestor sobre prioridades e apoio. Isso tem custo (sobretudo o seu tempo e o "
-                                             "do RH), e você o estima melhor do que nós."),
             }.get(rec, f"{rec}. Isso tem custo, e você o estima melhor do que nós.")
-            extra = (" Nesses casos, gastar com salário ou com projeto quase não mudou o resultado."
-                     if case["escalated"] else "")
             suggestion = (
-                f"{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses.{extra} "
+                f"{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses. "
                 f"{loss_txt} Por isso, **a iniciativa compensa enquanto o custo total ficar abaixo de cerca de "
                 f"{brl(break_even)}.** A decisão é sua: você conhece o contexto que os dados não mostram."
             )

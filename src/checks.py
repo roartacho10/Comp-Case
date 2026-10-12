@@ -11,8 +11,9 @@ import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
-from src.generator import CAUSES, World
-from src.signals import compute_signals
+from src.generator import World
+from src.personas import persona_signals
+from src.signals import CAUSES, compute_signals
 
 
 def _tol(p: float, n: int) -> float:
@@ -69,7 +70,6 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     expected_causes = {
         "remuneração": a.num("cause.compensation"),
         "crescimento": a.num("cause.growth"),
-        "gestor": world.notes["expected_manager_share"],
         "externa": a.num("cause.external"),
     }
     obs_causes = truth["cause"].value_counts(normalize=True)
@@ -86,21 +86,12 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
         "Prova de que os dados brutos exibem exatamente os sinais definidos pela causa")
 
     p_with, p_without = a.num("signals.prob_with_cause"), a.num("signals.prob_without_cause")
-    team_share = a.num("cause.manager.team_share")
-    ic_share = (active["role"] == "Individual").mean()
-    n_teams = len(team_mgrs)
     for _, s in a.signals.iterrows():
-        if s["level"] == "pessoa":
-            pc = expected_causes[s["component"]]
-            expected = pc * p_with + (1 - pc) * p_without
-            tol = _tol(expected, n)
-        else:
-            team_rate = team_share * p_with + (1 - team_share) * p_without
-            expected = ic_share * team_rate
-            tol = max(0.02, 3 * np.sqrt(team_rate * (1 - team_rate) / n_teams) * ic_share)
+        pc = expected_causes[s["component"]]
+        expected = pc * p_with + (1 - pc) * p_without
+        tol = _tol(expected, n)
         o = observed[s["signal"]].mean()
-        add("Sinais", f"Prevalência: {s['description']}", f"{_pct(expected)} ± {_pct(tol)}", _pct(o), abs(o - expected) <= tol,
-            "Sinal de time: varia com poucos times" if s["level"] == "time" else "")
+        add("Sinais", f"Prevalência: {s['description']}", f"{_pct(expected)} ± {_pct(tol)}", _pct(o), abs(o - expected) <= tol)
 
     comp = dict(zip(a.signals["signal"], a.signals["component"]))
     counts = pd.DataFrame({c: observed[[s for s in observed.columns if comp[s] == c]].sum(axis=1) for c in CAUSES})
@@ -152,10 +143,11 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     cases = engine.cases.set_index("employee_id")
     comp = dict(zip(a.signals["signal"], a.signals["component"]))
     by_cause = dict(zip(a.interventions["target_cause"], a.interventions["intervention"]))
+    script = a.personas.set_index("persona_id")
     for _, p in pub["personas"].iterrows():
         emp, label = p["employee_id"], p["name"]
-        cause = a.personas.set_index("persona_id").loc[p["persona_id"], "cause"]
-        expected = sorted(s for s in comp if comp[s] == cause)
+        cause = script.loc[p["persona_id"], "cause"]
+        expected = persona_signals(script.loc[p["persona_id"]])
         found = sorted(s for s in engine.signals.columns if engine.signals.loc[emp, s])
         add("Personagens", f"{label}: sinais encontrados pelo motor", ", ".join(expected), ", ".join(found), found == expected)
         ok_case = emp in cases.index
@@ -164,7 +156,8 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
         add("Personagens", f"{label}: recomendação", by_cause[cause], cases.loc[emp, "recommended"] if ok_case else "—",
             ok_case and cases.loc[emp, "recommended"] == by_cause[cause])
         others = int((cases["decision_maker_id"] == p["decision_maker_id"]).sum()) - 1
-        add("Personagens", f"{label}: outros casos com o mesmo decisor", "≥ 3", str(others), others >= 3)
+        add("Personagens", f"{label}: outros casos com o mesmo decisor", "≥ 2", str(others), others >= 2,
+            "Para o retorno comparar a previsão de quem decide em mais de um caso")
     accuracy = (hid["truth"].set_index("employee_id").loc[cases.index, "cause"] == cases["cause"]).mean()
     add("Motor", "Casos abertos em T0", "—", str(len(cases)), True)
     add("Motor", "Causa provável igual à causa verdadeira (informativo)", "—", _pct(accuracy), True,

@@ -1,13 +1,10 @@
 persona_id,intervention,stays,exit_month,performing,note
 P1,Ajuste salarial,True,,True,O ajuste reduziu a defasagem; ela recusou as propostas externas.
 P1,Carreira e projeto,False,4.0,False,Ela aceitou a proposta de uma fintech com salário 30% acima.
-P1,Escalar para a liderança,False,4.0,False,Ela aceitou a proposta de uma fintech com salário 30% acima.
 P1,Monitorar,False,4.0,False,Ela aceitou a proposta de uma fintech com salário 30% acima.
 P2,Carreira e projeto,False,5.0,False,"Ele assumiu a liderança de um squad, mas recebeu uma oferta externa muito acima. Na entrevista de desligamento: o novo escopo ajudou; a diferença da oferta decidiu."
 P2,Ajuste salarial,False,3.0,False,Ele aceitou uma posição de liderança em outra empresa.
-P2,Escalar para a liderança,False,3.0,False,Ele aceitou uma posição de liderança em outra empresa.
 P2,Monitorar,False,3.0,False,Ele aceitou uma posição de liderança em outra empresa.
-P3,Escalar para a liderança,True,,True,A liderança conversou com a equipe e ela mudou de time no mês 2.
-P3,Ajuste salarial,False,5.0,False,"Ela recebeu o ajuste, mas não ficou. Na entrevista de desligamento: falta de clareza e de apoio da gestão."
-P3,Carreira e projeto,False,4.0,False,Na entrevista de desligamento: falta de clareza e de apoio da gestão.
-P3,Monitorar,False,3.0,False,Na entrevista de desligamento: falta de clareza e de apoio da gestão.
+P3,Carreira e projeto,True,,True,Ela assumiu as contas estratégicas e passou a acompanhar quem chega ao time.
+P3,Ajuste salarial,False,5.0,False,"Ela recebeu o ajuste, mas não ficou. Na entrevista de desligamento: faltava perspectiva de crescimento."
+P3,Monitorar,False,4.0,False,Na entrevista de desligamento: faltava perspectiva de crescimento.

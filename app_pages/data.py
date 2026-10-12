@@ -15,10 +15,10 @@ with st.expander("A ordem de geração"):
     st.markdown(
         """
 1. **Esqueleto:** país, área e nível de cada pessoa, times e gestores.
-2. **Causa oculta de risco:** remuneração, crescimento, gestor, externa ou nenhuma. A causa “gestor” nasce no time: alguns gestores têm problema de relação com o time.
-3. **Sinais ativos:** cada sinal aparece com uma chance maior quando a sua causa existe, no nível em que o sinal existe (pessoa ou time).
-4. **Dados brutos:** salários, datas, pulsos e anotações construídos para exibir exatamente esses sinais.
-5. **Histórico:** admissões, promoções, reajustes, trocas de gestor e saídas dos últimos 12 meses.
+2. **Causa oculta de risco:** remuneração, crescimento, externa (mudança de cidade, de carreira, vida pessoal) ou nenhuma.
+3. **Sinais ativos:** cada sinal aparece com uma chance maior quando a sua causa existe.
+4. **Dados brutos:** salários, datas e anotações construídos para exibir exatamente esses sinais.
+5. **Histórico:** admissões, promoções, reajustes e saídas dos últimos 12 meses.
 6. **Rede da Comp:** casos fechados de outras empresas, gerados pelas mesmas regras.
 
 A causa oculta fica fora do app: o sistema só enxerga os dados brutos e os sinais calculados a partir deles.
@@ -78,7 +78,6 @@ with tab_tables:
         "events": "Eventos",
         "benchmark": "Benchmark da Comp",
         "managers": "Gestores",
-        "pulse": "Pulso",
         "context": "Contexto (anotações e atas)",
         "network_companies": "Rede: empresas",
         "network_cases": "Rede: casos fechados",

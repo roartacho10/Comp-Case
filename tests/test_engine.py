@@ -17,13 +17,12 @@ def setup():
     return a, world, engine, ctx
 
 
-def test_manager_cause_is_escalated(setup):
+def test_case_goes_to_the_person_manager(setup):
     a, world, engine, ctx = setup
-    cases = engine.cases
-    managers = world.public["managers"].set_index("manager_id")
-    for _, c in cases[cases["cause"] == "gestor"].iterrows():
-        team_mgr = world.public["hris"].set_index("employee_id").loc[c["employee_id"], "manager_id"]
-        assert c["decision_maker_id"] == managers.loc[team_mgr, "superior_id"]
+    hris = world.public["hris"].set_index("employee_id")
+    for _, c in engine.cases.iterrows():
+        assert c["decision_maker_id"] == hris.loc[c["employee_id"], "manager_id"]
+    assert set(engine.cases["cause"]) <= {"remuneração", "crescimento"}
 
 
 def test_recommendation_has_highest_positive_expected_value(setup):
@@ -53,7 +52,7 @@ def test_simulation_is_deterministic_and_independent_of_persona_choices(setup):
 @pytest.mark.parametrize("pid,intervention,stays,month", [
     ("P1", "Ajuste salarial", True, None), ("P1", MONITOR, False, 4),
     ("P2", "Carreira e projeto", False, 5),
-    ("P3", "Escalar para a liderança", True, None), ("P3", "Ajuste salarial", False, 5),
+    ("P3", "Carreira e projeto", True, None), ("P3", "Ajuste salarial", False, 5), ("P3", MONITOR, False, 4),
 ])
 def test_persona_scripts(setup, pid, intervention, stays, month):
     a, world, engine, ctx = setup

@@ -1,4 +1,4 @@
-"""Signals computed from raw data only (HRIS, events, managers, pulse, context).
+"""Signals computed from raw data only (HRIS, events, benchmark, context).
 
 This is what the system can observe. It never reads the hidden truth. In Phase 1 it
 proves that the generated raw data reproduces exactly the signals drawn by the
@@ -13,6 +13,7 @@ from src.assumptions import Assumptions
 
 DAYS_PER_MONTH = 30.4375
 DAYS_PER_YEAR = 365.25
+CAUSES = ["remuneração", "crescimento"]  # causes the platform can detect and act on
 
 CONTEXT_EVENT_TO_SIGNAL = {
     "proposta_externa": "external_offer",
@@ -72,25 +73,5 @@ def compute_signals(tables: dict[str, pd.DataFrame], a: Assumptions) -> pd.DataF
         events = [e for e, s in CONTEXT_EVENT_TO_SIGNAL.items() if s == signal]
         ids = set(recent.loc[recent["extracted_event"].isin(events), "employee_id"])
         out[signal] = out.index.isin(ids)
-
-    # Manager (team-level signals are shared by every member of the team)
-    managers = tables["managers"].set_index("team_id")
-    team_start = pd.to_datetime(managers["team_start_date"].dropna())
-    changed = (t0 - team_start).dt.days <= a.num("signals.manager_change_months") * DAYS_PER_MONTH
-    changed_teams = set(changed[changed].index)
-    is_member = active["role"] == "Individual"
-    out["manager_change"] = is_member & active["team_id"].isin(changed_teams)
-
-    exits = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")].copy()
-    exits = exits[
-        (t0 - pd.to_datetime(exits["exit_date"])).dt.days
-        <= a.num("signals.team_exits_window_months") * DAYS_PER_MONTH
-    ]
-    counts = exits.groupby("team_id").size()
-    hot_teams = set(counts[counts >= a.int("signals.team_exits_min")].index)
-    out["team_exits"] = is_member & active["team_id"].isin(hot_teams)
-
-    pulse = tables["pulse"].sort_values("date").groupby("employee_id").last()["score"]
-    out["pulse_manager"] = out.index.map(pulse).fillna(5) <= a.num("signals.pulse_max_score")
 
     return out[a.signals["signal"].tolist()].astype(bool)

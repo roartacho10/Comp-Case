@@ -1,10 +1,7 @@
-signal,component,level,source,description,manager_label
-compa_below,remuneração,pessoa,estruturado,"Salário abaixo do mercado (compa-ratio abaixo do limiar, benchmark da Comp)",Salário abaixo do mercado
-no_raise,remuneração,pessoa,estruturado,Sem mudança salarial (promoção ou reajuste) há mais que o limiar,Sem aumento há muito tempo
-external_offer,remuneração,pessoa,contexto,Menção a propostas externas em conversa de carreira,Comentou sobre propostas de fora
-time_in_level,crescimento,pessoa,estruturado,Tempo no nível acima do múltiplo da referência do nível,Muito tempo sem promoção
-tenure_milestone,crescimento,pessoa,estruturado,Completa um marco de tempo de casa nos próximos meses,Perto de um marco de tempo de casa
-growth_request,crescimento,pessoa,contexto,Fim de projeto sem novo escopo ou pedido de crescimento sem plano,"Quer crescer, sem um plano definido"
-manager_change,gestor,time,estruturado,O time trocou de gestor recentemente,O time trocou de gestor recentemente
-team_exits,gestor,time,estruturado,Saídas voluntárias recentes no time,Saídas recentes no time
-pulse_manager,gestor,pessoa,estruturado,Nota baixa no pulso sobre clareza e apoio do gestor,Avaliou mal o apoio que recebe do gestor
+signal,component,source,description,manager_label
+compa_below,remuneração,estruturado,"Salário abaixo do mercado (compa-ratio abaixo do limiar, benchmark da Comp)",Salário abaixo do mercado
+no_raise,remuneração,estruturado,Sem mudança salarial (promoção ou reajuste) há mais que o limiar,Sem aumento há muito tempo
+external_offer,remuneração,contexto,Menção a propostas externas em conversa de carreira,Comentou sobre propostas de fora
+time_in_level,crescimento,estruturado,Tempo no nível acima do múltiplo da referência do nível,Muito tempo sem promoção
+tenure_milestone,crescimento,estruturado,Completa um marco de tempo de casa nos próximos meses,Perto de um marco de tempo de casa
+growth_request,crescimento,contexto,Fim de projeto sem novo escopo ou pedido de crescimento sem plano,"Quer crescer, sem um plano definido"

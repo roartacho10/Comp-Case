@@ -109,7 +109,7 @@ SCHEMAS = {
     "extract": {
         "type": "object",
         "properties": {
-            "signal": {"type": "string", "enum": ["external_offer", "growth_request", "manager_relationship", "none"]},
+            "signal": {"type": "string", "enum": ["external_offer", "growth_request", "none"]},
             "quote": STRING,
         },
         "required": ["signal", "quote"],

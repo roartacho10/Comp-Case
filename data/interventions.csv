@@ -1,5 +1,4 @@
 intervention,target_cause,cost_rule,cost_key
 Ajuste salarial,remuneração,share_of_annual_cost,cost.compensation_share
 Carreira e projeto,crescimento,fixed,cost.growth
-Escalar para a liderança,gestor,fixed,cost.escalate
 Monitorar,,fixed,cost.monitor

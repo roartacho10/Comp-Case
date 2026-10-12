@@ -19,8 +19,6 @@ def messages():
     w = generate_world(a)
     eng = run_engine(w.public, a)
     cases = eng.cases.set_index("employee_id")
-    hris = w.public["hris"].set_index("employee_id")
-    mgrs = w.public["managers"].set_index("manager_id")
     out = {}
     for _, p in w.public["personas"].iterrows():
         emp = p["employee_id"]
@@ -28,7 +26,7 @@ def messages():
         active = [s for s in eng.signals.columns if eng.signals.loc[emp, s]]
         out[p["persona_id"]] = (case, build_case_message(
             case, eng.options[eng.options["employee_id"] == emp], signal_evidence(w.public, a, emp, active),
-            eng.network_stats, a, mgrs.loc[hris.loc[emp, "manager_id"], "name"]))
+            eng.network_stats, a))
     return out
 
 
@@ -42,10 +40,10 @@ def test_messages_guide_and_never_label(messages):
         assert len(msg["questions"]) == 3
 
 
-def test_escalated_message_explains_routing(messages):
-    case, msg = messages["P3"]
-    assert case["escalated"]
-    assert "liderança acima" in msg["intro"] and "não para uma questão individual" in msg["intro"]
+def test_personas_suggestions_follow_their_cause(messages):
+    expected = {"P1": "Ajuste salarial", "P2": "Carreira e projeto", "P3": "Carreira e projeto"}
+    for pid, (case, msg) in messages.items():
+        assert case["recommended"] == expected[pid], pid
 
 
 def test_rejection_requires_justification():
@@ -56,6 +54,6 @@ def test_rejection_requires_justification():
     next(b for b in at.button if b.label == "Registrar decisão").click().run()
     assert any("caminho diferente da sugestão" in e.value for e in at.error)
     assert "P3" not in at.session_state["persona_decisions"]
-    at.text_area[0].input("Está abaixo do mercado.").run()
+    at.text_area[0].input("Acho que um aumento resolve.").run()
     next(b for b in at.button if b.label == "Registrar decisão").click().run()
     assert at.session_state["persona_decisions"]["P3"]["intervention"] == "Ajuste salarial"

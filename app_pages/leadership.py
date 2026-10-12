@@ -5,6 +5,7 @@ import streamlit as st
 from src.app_data import assumptions, load_world
 from src.format import brl, num, pct
 from src.leadership import at_t0
+from src.signals import CAUSES
 from src.state import current_decisions, dates, month_label, results
 from src import ai
 from src.state import ai_badge, ai_on
@@ -55,11 +56,11 @@ left, right = st.columns([3, 2], gap="large")
 with left:
     st.markdown("**Casos abertos por área e causa provável**")
     ac = view["area_cause"]
-    grid = pd.MultiIndex.from_product([sorted(ac["area"].unique()), ["remuneração", "crescimento", "gestor"]],
+    grid = pd.MultiIndex.from_product([sorted(ac["area"].unique()), CAUSES],
                                       names=["area", "cause"])
     ac = ac.set_index(["area", "cause"]).reindex(grid, fill_value=0).reset_index()
     base = alt.Chart(ac).encode(
-        x=alt.X("cause:N", title=None, sort=["remuneração", "crescimento", "gestor"], axis=alt.Axis(labelAngle=0, orient="top")),
+        x=alt.X("cause:N", title=None, sort=CAUSES, axis=alt.Axis(labelAngle=0, orient="top")),
         y=alt.Y("area:N", title=None),
     )
     heat = base.mark_rect(cornerRadius=6, stroke="#FFFFFF", strokeWidth=2).encode(
@@ -83,7 +84,7 @@ with right:
         "% do time": [pct(x, 0) for x in teams["share"]],
         "Causa predominante": teams["cause"],
     }), hide_index=True, width="stretch")
-    st.caption("Times em que a causa predominante é gestão indicam onde a liderança acima pode olhar primeiro.")
+    st.caption("Ajuda a liderança a decidir onde apoiar primeiro os gestores com mais casos abertos.")
 
 # What is being done ------------------------------------------------------------------
 st.subheader("O que está sendo feito")

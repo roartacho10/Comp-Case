@@ -3,7 +3,7 @@
 Generation follows the causal order of the world:
 1. skeleton (country, area, level, teams, managers)
 2. hidden cause of risk
-3. active signals, drawn from the cause (at the level where each signal exists: person or team)
+3. active signals, drawn from the cause
 4. raw data built to exhibit exactly those signals
 5. event history consistent with the raw data
 6. the Comp network: closed cases from other companies, under the same rules
@@ -20,9 +20,8 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.names import unique_name
-from src.signals import DAYS_PER_MONTH, DAYS_PER_YEAR, milestone_active, milestones
+from src.signals import CAUSES, DAYS_PER_MONTH, DAYS_PER_YEAR, milestone_active, milestones
 
-CAUSES = ["remuneração", "crescimento", "gestor"]
 NO_CAUSE, EXTERNAL = "nenhuma", "externa"
 IC, TEAM_MANAGER, LEADER = "Individual", "Gestor de time", "Liderança"
 MANAGER_LEVEL = "Gestor"
@@ -153,37 +152,14 @@ def generate_world(a: Assumptions) -> World:
         manager_id[manager_of_team[tid]] = superior
 
     # 2. Hidden cause -----------------------------------------------------------
-    k_problem = int(round(a.num("cause.manager.team_share") * n_teams))
-    problem_teams = set(rng.choice(team_ids, size=k_problem, replace=False)) if k_problem else set()
-    member_prob = a.num("cause.manager.member_prob")
-    in_problem_team = np.array([role[i] == IC and team_of[i] in problem_teams for i in range(n)])
-    expected_manager_share = member_prob * in_problem_team.sum() / n
-    other = {
-        "remuneração": a.num("cause.compensation"),
-        "crescimento": a.num("cause.growth"),
-        EXTERNAL: a.num("cause.external"),
-    }
-    scale = 1 / (1 - expected_manager_share)
-    probs = {k: v * scale for k, v in other.items()}
-    probs[NO_CAUSE] = 1 - sum(probs.values())
-    cause = np.empty(n, dtype=object)
-    for i in range(n):
-        if in_problem_team[i] and rng.random() < member_prob:
-            cause[i] = "gestor"
-        else:
-            cause[i] = rng.choice(list(probs), p=list(probs.values()))
+    probs = cause_probabilities(a)
+    cause = np.array([rng.choice(list(probs), p=list(probs.values())) for _ in range(n)], dtype=object)
 
     # 3. Active signals ---------------------------------------------------------
     drawn = pd.DataFrame(index=ids)
-    team_signal_state = {}
     for _, s in signals.iterrows():
-        if s["level"] == "pessoa":
-            p = np.where(cause == s["component"], p_with, p_without)
-            drawn[s["signal"]] = rng.random(n) < p
-        else:
-            state = {t: rng.random() < (p_with if t in problem_teams else p_without) for t in team_ids}
-            team_signal_state[s["signal"]] = state
-            drawn[s["signal"]] = [role[i] == IC and state[team_of[i]] for i in range(n)]
+        p = np.where(cause == s["component"], p_with, p_without)
+        drawn[s["signal"]] = rng.random(n) < p
 
     # 4. Raw data ---------------------------------------------------------------
     medians = a.group("market.median")
@@ -197,19 +173,8 @@ def generate_world(a: Assumptions) -> World:
     window_days = a.num("signals.milestone_window_months") * DAYS_PER_MONTH
     tmin_days = a.num("structure.tenure_min_months") * DAYS_PER_MONTH
     tmax_days = a.num("structure.tenure_max_months") * DAYS_PER_MONTH
-    change_days = a.num("signals.manager_change_months") * DAYS_PER_MONTH
     max_no_raise_days = a.num("generation.max_months_without_raise") * DAYS_PER_MONTH
     tl_extra_days = a.num("generation.time_in_level_extra_months") * DAYS_PER_MONTH
-    max_change_days = a.num("generation.max_months_since_manager_change") * DAYS_PER_MONTH
-
-    # Team manager start dates (team-level signal: manager change)
-    team_start_days = {}
-    for tid in team_ids:
-        if team_signal_state["manager_change"][tid]:
-            team_start_days[tid] = rng.uniform(15, change_days - 10)
-        else:
-            team_start_days[tid] = rng.uniform(change_days + 10, max_change_days)
-    start_needed = {manager_of_team[t]: d for t, d in team_start_days.items()}
 
     rows, events = [], []
     for i in range(n):
@@ -231,7 +196,7 @@ def generate_world(a: Assumptions) -> World:
             mr = rng.uniform(30, no_raise_days - 10)
         if tl is None:
             tl = rng.uniform(max(mr, 30), level_thr - 10) if max(mr, 30) < level_thr - 10 else mr
-        min_tenure = max(tl, start_needed.get(i, 0), tmin_days)
+        min_tenure = max(tl, tmin_days)
 
         if sig["tenure_milestone"]:
             options = []
@@ -270,37 +235,13 @@ def generate_world(a: Assumptions) -> World:
             events.append(dict(employee_id=ids[i], date=pay_change.date(), event="reajuste", detail=""))
 
     hris = pd.DataFrame(rows)
-    hire_by_id = dict(zip(hris["employee_id"], pd.to_datetime(hris["hire_date"])))
-    for tid in team_ids:
-        start = _days_ago(t0, team_start_days[tid])
-        for i in np.where((team_of == tid) & (role == IC))[0]:
-            if hire_by_id[ids[i]] < start:
-                events.append(dict(employee_id=ids[i], date=start.date(), event="troca de gestor",
-                                   detail=f"novo gestor: {ids[manager_of_team[tid]]}"))
 
     # 5. Exit history -----------------------------------------------------------
     p_no, p_yes = a.num("exit.annual_prob_no_cause"), a.num("exit.annual_prob_with_cause")
     expected_turnover = float(np.mean(np.where(cause == NO_CAUSE, p_no, p_yes)))
     hist_days = a.num("history.months") * DAYS_PER_MONTH
-    exit_window = a.num("signals.team_exits_window_months") * DAYS_PER_MONTH
-    exits_min = a.int("signals.team_exits_min")
     n_hist = int(round(n * expected_turnover * a.num("history.months") / 12))
-    n_recent = int(round(n_hist * exit_window / hist_days))
-
-    exit_rows = []  # (team_id, days_ago)
-    hot = [t for t in team_ids if team_signal_state["team_exits"][t]]
-    cold = [t for t in team_ids if not team_signal_state["team_exits"][t]]
-    for t in hot:
-        for _ in range(int(rng.integers(exits_min, exits_min + 2))):
-            exit_rows.append((t, rng.uniform(5, exit_window - 5)))
-    remaining_recent = max(0, n_recent - len(exit_rows))
-    per_cold_max = exits_min - 1
-    cold_slots = [t for t in cold for _ in range(per_cold_max)]
-    rng.shuffle(cold_slots)
-    for t in cold_slots[:remaining_recent]:
-        exit_rows.append((t, rng.uniform(5, exit_window - 5)))
-    for _ in range(max(0, n_hist - len(exit_rows))):
-        exit_rows.append((team_ids[rng.integers(len(team_ids))], rng.uniform(exit_window + 5, hist_days - 5)))
+    exit_rows = [(team_ids[rng.integers(len(team_ids))], rng.uniform(5, hist_days - 5)) for _ in range(n_hist)]
 
     ic_level_dist = {k: v for k, v in a.distribution("population.level").items() if k != MANAGER_LEVEL}
     ic_level_dist = {k: v / sum(ic_level_dist.values()) for k, v in ic_level_dist.items()}
@@ -329,17 +270,7 @@ def generate_world(a: Assumptions) -> World:
         events.append(dict(employee_id=eid, date=exit_date.date(), event="desligamento voluntário", detail=""))
     hris = pd.concat([hris, pd.DataFrame(former)], ignore_index=True)
 
-    # Pulse and context ---------------------------------------------------------
-    pulse_max = a.int("signals.pulse_max_score")
-    pulse = pd.DataFrame(
-        dict(
-            employee_id=ids,
-            date=[_days_ago(t0, rng.uniform(3, 30)).date() for _ in range(n)],
-            question="Tenho clareza e apoio do meu gestor",
-            score=[int(rng.integers(1, pulse_max + 1)) if s else int(rng.integers(pulse_max + 1, 6))
-                   for s in drawn["pulse_manager"]],
-        )
-    )
+    # Context -------------------------------------------------------------------
     ctx_window = a.num("signals.context_window_months") * DAYS_PER_MONTH
     neutral_share = a.num("generation.neutral_context_share")
     context = []
@@ -367,12 +298,11 @@ def generate_world(a: Assumptions) -> World:
     for tid in team_ids:
         p = manager_of_team[tid]
         mgr_rows.append(dict(manager_id=ids[p], name=names[p], area=team_area[tid], team_id=tid, role=TEAM_MANAGER,
-                             superior_id=superior_of_team[tid], n_reports=int(((team_of == tid) & (role == IC)).sum()),
-                             team_start_date=_days_ago(t0, team_start_days[tid]).date()))
+                             superior_id=superior_of_team[tid], n_reports=int(((team_of == tid) & (role == IC)).sum())))
     for ar, people in leaders_by_area.items():
         for p in people:
             mgr_rows.append(dict(manager_id=ids[p], name=names[p], area=ar, team_id=None, role=LEADER,
-                                 superior_id=None, n_reports=int((manager_id == ids[p]).sum()), team_start_date=None))
+                                 superior_id=None, n_reports=int((manager_id == ids[p]).sum())))
     managers = pd.DataFrame(mgr_rows)
 
     benchmark = pd.DataFrame(
@@ -386,16 +316,12 @@ def generate_world(a: Assumptions) -> World:
         events=pd.DataFrame(events).sort_values(["date", "employee_id"]).reset_index(drop=True),
         benchmark=benchmark,
         managers=managers,
-        pulse=pulse,
         context=context,
     )
     world.hidden = dict(
-        truth=pd.DataFrame(dict(employee_id=ids, cause=cause, in_problem_team=in_problem_team)).join(
-            drawn.reset_index(drop=True)
-        ),
-        problem_teams=pd.DataFrame(dict(team_id=sorted(problem_teams))),
+        truth=pd.DataFrame(dict(employee_id=ids, cause=cause)).join(drawn.reset_index(drop=True)),
     )
-    world.notes = dict(expected_turnover=expected_turnover, expected_manager_share=expected_manager_share)
+    world.notes = dict(expected_turnover=expected_turnover)
 
     # 6. Network ----------------------------------------------------------------
     # Scripted personas replace three generated employees (data/personas.csv).
@@ -407,11 +333,19 @@ def generate_world(a: Assumptions) -> World:
     per_cause = np.stack([final[[s for s in comp_of if comp_of[s] == c]].sum(axis=1) for c in CAUSES], axis=1)
     case_rate = float((per_cause.max(axis=1) >= a.int("case.min_signals_same_cause")).mean())
     world.notes["case_rate"] = case_rate
-    network, network_truth, companies = generate_network(a, rng, expected_manager_share, case_rate)
+    network, network_truth, companies = generate_network(a, rng, case_rate)
     world.public["network_companies"] = companies
     world.public["network_cases"] = network
     world.hidden["network_truth"] = network_truth
     return world
+
+
+def cause_probabilities(a: Assumptions) -> dict[str, float]:
+    """Share of people with each hidden cause; the rest have no cause of risk."""
+    probs = {"remuneração": a.num("cause.compensation"), "crescimento": a.num("cause.growth"),
+             EXTERNAL: a.num("cause.external")}
+    probs[NO_CAUSE] = 1 - sum(probs.values())
+    return probs
 
 
 def intervention_effect(a: Assumptions, intervention: str, true_cause: str) -> float:
@@ -442,7 +376,7 @@ def _trunc_normal_vec(rng, mean, sd, lo, hi) -> np.ndarray:
     return x
 
 
-def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float):
+def generate_network(a: Assumptions, rng, case_rate: float):
     """Closed cases at other Comp clients, generated by the same world rules (signals drawn per person).
 
     Network size follows from the assumptions: employees across the client base x the share of employees
@@ -476,9 +410,7 @@ def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float
     years_of_decisions = (max_months - min_months) / 12
     n_cases = int(round(companies["employees"].sum() * case_rate * years_of_decisions))
 
-    cause_probs = {"remuneração": a.num("cause.compensation"), "crescimento": a.num("cause.growth"),
-                   "gestor": manager_share, EXTERNAL: a.num("cause.external")}
-    cause_probs[NO_CAUSE] = 1 - sum(cause_probs.values())
+    cause_probs = cause_probabilities(a)
     cause_labels = np.array(list(cause_probs), dtype=object)
 
     # Candidates are drawn in batches; only those whose signals open a case enter the network.
@@ -528,7 +460,7 @@ def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float
     compa = _trunc_normal_vec(rng, cmean, csd, np.where(below, cmin, thr + 0.003), np.where(below, thr - 0.003, cmax))
     annual_cost = np.round(compa * np.array([medians[l] for l in level]) * np.array([factors[c] for c in country]), -2)
 
-    # Outcome after 6 months.
+    # Outcome after the outcome window.
     p_no, p_yes = a.num("exit.annual_prob_no_cause"), a.num("exit.annual_prob_with_cause")
     eff_right, eff_wrong = a.num("intervention.effect_right"), a.num("intervention.effect_wrong")
     target = np.array([target_of[x] for x in chosen], dtype=object)

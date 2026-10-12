@@ -5,6 +5,7 @@ from src import simulation
 from src.app_data import assumptions, load_world
 from src.engine import MONITOR, comparable_cases, signal_evidence
 from src.format import brl, num, pct, pp
+from src.signals import CAUSES
 from src.state import results
 from src.ui import synthetic_data_banner
 
@@ -30,9 +31,8 @@ st.session_state.setdefault("advanced", False)
 
 # Overview --------------------------------------------------------------------
 st.subheader("Visão geral em T0")
-c1, c2, c3, c4 = st.columns(4)
+c1, c3, c4 = st.columns(3)
 c1.metric("Casos abertos", len(cases))
-c2.metric("Escalados (causa gestor)", int(cases["escalated"].sum()))
 c3.metric("Empates de causa", int(cases["tie"].sum()))
 c4.metric(f"Saída voluntária média em {W} meses", pct(engine.company_exit_window))
 by = cases.groupby(["cause", "recommended"]).size().unstack(fill_value=0)
@@ -50,13 +50,7 @@ case = cases.loc[emp]
 persona_id = next((pid for pid, p in personas.iterrows() if p["employee_id"] == emp), None)
 
 decider = case["decision_maker_name"] or "—"
-if case["escalated"]:
-    st.warning(
-        f"Causa provável ligada à gestão: o caso vai para **{decider}**, liderança acima do gestor do time. "
-        "O sistema não recomenda gasto antes de verificar a causa."
-    )
-else:
-    st.info(f"Quem decide: **{decider}** (gestor do time).")
+st.info(f"Quem decide: **{decider}** (gestor do time).")
 
 st.markdown(f"**{case['name']}** · {case['level']} · {case['area']} · {case['country']} · time {case['team_id']}")
 
@@ -74,7 +68,7 @@ st.dataframe(
 if case["tie"]:
     st.warning(
         f"**Empate entre causas: {case['tied_causes']}.** As duas têm o mesmo número de sinais. "
-        f"Os números abaixo usam {case['cause']} (primeira na ordem fixa: remuneração, crescimento, gestor). "
+        f"Os números abaixo usam {case['cause']} (primeira na ordem fixa: remuneração, crescimento). "
         "A definição da causa fica com quem decide, depois das perguntas ao colaborador."
     )
 st.markdown(
@@ -138,7 +132,7 @@ if persona_id:
             interventions = opts["intervention"].tolist()
             chosen = st.radio("Intervenção", interventions, index=interventions.index(case["recommended"]))
             belief = st.selectbox("Causa em que você acredita", case["tied_causes"].split(", ") +
-                                  [c for c in ("remuneração", "crescimento", "gestor") if c not in case["tied_causes"]])
+                                  [c for c in CAUSES if c not in case["tied_causes"]])
             prediction = st.slider(f"Chance de a pessoa ficar em {W} meses (%)", 0, 100, 80, 5)
             justification = st.text_area("Justificativa (obrigatória se a escolha diverge da recomendação)")
             if st.form_submit_button("Registrar decisão"):

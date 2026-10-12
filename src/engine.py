@@ -2,7 +2,7 @@
 
 Flow per employee: signals -> case (2+ signals of the same cause) -> probable cause (ties shown, human
 decides) -> risk if nothing is done (network) -> expected value of each intervention over the horizon
-the person would still stay -> recommendation, comparable cases and who decides.
+the person would still stay -> recommendation, comparable cases and who decides (the team manager).
 """
 
 from __future__ import annotations
@@ -14,9 +14,8 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.format import num
-from src.signals import DAYS_PER_MONTH, compute_signals
+from src.signals import CAUSES, DAYS_PER_MONTH, compute_signals
 
-CAUSES = ["remuneração", "crescimento", "gestor"]
 MONITOR = "Monitorar"
 
 
@@ -110,12 +109,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
         tied = [c for c in CAUSES if counts.loc[emp, c] == top[emp]]
         cause = tied[0]
         k = int(counts.loc[emp, cause])
-        # Who decides: manager cause goes one level up.
-        if person["role"] == "Individual":
-            team_mgr = team_manager_of.get(person["team_id"])
-            decider = managers.loc[team_mgr, "superior_id"] if cause == "gestor" else team_mgr
-        else:
-            decider = person["manager_id"]
+        # Who decides: the person's manager (the team manager for team members).
+        decider = team_manager_of.get(person["team_id"]) if person["role"] == "Individual" else person["manager_id"]
         decider = decider if isinstance(decider, str) else None
 
         # Risk if nothing is done: same cause and same number of signals (monitored cases).
@@ -180,7 +175,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             employee_id=emp, name=person["name"], area=person["area"], team_id=person["team_id"], level=person["level"],
             country=person["country"], role=person["role"], decision_maker_id=decider,
             decision_maker_name=managers.loc[decider, "name"] if decider in managers.index else None,
-            escalated=cause == "gestor", cause=cause, tied_causes=", ".join(tied), tie=len(tied) > 1,
+            cause=cause, tied_causes=", ".join(tied), tie=len(tied) > 1,
             n_signals=k, signals=", ".join(s for s in signals.columns if signals.loc[emp, s]),
             exit_window_no_action=float(exit_w), exit_window_lo=float(1 - base["stay_hi"]), exit_window_hi=float(1 - base["stay_lo"]),
             exit_window_n=int(base["n"]), risk_multiple=float(exit_w / company_exit_window) if company_exit_window else np.nan,
@@ -234,23 +229,6 @@ def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id
         elif s in ("external_offer", "growth_request"):
             ev = " / ".join(notes)
             plain = ev[0].lower() + ev[1:] if ev else ""
-        elif s == "manager_change":
-            mgr = tables["managers"].set_index("team_id").loc[p["team_id"]]
-            months = (t0 - pd.Timestamp(mgr["team_start_date"])).days / DAYS_PER_MONTH
-            ev = f"O time {p['team_id']} trocou de gestor há {months:.0f} meses"
-            plain = f"a troca aconteceu há {months:.0f} meses."
-        elif s == "team_exits":
-            ex = tables["hris"]
-            ex = ex[(ex["team_id"] == p["team_id"]) & (ex["status"] == "desligado") & (ex["exit_type"] == "voluntário")]
-            window = a.int("signals.team_exits_window_months")
-            ex = ex[(t0 - pd.to_datetime(ex["exit_date"])).dt.days <= window * DAYS_PER_MONTH]
-            ev = f"{len(ex)} saídas voluntárias no time nos últimos {window} meses"
-            plain = f"{len(ex)} pessoas do time pediram demissão nos últimos {window} meses."
-        elif s == "pulse_manager":
-            pl = tables["pulse"]
-            score = pl[pl["employee_id"] == employee_id].sort_values("date")["score"].iloc[-1]
-            ev = f"Nota {score} de 5 em 'tenho clareza e apoio do meu gestor'"
-            plain = f"na pesquisa interna, deu nota {score} de 5 para \u201ctenho clareza e apoio do meu gestor\u201d."
         else:
             ev, plain = "", ""
         out.append(dict(signal=s, description=catalog.loc[s, "description"], label=catalog.loc[s, "manager_label"],
