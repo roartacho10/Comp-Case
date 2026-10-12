@@ -537,8 +537,9 @@ def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float
     treated = (chosen == right) | (cause == NO_CAUSE)
     perf_p = np.where(treated, a.num("outcome.performing_if_treated"), a.num("outcome.performing_if_untreated"))
     performing = stayed & (rng.random(n_cases) < perf_p)
-    bias, noise = a.num("behavior.prediction_bias_pp") / 100, a.num("behavior.prediction_noise_pp") / 100
-    prediction = np.clip(np.round((1 - p6_after + bias + rng.normal(0, noise, n_cases)) * 20) / 20, 0.05, 0.95)
+    under, noise = a.num("behavior.risk_underestimation"), a.num("behavior.prediction_noise_pp") / 100
+    prediction = np.clip(np.round((1 - p6_after * (1 - under) + rng.normal(0, noise, n_cases)) * 20) / 20,
+                         a.num("behavior.prediction_min"), a.num("behavior.prediction_max"))
     exit_month = np.where(stayed, np.nan, rng.integers(1, 7, n_cases))
 
     cost_rule = dict(zip(inter["intervention"], inter["cost_rule"]))

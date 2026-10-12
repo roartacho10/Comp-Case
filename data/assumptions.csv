@@ -70,8 +70,8 @@ intervenções,cost.replacement_share,0.75,fração do custo anual,"Custo de rep
 resultado,outcome.performing_if_treated,0.9,prob.,"Chance de seguir performando, se ficou e a causa foi tratada (ou não havia causa)",Resolver a causa preserva o engajamento,premissa
 resultado,outcome.performing_if_untreated,0.75,prob.,"Chance de seguir performando, se ficou e a causa não foi tratada",Ficar com a causa sem solução tende a reduzir a entrega,premissa
 comportamento,behavior.status_quo_prob_right,0.3333,prob.,Chance de o gestor escolher a intervenção certa sem o sistema,"Equivale a escolher ao acaso entre as 3 intervenções ativas: sem diagnóstico, a escolha não usa a causa",premissa
-comportamento,behavior.prediction_bias_pp,15,p.p.,"Quanto os gestores superestimam, em média, a chance de a pessoa ficar",Excesso de confiança comum de gestores sobre o próprio time,premissa
-comportamento,behavior.prediction_noise_pp,10,p.p.,Dispersão das previsões dos gestores em torno do viés,Previsões variam entre gestores e casos,premissa
+comportamento,behavior.risk_underestimation,0.5,fração,Quanto os gestores subestimam o risco de saída: preveem (1 − esta fração) do risco real,"Gestores tendem a achar que o próprio time vai ficar; prever metade do risco real gera um viés visível em qualquer nível de risco, ao contrário de um acréscimo fixo em pontos, que esbarra no teto de 95%",premissa
+comportamento,behavior.prediction_noise_pp,5,p.p.,Dispersão das previsões dos gestores em torno do viés,Previsões variam entre gestores e casos; dispersão moderada para não esconder o viés,premissa
 comportamento,behavior.follow_recommendation,0.6,prob.,Chance de o gestor seguir a recomendação do sistema,Adesão parcial: o gestor decide e às vezes discorda,premissa
 casos,case.min_signals_same_cause,2,sinais,Número de sinais da mesma causa para abrir um caso,Um sinal isolado é ruído frequente; dois da mesma causa indicam padrão,premissa
 rede,network.n_companies,500,empresas,Clientes da Comp que formam a rede,Referência do autor: 500 clientes,premissa
@@ -93,3 +93,5 @@ valor esperado,ev.uncertainty_draws,500,sorteios,Sorteios usados para estimar a 
 valor esperado,ev.interval_level,0.8,prob.,Nível do intervalo mostrado para taxas e valores esperados,80% é um intervalo legível para decisão gerencial; 95% seria largo demais para orientar escolhas,premissa (detalhe de cálculo)
 casos,case.comparable_cases,3,casos,Casos comparáveis da rede mostrados em cada caso,Suficiente para dar exemplos concretos sem poluir o caso,premissa (detalhe de cálculo)
 geral,general.simulation_seed,7,-,Semente da simulação dos 6 meses seguintes,"Separada da semente dos dados: avançar 6 meses dá sempre o mesmo resultado, sem alterar os dados de T0",premissa (detalhe de cálculo)
+comportamento,behavior.prediction_max,0.99,prob.,Maior chance de ficar que um gestor simulado prevê,"Ninguém prevê certeza absoluta; um teto mais baixo (ex.: 95%) esconderia o viés, porque a maioria das pessoas em risco fica",premissa (detalhe de cálculo)
+comportamento,behavior.prediction_min,0.01,prob.,Menor chance de ficar que um gestor simulado prevê,Simétrico ao teto,premissa (detalhe de cálculo)

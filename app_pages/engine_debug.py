@@ -178,9 +178,14 @@ if st.session_state["advanced"]:
     m2.metric("Seguiram a recomendação", pct(s["followed"], 0))
     m3.metric("Ficaram em 6 meses", pct(s["stayed"], 0))
     m4.metric("Custo das intervenções (6 meses)", brl(s["cost_6m"]))
+    st.markdown(
+        f"**Saídas nos casos abertos: os gestores esperavam {s['exits_expected_manager']:.0f}, o sistema esperava "
+        f"{s['exits_expected_system']:.0f} e ocorreram {int(s['exits_realized'])}.**"
+    )
     st.caption(
-        f"Previsão média dos gestores: {pct(s['manager_predicted'], 0)} · do sistema: {pct(s['system_predicted'], 0)} · "
-        f"realizado: {pct(s['stayed'], 0)}. Saídas voluntárias na empresa em 6 meses: {int(s['company_exits'])}."
+        f"Em chance de ficar: gestores {pct(s['manager_predicted'], 0)}, sistema {pct(s['system_predicted'], 0)}, "
+        f"realizado {pct(s['stayed'], 0)}. Como a maioria fica, a diferença aparece melhor no número de saídas. "
+        f"Saídas voluntárias na empresa inteira em 6 meses: {int(s['company_exits'])}."
     )
 
     st.markdown("**Personagens: previsto contra realizado**")
@@ -210,7 +215,7 @@ if st.session_state["advanced"]:
     st.caption("Com dezenas de milhares de casos, um cliente quase não move a taxa da rede: o ativo é a rede; "
                "o que se move é o aprendizado do cliente e de cada gestor.")
 
-    st.markdown("**Calibração das previsões (média prevista − realizada)**")
+    st.markdown("**Calibração das previsões por gestor**")
     calib = learn["calibration"]
     deciders = set(personas["decision_maker_id"])
     calib = calib.assign(order=~calib["decision_maker_id"].isin(deciders)).sort_values(["order", "n"], ascending=[True, False])
@@ -220,7 +225,9 @@ if st.session_state["advanced"]:
         "Previsão do gestor": [pct(x, 0) for x in calib["predicted"]],
         "Previsão do sistema": [pct(x, 0) for x in calib["system"]],
         "Realizado": [pct(x, 0) for x in calib["realized"]],
+        "Saídas esperadas pelo gestor": [num(x) for x in calib["exits_expected_manager"]],
+        "Saídas esperadas pelo sistema": [num(x) for x in calib["exits_expected_system"]],
+        "Saídas que ocorreram": [f"{x:.0f}" for x in calib["exits_realized"]],
         "Viés do gestor": [pp(x) for x in calib["bias_pp"]],
-        "Viés do sistema": [pp(x) for x in calib["system_bias_pp"]],
     }), hide_index=True, width="stretch", height=380)
     st.caption("★ decisores dos personagens. Com poucos casos por gestor, a calibração individual ainda é ruidosa.")

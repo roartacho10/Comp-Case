@@ -58,7 +58,7 @@ def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -
     options = inter["intervention"].tolist()
     follow = a.num("behavior.follow_recommendation")
     sq_right = a.num("behavior.status_quo_prob_right")
-    bias = a.num("behavior.prediction_bias_pp") / 100
+    under = a.num("behavior.risk_underestimation")
     noise = a.num("behavior.prediction_noise_pp") / 100
     opts = engine.options.set_index(["employee_id", "intervention"])
     persona_ids = set(ctx.personas["employee_id"])
@@ -77,8 +77,9 @@ def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -
         else:
             pool = [o for o in options if o != right]
             chosen = pool[int(u_pick * len(pool))]
-        true_stay = 1 - _p6(a, cause) * (1 - _effect(a, chosen, cause))
-        prediction = float(np.clip(np.round((true_stay + bias + noise * u_noise) * 20) / 20, 0.05, 0.95))
+        true_exit = _p6(a, cause) * (1 - _effect(a, chosen, cause))
+        prediction = float(np.clip(np.round((1 - true_exit * (1 - under) + noise * u_noise) * 20) / 20,
+                                   a.num("behavior.prediction_min"), a.num("behavior.prediction_max")))
         rows.append(dict(
             employee_id=case["employee_id"], decision_maker_id=case["decision_maker_id"],
             decision_maker_name=case["decision_maker_name"], cause=case["cause"],
@@ -165,12 +166,18 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
         system=("system_prediction", "mean"), realized=("stayed_6m", "mean"),
     ).reset_index()
     calib["bias_pp"] = (calib["predicted"] - calib["realized"]) * 100
+    calib["exits_expected_manager"] = (1 - calib["predicted"]) * calib["n"]
+    calib["exits_expected_system"] = (1 - calib["system"]) * calib["n"]
+    calib["exits_realized"] = (1 - calib["realized"]) * calib["n"]
     calib["system_bias_pp"] = (calib["system"] - calib["realized"]) * 100
 
     summary = pd.DataFrame([dict(
         cases=len(closed), followed=closed["followed"].mean(), stayed=closed["stayed_6m"].mean(),
         performing=closed["performing_6m"].mean(), cost_6m=closed["cost_6m"].sum(),
         manager_predicted=closed["manager_prediction"].mean(), system_predicted=closed["system_prediction"].mean(),
+        exits_expected_manager=(1 - closed["manager_prediction"]).sum(),
+        exits_expected_system=(1 - closed["system_prediction"]).sum(),
+        exits_realized=int((~closed["stayed_6m"]).sum()),
         company_exits=int((~outcomes["stayed_6m"]).sum()), company_regretted=int(outcomes["regretted"].sum()),
     )])
     return dict(closed=closed, rates=rates, calibration=calib, summary=summary)

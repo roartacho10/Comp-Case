@@ -156,4 +156,9 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - A calibração individual dos gestores sai fraca: com permanência de ~90% em 6 meses, o viés de +15 p.p. bate no teto de 95% e, com 5 a 13 casos por gestor, o realizado é dominado pelo acaso.
 - Os casos comparáveis mais recentes caem quase sempre na mesma data (a rede tem ~130 decisões por dia).
 
+### Revisão da Fase 2
+
+- **Calibração dos gestores reformulada (aprovada pelo autor).** "Superestimam a permanência em 15 p.p." virou "subestimam o risco de saída pela metade". O acréscimo fixo esbarrava no teto de 95%: como ~90% das pessoas em risco ficam em 6 meses, o viés quase sumia (+2 p.p.).
+- Ao implementar, o mesmo efeito de teto reapareceu: com previsões limitadas a 95% e ruído de 10 p.p., o viés seguia em ~2 p.p. Teto passou a 99% e ruído a 5 p.p. (premissas), e **a calibração passou a ser mostrada em número de saídas**: nos casos abertos, os gestores esperavam 13 saídas, o sistema 22, e ocorreram 18. Em chance de ficar a diferença parece pequena (93% contra 91%), porque a maioria fica; em saídas, os gestores previram cerca de 70% do que aconteceu.
+
 **Status:** em validação pelo autor.
