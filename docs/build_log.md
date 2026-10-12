@@ -334,4 +334,4 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Nenhuma chave no histórico do git.
 - Capturas de tela das páginas em 1.440 e 1.280 px revisadas.
 
-**Status:** em validação pelo autor.
+**Status:** concluída e aprovada pelo autor.

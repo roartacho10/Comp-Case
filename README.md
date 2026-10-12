@@ -78,7 +78,7 @@ Os dados em `data/generated/` são **derivados** dessas tabelas e não são edit
 | 3 | Fluxo 1: caso do gestor | Concluída |
 | 4 | Fluxos 2 e 3 (aprendizado, liderança) e resultado | Concluída |
 | 5 | Camada de AI | Concluída |
-| 6 | Testes, README e publicação final | Em validação |
+| 6 | Testes, README e publicação final | Concluída |
 
 ## Como rodar localmente
 
