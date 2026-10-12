@@ -257,4 +257,42 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 
 - **Página própria para o resultado (pedido do autor):** "4. Resultado em 12 meses", separada da visão da liderança, que perdia destaque. Mostra saídas esperadas sem ação × ocorridas, saídas evitadas e valor preservado (com quanto cada R$ 1 em intervenções evitou em reposição), permanência quando a sugestão foi seguida × quando a decisão divergiu (com a ressalva de que é comparação descritiva), resultado por motivo e turnover e saídas arrependidas da empresa inteira contra os 12 meses anteriores.
 
+**Status:** concluída e aprovada pelo autor.
+
+---
+
+## Fase 5 — Camada de AI
+
+**Objetivo:** pôr a AI onde ela é estrutural (ler contexto não estruturado e escrever para quem decide), sem deixá-la calcular, decidir ou inventar.
+
+**Decisões validadas antes da execução**
+
+| Decisão | Escolha | Racional |
+|---|---|---|
+| Onde a AI escreve | Mensagem do caso, retorno após 12 meses e resumos das páginas 3 e 4 | É onde a linguagem importa; tabelas e números vêm direto do motor |
+| Leitura de contexto | A AI lê a anotação da conversa de carreira e indica o sinal; a tela mostra o trecho destacado quando bate com o que o motor espera e o trecho existe literalmente na anotação | Uso estrutural da AI: texto solto vira dado (seção 4.1) |
+| Perguntas | Adaptadas ao contexto da pessoa, a partir das perguntas-base | Perguntas que conversam com o que a pessoa disse funcionam melhor |
+| Entrada | Só os fatos já calculados e o texto padrão aprovado como referência | A AI só pode usar o que está no pacote; isso torna a checagem possível |
+| Regras | Orientar, não mandar; só números do pacote; linguagem simples; risco como "casos parecidos"; nunca rotular; nenhuma ação fora das opções (`prompts/system.md`) | As regras validadas nas Fases 3 e 4, escritas para a AI |
+| Checagens | Formato; todo número do texto existe no pacote; nenhum termo vetado; "a decisão é sua" na mensagem do caso | Garantia, e não só instrução |
+| Reserva | Os textos padrão revisados | Já cumprem o papel das respostas pré-geradas previstas na 4.3, sem um segundo conjunto para revisar |
+| Modelo | Claude Sonnet 5.5 (`claude-sonnet-5-5`), como premissa editável | Equilíbrio entre qualidade e velocidade |
+| Custo e abuso | Textos guardados no servidor por entrada; limite de 20 chamadas por sessão; 20 s por chamada | App público; demonstração rápida após a primeira visita |
+| Transparência | Selo "escrito por AI" ou "texto padrão (motivo)" e seletor na barra lateral | Quem avalia vê onde a AI entra; o autor controla o risco na gravação |
+| Chave | Somente nos secrets do Streamlit, colada pelo autor; nunca nesta conversa, que é parte do log | Segurança |
+
+**O que foi construído**
+
+- `prompts/`: regras comuns e uma instrução por tarefa (caso, retorno, resumo, leitura de anotação), versionadas e usadas como parte da chave do cache.
+- `src/ai.py`: chamada à API, armazenamento das respostas validadas no servidor, limite por sessão, as quatro checagens e a reserva.
+- `src/summaries.py`: resumos padrão para as páginas 3 e 4.
+- Integração nas páginas 1 a 4, seletor "Textos escritos por AI ao vivo" e selos.
+- Premissas de AI: modelo, tempo máximo, limite de chamadas e tamanho máximo da resposta.
+
+**Checagens**
+
+- Testes: 50 passando. Com um modelo simulado: saída válida aceita e reaproveitada sem nova chamada; rejeição por número inventado, termo vetado, tom de comando, frase obrigatória ausente e formato; queda para o texto padrão em tempo esgotado, resposta sem JSON, sem chave, AI desligada e limite da sessão; leitura de anotação rejeitada quando diverge ou cita trecho inexistente; o caminho real da chamada (SDK simulado) usa o modelo da premissa; páginas 1 a 4 mostram o selo de AI com chave configurada.
+- App verificado no navegador sem chave: seletor desabilitado, textos padrão com o motivo.
+- **Pendente:** teste com a API real, que depende da chave do autor nos secrets do Streamlit.
+
 **Status:** em validação pelo autor.

@@ -7,7 +7,7 @@ import json
 import pandas as pd
 import streamlit as st
 
-from src import simulation
+from src import ai, simulation
 from src.assumptions import Assumptions
 
 MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
@@ -42,6 +42,11 @@ def sidebar_controls(a: Assumptions) -> None:
             st.session_state["advanced"] = False
             st.session_state.pop("results_cache", None)
             st.rerun()
+        st.divider()
+        has_key = ai.available()
+        st.toggle("Textos escritos por AI ao vivo", value=has_key, disabled=not has_key, key="ai_on")
+        st.caption("Com a AI desligada ou indisponível, a tela usa os textos padrão revisados."
+                   if has_key else "AI indisponível: chave não configurada. A tela usa os textos padrão revisados.")
         decided = len(st.session_state["persona_decisions"])
         if not st.session_state["advanced"]:
             st.caption(f"Decisões registradas nos casos dos personagens: {decided} de 3. "
@@ -78,3 +83,14 @@ def current_decisions(world: dict) -> pd.DataFrame:
          simulation.persona_decision_rows(world["sim_context"], world["engine"], st.session_state["persona_decisions"])],
         ignore_index=True,
     )
+
+
+def ai_on() -> bool:
+    return bool(st.session_state.get("ai_on", True))
+
+
+def ai_badge(result) -> None:
+    if result.source == "ai":
+        st.caption("✦ Escrito por AI a partir dos dados do caso; os números vêm do motor.")
+    else:
+        st.caption(f"Texto padrão ({result.reason}).")

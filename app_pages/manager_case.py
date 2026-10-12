@@ -7,6 +7,8 @@ from src.app_data import assumptions, load_world
 from src.case_text import build_case_message, confirmation_message
 from src.engine import MONITOR, signal_evidence
 from src.format import brl, pct
+from src import ai
+from src.state import ai_badge, ai_on
 from src.ui import md, message_header, synthetic_data_banner
 
 synthetic_data_banner()
@@ -46,7 +48,21 @@ opts = engine.options[engine.options["employee_id"] == emp]
 active = [s for s in engine.signals.columns if engine.signals.loc[emp, s]]
 evidence = signal_evidence(tables, a, emp, active)
 team_manager = managers.loc[hris.loc[emp, "manager_id"], "name"] if hris.loc[emp, "manager_id"] in managers.index else None
-msg = build_case_message(case, opts, evidence, engine.network_stats, a, team_manager)
+template = build_case_message(case, opts, evidence, engine.network_stats, a, team_manager)
+notes = tables["context"][tables["context"]["employee_id"] == emp]
+facts = dict(
+    pessoa=case["name"], primeiro_nome=case["name"].split()[0], quem_decide=case["decision_maker_name"],
+    cargo=f"{case['level']}, {case['area']}", caso_escalado_para_lideranca_acima="sim" if case["escalated"] else "não",
+    gestor_direto=team_manager or "", anotacoes=notes["text"].tolist(), perguntas_base=template["questions"],
+)
+with st.spinner("Escrevendo a mensagem…"):
+    written = ai.write_case(template, facts, a, enabled=ai_on())
+msg = written.value
+
+# The AI also reads the career-conversation note and says which signal it indicates.
+expected = ("external_offer" if "external_offer" in active else "growth_request" if "growth_request" in active
+            else "manager_relationship" if case["cause"] == "gestor" else "none")
+note_reading = ai.read_note(notes["text"].iloc[0], expected, a, enabled=ai_on()) if len(notes) else None
 decider = case["decision_maker_name"]
 
 left, right = st.columns([1, 4], gap="medium")
@@ -69,6 +85,9 @@ with right, st.container(border=True):
 
     st.markdown("**O que chamou atenção**")
     md("\n".join(f"- {s}" for s in msg["signals"]))
+    if note_reading is not None and note_reading.source == "ai" and note_reading.value.get("quote"):
+        st.caption(f"✦ A anotação da conversa de carreira foi lida por AI, que destacou: "
+                   f"\u201c{note_reading.value['quote']}\u201d")
     md(msg["risk"])
 
     md(f"**O motivo mais provável:** {msg['cause']}")
@@ -104,6 +123,7 @@ with right, st.container(border=True):
     )
 
     md(msg["closing"])
+    ai_badge(written)
     st.caption(f"{case['name'].split()[0]} não vê esta mensagem nem nenhum número.")
 
     # Decision ------------------------------------------------------------------

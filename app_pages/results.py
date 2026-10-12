@@ -5,6 +5,9 @@ from src.app_data import assumptions, load_world
 from src.format import brl, num, pct
 from src.leadership import after_window, at_t0
 from src.state import dates, month_label, results
+from src import ai
+from src.state import ai_badge, ai_on
+from src.summaries import results_summary
 from src.ui import md, synthetic_data_banner
 
 synthetic_data_banner()
@@ -22,6 +25,14 @@ if res is None:
 
 view = at_t0(world, a, res["decisions"])
 after = after_window(world, a, view, res)
+
+summary_text, summary_facts = results_summary(view, after, W)
+with st.container(border=True):
+    st.markdown("**Em resumo**")
+    with st.spinner("Escrevendo o resumo…"):
+        written = ai.write_summary(summary_text, summary_facts, a, enabled=ai_on())
+    md(written.value["text"])
+    ai_badge(written)
 
 # Headline ----------------------------------------------------------------------------
 st.subheader("Saídas evitadas e valor preservado")

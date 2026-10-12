@@ -6,6 +6,9 @@ from src.app_data import assumptions, load_world
 from src.format import brl, num, pct
 from src.leadership import at_t0
 from src.state import current_decisions, dates, month_label, results
+from src import ai
+from src.state import ai_badge, ai_on
+from src.summaries import leadership_summary
 from src.ui import ACCENT, md, synthetic_data_banner
 
 synthetic_data_banner()
@@ -22,6 +25,14 @@ st.caption(
 
 res = results(world, a)
 view = at_t0(world, a, res["decisions"] if res else current_decisions(world))
+
+summary_text, summary_facts = leadership_summary(view, W)
+with st.container(border=True):
+    st.markdown("**O que a liderança precisa saber**")
+    with st.spinner("Escrevendo o resumo…"):
+        written = ai.write_summary(summary_text, summary_facts, a, enabled=ai_on())
+    md(written.value["text"])
+    ai_badge(written)
 
 # Value at risk -----------------------------------------------------------------------
 st.subheader(f"Risco em {month_label(t0)}")

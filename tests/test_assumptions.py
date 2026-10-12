@@ -18,7 +18,21 @@ def test_missing_assumption_raises():
         Assumptions.load().num("does.not.exist")
 
 
-def test_every_assumption_is_used():
+class _FakeAnthropic:
+    """Stands in for anthropic.Anthropic: records the call and returns an empty JSON object."""
+    last = {}
+
+    def __init__(self, **kwargs):
+        _FakeAnthropic.last["client"] = kwargs
+        self.messages = self
+
+    def create(self, **kwargs):
+        _FakeAnthropic.last["create"] = kwargs
+        block = type("Block", (), {"type": "text", "text": "{}"})()
+        return type("Response", (), {"content": [block]})()
+
+
+def test_every_assumption_is_used(monkeypatch):
     """No orphan rule: every row of the base is read by the generator or the checks."""
     from src import simulation
     from src.engine import comparable_cases, run_engine
@@ -35,6 +49,16 @@ def test_every_assumption_is_used():
     at_t0(dict(engine=engine, public=world.public), a, decisions)
     first = engine.cases.iloc[0]
     comparable_cases(world.public["network_cases"], a, first["cause"], first["level"], first["recommended"])
+    import anthropic
+
+    from src import ai
+
+    monkeypatch.setattr(ai, "available", lambda: True)
+    monkeypatch.setattr(ai, "_api_key", lambda: "test-key")
+    monkeypatch.setattr(anthropic, "Anthropic", _FakeAnthropic)  # exercises the real call path, offline
+    ai._store().clear()
+    ai.write_summary("texto", {}, a)
+    assert _FakeAnthropic.last["create"]["model"] == a.text("ai.model")
     assert a.unused() == []
 
 

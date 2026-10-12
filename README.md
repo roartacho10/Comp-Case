@@ -16,8 +16,8 @@ Construção em fases, cada uma revisada e aprovada antes da seguinte. O histór
 | 1 | Mundo e dados sintéticos | Concluída |
 | 2 | Personagens e motor de regras | Concluída |
 | 3 | Fluxo 1: caso do gestor | Concluída |
-| 4 | Fluxos 2 e 3 (aprendizado, liderança) e resultado | Em validação |
-| 5 | Camada de AI | A fazer |
+| 4 | Fluxos 2 e 3 (aprendizado, liderança) e resultado | Concluída |
+| 5 | Camada de AI | Em validação |
 | 6 | Testes, README e publicação final | A fazer |
 
 ## Como rodar localmente
@@ -28,6 +28,17 @@ streamlit run app.py
 python scripts/generate_data.py   # regenera os CSVs a partir das premissas e roda as checagens
 pytest
 ```
+
+## Onde entra a AI
+
+A AI (Claude, pela API da Anthropic, chamada pelo servidor do app) **escreve e lê, mas não calcula nem decide**:
+
+- lê a anotação da conversa de carreira e indica o sinal que ela contém;
+- escreve a mensagem do caso para quem decide (com perguntas adaptadas à pessoa), o retorno após 12 meses e os resumos para a liderança.
+
+Ela recebe só os fatos já calculados pelo motor. Antes de aparecer, cada texto passa por quatro checagens: formato, **todo número do texto existe nos fatos recebidos**, nenhum termo vetado (rótulos, tom de comando, jargão) e a frase "a decisão é sua" na mensagem do caso. Se falhar, se não houver chave ou se a chamada demorar, a tela usa o texto padrão revisado. As regras estão em [`prompts/`](prompts/).
+
+Para ativar, coloque a chave nos secrets do Streamlit (`ANTHROPIC_API_KEY = "..."`). Nunca no código.
 
 ## Premissas determinísticas
 

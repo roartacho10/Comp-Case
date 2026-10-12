@@ -5,6 +5,8 @@ from src.app_data import assumptions, load_world
 from src.case_text import outcome_message, quadrant
 from src.format import pct
 from src.state import dates, month_label, results
+from src import ai
+from src.state import ai_badge, ai_on
 from src.ui import md, message_header, synthetic_data_banner
 
 synthetic_data_banner()
@@ -49,7 +51,12 @@ for col, (pid, p) in zip(cols, personas.iterrows()):
     with col, st.container(border=True):
         st.markdown(f"**{case['name']}** · para {case['decision_maker_name']}")
         message_header("Comp · Retenção", month_label(t1))
-        md(outcome_message(c, case, opts, calib.loc[case["decision_maker_id"]] if case["decision_maker_id"] in calib.index else None, a))
+        template = outcome_message(c, case, opts, calib.loc[case["decision_maker_id"]] if case["decision_maker_id"] in calib.index else None, a)
+        with st.spinner("Escrevendo o retorno…"):
+            written = ai.write_followup(template, dict(pessoa=case["name"], quem_decide=case["decision_maker_name"]),
+                                        a, enabled=ai_on())
+        md(written.value["text"])
+        ai_badge(written)
 
 # 2. Decision x outcome ------------------------------------------------------------
 st.subheader("Decisão e resultado são coisas diferentes")

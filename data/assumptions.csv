@@ -96,3 +96,7 @@ comportamento,behavior.prediction_max,0.99,prob.,Maior chance de ficar que um ge
 comportamento,behavior.prediction_min,0.01,prob.,Menor chance de ficar que um gestor simulado prevê,Simétrico ao teto,premissa (detalhe de cálculo)
 resultado,outcome.window_months,12,meses,Janela em que se mede o resultado de cada decisão (ficou e segue performando),Seção 3.2: o resultado aparece em 6 a 12 meses; 12 meses mostra o efeito das intervenções com clareza e coincide com a duração do efeito das ações pontuais. Custo: cada decisão leva 12 meses para virar aprendizado,premissa
 privacidade,privacy.min_group_size,5,pessoas,Tamanho mínimo de grupo exibido na visão da liderança,"Grupos menores permitiriam identificar pessoas; a liderança vê padrões, não indivíduos",premissa
+AI,ai.model,claude-sonnet-5-5,-,Modelo usado para escrever as mensagens e ler as anotações,Equilíbrio entre qualidade de texto e velocidade recomendado pela documentação da Anthropic; custo de centavos por demonstração,premissa
+AI,ai.timeout_seconds,20,segundos,Tempo máximo de espera por uma resposta da AI,"Acima disso, a tela usa o texto padrão para não travar a demonstração",premissa (detalhe de cálculo)
+AI,ai.max_calls_per_session,20,chamadas,Limite de chamadas à AI por sessão,O app é público: protege a chave contra uso abusivo; os textos ficam guardados no servidor e não contam de novo,premissa (detalhe de cálculo)
+AI,ai.max_tokens,1500,tokens,Tamanho máximo de cada resposta da AI,Folga para as mensagens mais longas (cerca de 220 palavras) em formato JSON,premissa (detalhe de cálculo)
