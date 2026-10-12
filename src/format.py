@@ -18,11 +18,16 @@ def brl(x) -> str:
         return "—"
     sign = "−" if x < 0 else ""
     x = abs(x)
-    if x >= 1e6:
+    if round(x, -3) >= 1e6:  # 999.600 rounds to "R$ 1,0 mi", not "R$ 1000 mil"
         return f"{sign}R$ {x / 1e6:.1f} mi".replace(".", ",")
-    if x >= 1e3:
+    if round(x) >= 1e3:
         return f"{sign}R$ {x / 1e3:.0f} mil"
     return f"{sign}R$ {x:.0f}"
+
+
+def share_words(x: float) -> str:
+    """'metade' for one half, otherwise the percentage ('30%')."""
+    return "metade" if abs(x - 0.5) < 1e-9 else pct(x, 0)
 
 
 def num(x, digits=1) -> str:

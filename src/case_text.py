@@ -30,7 +30,11 @@ def _thousands(n: int) -> str:
 
 
 def _times(ratio: float) -> str:
-    if ratio < 1.3:
+    if ratio < 0.9:
+        return "abaixo da média da sua empresa"
+    if ratio < 1.1:
+        return "perto da média da sua empresa"
+    if ratio < 1.5:
         return "um pouco acima da média da sua empresa"
     return f"cerca de {int(ratio + 0.5)} vezes a média da sua empresa"
 
@@ -184,7 +188,7 @@ def outcome_message(closed: pd.Series, case: pd.Series, options: pd.DataFrame, d
     elif chosen == rec:
         text += (f"Você seguiu a sugestão ({chosen.lower()}) e considerava {sentence(closed['manager_prediction'], person, a)}; "
                  f"para casos parecidos, o sistema estimava {pct(opts.loc[chosen, 'stay_rate'], 0)} de chance de ficar. ")
-        text += ("O resultado confirma o que a rede indicava. " if stayed else
+        text += ("O resultado confirma o que a base da Comp indicava. " if stayed else
                  f"A decisão foi consistente com a evidência: mesmo assim, cerca de "
                  f"{pct(1 - opts.loc[chosen, 'stay_rate'], 0)} das pessoas em casos parecidos saem. O risco existia, "
                  "e um resultado ruim não torna a decisão ruim. ")
@@ -196,7 +200,7 @@ def outcome_message(closed: pd.Series, case: pd.Series, options: pd.DataFrame, d
                  f"{pct(opts.loc[rec, 'stay_rate'], 0)} com {rec.lower()}. ")
         text += ("Deu certo: o seu contexto pode ter acrescentado algo que os dados não viam. " if stayed else
                  "A sugestão tinha mais chance, mas nenhuma opção garantia o resultado. ")
-    text += "O caso entra no aprendizado da rede."
+    text += "O caso entra no aprendizado da base da Comp."
     if decider_calib is not None and decider_calib["n"] > 1:
         expected = decider_calib["exits_expected_manager"]
         realized = int(round(decider_calib["exits_realized"]))

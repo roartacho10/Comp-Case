@@ -102,9 +102,9 @@ def persona_decision_rows(ctx: SimContext, engine: EngineResult, persona_decisio
         chosen = d.get("intervention", MONITOR)
         rows.append(dict(
             employee_id=p["employee_id"], decision_maker_id=case["decision_maker_id"],
-            decision_maker_name=case["decision_maker_name"], cause=d.get("cause", case["cause"]),
+            decision_maker_name=case["decision_maker_name"], cause=case["cause"], manager_cause=d.get("cause"),
             recommended=case["recommended"], intervention=chosen, followed=chosen == case["recommended"],
-            manager_prediction=float(d.get("prediction", 0.5)),
+            manager_prediction=float(d["prediction"]) if "prediction" in d else np.nan,  # no decision: no forecast
             system_prediction=float(opts.loc[(p["employee_id"], chosen), "stay_rate"]),
             cost_window=float(opts.loc[(p["employee_id"], chosen), "cost_window"]),
             justification=d.get("justification", "" if d else "Sem decisão registrada: monitorar"),
@@ -114,7 +114,7 @@ def persona_decision_rows(ctx: SimContext, engine: EngineResult, persona_decisio
 
 
 def advance_window(ctx: SimContext, decisions: pd.DataFrame, a: Assumptions) -> pd.DataFrame:
-    """Outcome after 6 months for every active employee."""
+    """Outcome after the outcome window for every active employee."""
     rng = np.random.default_rng([a.int("general.simulation_seed"), 2])
     window = a.int("outcome.window_months")
     chosen = decisions.set_index("employee_id")["intervention"].to_dict()
@@ -172,12 +172,14 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
     rates["n_after"] = rates["n"] + rates["n_client"]
 
     # Calibration of each decision maker and of the system, on the same cases.
-    calib = closed.groupby(["decision_maker_id", "decision_maker_name"]).agg(
+    # Cases without a registered forecast count in the outcome but not in the manager's expected exits.
+    closed = closed.assign(_mgr_exit=1 - closed["manager_prediction"])
+    calib = closed.groupby(["decision_maker_id", "decision_maker_name"], dropna=False).agg(
         n=("stayed", "size"), predicted=("manager_prediction", "mean"),
         system=("system_prediction", "mean"), realized=("stayed", "mean"),
+        exits_expected_manager=("_mgr_exit", "sum"),
     ).reset_index()
     calib["bias_pp"] = (calib["predicted"] - calib["realized"]) * 100
-    calib["exits_expected_manager"] = (1 - calib["predicted"]) * calib["n"]
     calib["exits_expected_system"] = (1 - calib["system"]) * calib["n"]
     calib["exits_realized"] = (1 - calib["realized"]) * calib["n"]
     calib["system_bias_pp"] = (calib["system"] - calib["realized"]) * 100
@@ -188,7 +190,7 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
         manager_predicted=closed["manager_prediction"].mean(), system_predicted=closed["system_prediction"].mean(),
         exits_expected_manager=(1 - closed["manager_prediction"]).sum(),
         exits_expected_system=(1 - closed["system_prediction"]).sum(),
-        exits_range_manager=_exit_range(1 - closed["manager_prediction"], level),
+        exits_range_manager=_exit_range((1 - closed["manager_prediction"]).dropna(), level),
         exits_range_system=_exit_range(1 - closed["system_prediction"], level),
         exits_realized=int((~closed["stayed"]).sum()),
         company_exits=int((~outcomes["stayed"]).sum()), company_regretted=int(outcomes["regretted"].sum()),

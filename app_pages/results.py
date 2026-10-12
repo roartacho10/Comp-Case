@@ -45,7 +45,7 @@ md(
     f"Nos {view['cases']} casos abertos em {month_label(t0)}, a base da Comp indicava cerca de "
     f"**{num(view['exits_no_action'], 0)} saídas** se nada fosse feito. Ocorreram **{after['exits_realized']}**. "
     f"As cerca de **{num(after['avoided'], 0)} saídas evitadas** representam {brl(after['saved'])} em reposição que não "
-    f"precisou acontecer. Descontado o custo das intervenções ({brl(view['intervention_cost'])}), sobram "
+    f"precisou acontecer. Descontado o custo pago nas intervenções ({brl(after['cost_paid'])}), sobram "
     f"**{brl(after['value'])}**: cada R$ 1 investido nas intervenções evitou cerca de "
     f"R$ {num(after['return_per_real'])} em reposição."
 )

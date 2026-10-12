@@ -17,6 +17,7 @@ from src.format import num
 from src.signals import CAUSES, DAYS_PER_MONTH, compute_signals
 
 MONITOR = "Monitorar"
+PEOPLE_TEAM = ("RH", "Time de People (RH)")  # decides the cases of leaders who have no superior
 
 
 @dataclass
@@ -84,11 +85,13 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
     top = counts.max(axis=1)
     is_case = top >= min_signals
 
-    # Client history: voluntary exits in the last 12 months, per 6 months.
+    # Client history: annual voluntary exit rate over the recorded history, converted to the outcome window.
+    history = a.num("history.months")
     former = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")]
-    recent = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= 12 * DAYS_PER_MONTH]
+    recent = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= history * DAYS_PER_MONTH]
     window = a.num("outcome.window_months")
-    company_exit_window = 1 - (1 - len(recent) / len(active)) ** (window / 12)
+    annual_rate = min(0.99, len(recent) / len(active) * 12 / history)
+    company_exit_window = 1 - (1 - annual_rate) ** (window / 12)
 
     stats = network_stats(tables["network_cases"], a)
     pooled_stats = stats.groupby(["attributed_cause", "intervention"])[["n", "stayed"]].sum()
@@ -111,7 +114,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
         k = int(counts.loc[emp, cause])
         # Who decides: the person's manager (the team manager for team members).
         decider = team_manager_of.get(person["team_id"]) if person["role"] == "Individual" else person["manager_id"]
-        decider = decider if isinstance(decider, str) else None
+        decider = decider if isinstance(decider, str) else PEOPLE_TEAM[0]
 
         # Risk if nothing is done: same cause and same number of signals (monitored cases).
         st_k = stats[(stats["attributed_cause"] == cause) & (stats["n_signals"] == k)].set_index("intervention")
@@ -143,7 +146,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             h1 = h0 * (1 - reduction)
             if name == MONITOR:
                 ev = benefit = np.zeros(draws)
-                cost_total, cost_window = 0.0, 0.0
+                cost_total, cost_window, cost_annual = 0.0, 0.0, 0.0
             else:
                 paths = np.repeat(np.broadcast_to(h1, (draws,))[:, None], months, axis=1)
                 if not recurring:
@@ -155,6 +158,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 benefit = base_cost - _cost_of_path(paths, months, salary, median, a, 0.0, 0.0)
                 cost_total = round(rec_cost * horizon_years, -2) if recurring else one_cost
                 cost_window = round(rec_cost * window / 12, -2) if recurring else one_cost
+                cost_annual = round(rec_cost, -2) if recurring else one_cost
             option_rows.append(dict(
                 employee_id=emp, intervention=name,
                 target_cause=inter.loc[name, "target_cause"] if name in inter.index else "",
@@ -163,7 +167,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 stay_hi=float(np.quantile(stay_case, 1 - (1 - level) / 2)),
                 network_stay_rate=float(row["stayed"] / row["n"]), n=int(row["n"]),
                 reduction=float(np.median(reduction)) if name != MONITOR else 0.0,
-                cost_window=cost_window, cost_horizon=cost_total, recurring=bool(recurring),
+                cost_window=cost_window, cost_annual=cost_annual, cost_horizon=cost_total, recurring=bool(recurring),
                 ev=float(np.median(ev)), expected_cost=float(np.median(benefit - ev)),
                 benefit=float(np.median(ev) + np.median(benefit - ev)), ev_lo=float(np.quantile(ev, (1 - level) / 2)),
                 ev_hi=float(np.quantile(ev, 1 - (1 - level) / 2)),
@@ -176,7 +180,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
         case_rows.append(dict(
             employee_id=emp, name=person["name"], area=person["area"], team_id=person["team_id"], level=person["level"],
             country=person["country"], role=person["role"], decision_maker_id=decider,
-            decision_maker_name=managers.loc[decider, "name"] if decider in managers.index else None,
+            decision_maker_name=managers.loc[decider, "name"] if decider in managers.index else PEOPLE_TEAM[1],
             decision_maker_hourly_cost=(float(active.loc[decider, "annual_cost_brl"]) / a.num("general.work_hours_per_year")
                                         if decider in active.index else np.nan),
             cause=cause, tied_causes=", ".join(tied), tie=len(tied) > 1,
@@ -202,8 +206,11 @@ def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id
     p = hris.loc[employee_id]
     catalog = a.signals.set_index("signal")
     bench = tables["benchmark"].drop_duplicates(["level", "country"]).set_index(["level", "country"])["median_annual_brl"]
+    from src.signals import CONTEXT_EVENT_TO_SIGNAL
+
     ctx = tables["context"]
-    notes = ctx[ctx["employee_id"] == employee_id]["text"].tolist()
+    ctx = ctx[(ctx["employee_id"] == employee_id)
+              & ((t0 - pd.to_datetime(ctx["date"])).dt.days <= a.num("signals.context_window_months") * DAYS_PER_MONTH)]
     out = []
     for s in active_signals:
         if s == "compa_below":
@@ -231,7 +238,7 @@ def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id
             plain = (f"completa {int(round(years))} anos de empresa nos próximos meses, momento em que muita gente "
                      "reavalia a carreira.")
         elif s in ("external_offer", "growth_request"):
-            ev = " / ".join(notes)
+            ev = " / ".join(ctx.loc[ctx["extracted_event"].map(CONTEXT_EVENT_TO_SIGNAL) == s, "text"])
             plain = ev[0].lower() + ev[1:] if ev else ""
         else:
             ev, plain = "", ""

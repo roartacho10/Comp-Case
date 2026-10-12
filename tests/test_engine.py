@@ -4,7 +4,7 @@ from streamlit.testing.v1 import AppTest
 
 from src import simulation
 from src.assumptions import Assumptions
-from src.engine import MONITOR, run_engine
+from src.engine import MONITOR, PEOPLE_TEAM, run_engine
 from src.generator import generate_world
 
 
@@ -21,7 +21,8 @@ def test_case_goes_to_the_person_manager(setup):
     a, world, engine, ctx = setup
     hris = world.public["hris"].set_index("employee_id")
     for _, c in engine.cases.iterrows():
-        assert c["decision_maker_id"] == hris.loc[c["employee_id"], "manager_id"]
+        manager = hris.loc[c["employee_id"], "manager_id"]
+        assert c["decision_maker_id"] == (manager if isinstance(manager, str) else PEOPLE_TEAM[0])
     assert set(engine.cases["cause"]) <= {"remuneração", "crescimento"}
 
 

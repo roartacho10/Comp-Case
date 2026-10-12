@@ -3,9 +3,11 @@ Aggregated only (no names), with groups below the minimum size hidden."""
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
+from src.signals import DAYS_PER_MONTH
 
 
 def at_t0(world: dict, a: Assumptions, decisions: pd.DataFrame) -> dict:
@@ -36,7 +38,7 @@ def at_t0(world: dict, a: Assumptions, decisions: pd.DataFrame) -> dict:
                                                    followed=("followed", "mean")).reset_index()
     return dict(
         employees=len(active), cases=len(cases), exits_no_action=exits_no_action, loss=loss,
-        regretted_loss=loss * a.num("exit.regretted_share"), exits_with_decisions=exits_with_decisions,
+        regretted_loss=loss * a.num("exit.regretted_share"), regretted_share=a.num("exit.regretted_share"), exits_with_decisions=exits_with_decisions,
         loss_with_decisions=loss_with_decisions, intervention_cost=float(d["cost_window"].sum()),
         followed=float(d["followed"].mean()), area_cause=area_cause, teams=teams, by_intervention=by_intervention,
         turnover_12m=_turnover(hris, a),
@@ -48,10 +50,18 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
     closed = learn["closed"]
     s = learn["summary"].iloc[0]
     cases = world["engine"].cases.set_index("employee_id")
-    replacement = (a.num("cost.replacement_share") * cases["salary"]).reindex(closed["employee_id"])
+    window = a.int("outcome.window_months")
+    replacement = (a.num("cost.replacement_share") * cases["salary"]).reindex(closed["employee_id"]).to_numpy()
+    expected_exit = cases.loc[closed["employee_id"], "exit_window_no_action"].to_numpy()
+    exited = (~closed["stayed"].astype(bool)).to_numpy(dtype=float)
     avoided = t0_view["exits_no_action"] - s["exits_realized"]
-    avg_replacement = float(replacement.mean())
-    saved = avoided * avg_replacement
+    # Each case weighs by its own replacement cost: (chance of leaving with no action − left or not) × replacement.
+    saved = float(((expected_exit - exited) * replacement).sum())
+    # Cost actually paid: recurring costs (salary adjustment) only while the person stayed; one-off costs in full.
+    recurring = closed["intervention"].map(
+        dict(zip(a.interventions["intervention"], a.interventions["cost_rule"] == "share_of_annual_cost"))).fillna(False)
+    months_paid = closed["exit_month"].astype(float).fillna(window).clip(upper=window).where(~closed["stayed"], window)
+    cost_paid = float(np.where(recurring, closed["cost_window"] * months_paid / window, closed["cost_window"]).sum())
 
     c = closed.assign(no_action=cases.loc[closed["employee_id"], "exit_window_no_action"].values,
                       cause=cases.loc[closed["employee_id"], "cause"].values)
@@ -61,12 +71,14 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
     followed = c.groupby("followed")["stayed"].agg(["mean", "size"])
 
     hris = world["public"]["hris"]
+    t0 = a.date("general.reference_date")
     former = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")]
+    former = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= window * DAYS_PER_MONTH]  # same length as after
     active = int((hris["status"] == "ativo").sum())
     return dict(
-        exits_realized=int(s["exits_realized"]), avoided=float(avoided), saved=float(saved),
-        value=float(saved - t0_view["intervention_cost"]), avg_replacement=avg_replacement,
-        return_per_real=float(saved / t0_view["intervention_cost"]) if t0_view["intervention_cost"] else float("nan"),
+        exits_realized=int(s["exits_realized"]), avoided=float(avoided), saved=saved, cost_paid=cost_paid,
+        value=float(saved - cost_paid),
+        return_per_real=float(saved / cost_paid) if cost_paid else float("nan"),
         by_cause=by_cause,
         stay_followed=float(followed.loc[True, "mean"]) if True in followed.index else float("nan"),
         stay_diverged=float(followed.loc[False, "mean"]) if False in followed.index else float("nan"),
@@ -81,5 +93,5 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
 def _turnover(hris: pd.DataFrame, a: Assumptions) -> float:
     t0 = a.date("general.reference_date")
     former = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")]
-    recent = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= 365]
+    recent = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= 12 * DAYS_PER_MONTH]  # "últimos 12 meses"
     return len(recent) / int((hris["status"] == "ativo").sum())

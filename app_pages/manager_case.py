@@ -111,7 +111,7 @@ with right, st.container(border=True):
         elif rec:
             # Rounded so that the row adds up as shown: perda que evita − custo = saldo.
             cost_r, ev_r = round(o["expected_cost"], -3), round(o["ev"], -3)
-            cost_txt = f"{brl(cost_r)} ({brl(o['cost_window'])}/ano)"
+            cost_txt = f"{brl(cost_r)} ({brl(o['cost_annual'])}/ano)"
             avoided, balance = brl(cost_r + ev_r), brl(ev_r)
         else:
             cost_txt = "você estima"

@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from src.app_data import assumptions, load_world
-from src.format import brl, cost_note, num, pct
+from src.format import brl, cost_note, num, pct, share_words
 from src.leadership import at_t0
 from src.signals import CAUSES
 from src.state import current_decisions, dates, month_label, results
@@ -21,7 +21,7 @@ W = a.int("outcome.window_months")
 t0, t1 = dates(a)
 st.caption(
     "Onde a empresa corre maior risco de perder valor por saídas evitáveis, o que está sendo feito e com que resultado. "
-    f"Só dados agregados: nenhum nome, e grupos com menos de {a.int('privacy.min_group_size')} pessoas não aparecem."
+    f"Só dados agregados: nenhum nome, e times com menos de {a.int('privacy.min_group_size')} pessoas não aparecem."
 )
 
 res = results(world, a)
@@ -38,14 +38,14 @@ with st.container(border=True):
 # Value at risk -----------------------------------------------------------------------
 st.subheader(f"Risco em {month_label(t0)}")
 c1, c2, c3 = st.columns(3)
-c1.metric("Casos abertos", view["cases"], help="Pessoas com 2 ou mais sinais da mesma causa")
+c1.metric("Casos abertos", view["cases"], help=f"Pessoas com {a.int('case.min_signals_same_cause')} ou mais sinais da mesma causa")
 c2.metric("Saídas esperadas, sem ação", num(view["exits_no_action"], 0),
           help=f"Nos casos abertos, em {W} meses, se nada for feito")
-c3.metric("Perda esperada, sem ação", brl(view["loss"]), help="Saídas esperadas × custo de reposição (75% do custo anual)")
+c3.metric("Perda esperada, sem ação", brl(view["loss"]), help=f"Saídas esperadas × custo de reposição ({pct(a.num('cost.replacement_share'), 0)} do custo anual)")
 employees = f"{view['employees']:,}".replace(",", ".")
 md(
     f"Na empresa de {employees} pessoas, se nada for feito, os {view['cases']} casos abertos devem gerar cerca de **{num(view['exits_no_action'], 0)} saídas** "
-    f"em {W} meses, com perda esperada de **{brl(view['loss'])}** em reposição; cerca de metade em saídas arrependidas "
+    f"em {W} meses, com perda esperada de **{brl(view['loss'])}** em reposição; {share_words(a.num('exit.regretted_share'))} em saídas arrependidas "
     f"({brl(view['regretted_loss'])}). Com as decisões tomadas, o sistema estima {num(view['exits_with_decisions'], 0)} saídas "
     f"e perda de {brl(view['loss_with_decisions'])}, para um custo de intervenções de {brl(view['intervention_cost'])}. "
     f"Turnover voluntário dos últimos 12 meses: {pct(view['turnover_12m'])}."

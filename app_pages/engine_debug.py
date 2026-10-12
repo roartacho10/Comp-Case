@@ -74,7 +74,7 @@ if case["tie"]:
         "A definição da causa fica com quem decide, depois das perguntas ao colaborador."
     )
 st.markdown(
-    f"**Causa provável:** {case['cause']} ({case['n_signals']} de 3 sinais).  \n"
+    f"**Causa provável:** {case['cause']} ({case['n_signals']} de {int((a.signals['component'] == case['cause']).sum())} sinais).  \n"
     f"**Risco se nada for feito:** {pct(case['exit_window_no_action'])} de chance de sair em {W} meses "
     f"(intervalo de 80%: {pct(case['exit_window_lo'])} a {pct(case['exit_window_hi'])}; {case['exit_window_n']} casos semelhantes na rede), "
     f"{num(case['risk_multiple'])}x a média da empresa.  \n"
@@ -99,7 +99,7 @@ view = pd.DataFrame({
 st.dataframe(view, hide_index=True, width="stretch")
 st.caption(
     "Valor esperado = custo esperado de não agir − custo esperado com a intervenção, mês a mês no horizonte: "
-    "custo da intervenção, reposição de quem sai (75% do custo anual) e diferença de mercado paga ao substituto. "
+    f"custo da intervenção, reposição de quem sai ({pct(a.num('cost.replacement_share'), 0)} do custo anual) e diferença de mercado paga ao substituto. "
     "A chance de ficar combina o risco deste caso (mesma causa e número de sinais) com o efeito de cada intervenção "
     f"na rede (mesma causa). O resultado é verificado em {W} meses; o restante do horizonte é extrapolação."
 )

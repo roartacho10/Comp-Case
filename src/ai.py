@@ -25,6 +25,14 @@ FORBIDDEN_TERMS = [
     "você deve", "é obrigatório", "compa-ratio", "probabilidade posterior",
 ]
 SMALL_NUMBERS_ALLOWED = {"1", "2", "3"}
+# Numbers written out are checked like digits ("sete em cada dez" needs 7 and 10 in the facts). "um/uma" (also an
+# article) and "mil" (a unit, as in "R$ 7 mil") are left out.
+NUMBER_WORDS = {
+    "dois": 2, "duas": 2, "três": 3, "quatro": 4, "cinco": 5, "seis": 6, "sete": 7, "oito": 8, "nove": 9, "dez": 10,
+    "onze": 11, "doze": 12, "treze": 13, "catorze": 14, "quatorze": 14, "quinze": 15, "dezesseis": 16,
+    "dezessete": 17, "dezoito": 18, "dezenove": 19, "vinte": 20, "trinta": 30, "quarenta": 40, "cinquenta": 50,
+    "sessenta": 60, "setenta": 70, "oitenta": 80, "noventa": 90, "cem": 100,
+}
 
 
 @dataclass
@@ -61,7 +69,7 @@ def _store() -> dict:
 
 
 def _numbers(text: str) -> set[str]:
-    out = set()
+    out = {str(NUMBER_WORDS[w]) for w in re.findall(r"[a-zà-ú]+", text.lower()) if w in NUMBER_WORDS}
     for token in re.findall(r"\d+(?:[.,]\d+)*", text):
         t = token.replace(".", "").replace(",", ".") if re.search(r"\d\.\d{3}", token) else token.replace(",", ".")
         out.add(t.rstrip("0").rstrip(".") if "." in t else t)
