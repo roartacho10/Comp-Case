@@ -1,0 +1,89 @@
+group,key,value,unit,description,origin
+geral,general.seed,42,-,Semente aleatória: mesmas premissas e mesma semente geram exatamente os mesmos dados,premissa
+geral,general.reference_date,2026-10-01,data,Data de referência do protótipo (T0),premissa
+geral,general.n_employees,1000,pessoas,Colaboradores ativos em T0,case
+população,population.country.Brasil,0.7,fração,Distribuição por país (sede em São Paulo),premissa
+população,population.country.México,0.12,fração,Distribuição por país,premissa
+população,population.country.Colômbia,0.08,fração,Distribuição por país,premissa
+população,population.country.Argentina,0.06,fração,Distribuição por país,premissa
+população,population.country.Chile,0.04,fração,Distribuição por país,premissa
+população,population.area.Engenharia,0.35,fração,Distribuição por área,premissa
+população,population.area.Vendas,0.18,fração,Distribuição por área,premissa
+população,population.area.Customer Success,0.17,fração,Distribuição por área,premissa
+população,population.area.G&A,0.16,fração,Distribuição por área,premissa
+população,population.area.Produto,0.08,fração,Distribuição por área,premissa
+população,population.area.Marketing,0.06,fração,Distribuição por área,premissa
+população,population.level.Júnior,0.25,fração,Distribuição por nível,premissa
+população,population.level.Pleno,0.35,fração,Distribuição por nível,premissa
+população,population.level.Sênior,0.3,fração,Distribuição por nível,premissa
+população,population.level.Gestor,0.1,fração,Distribuição por nível (gestores de time e liderança acima),premissa
+estrutura,structure.reports_per_team_manager,11,pessoas,Liderados por gestor de time (case: 10 a 15),case
+estrutura,structure.tenure_min_months,1,meses,Tempo de casa mínimo,premissa
+estrutura,structure.tenure_max_months,96,meses,Tempo de casa máximo,premissa
+remuneração,market.median.Júnior,140000,R$/ano,Mediana de mercado do custo anual no Brasil (benchmark da Comp),premissa
+remuneração,market.median.Pleno,230000,R$/ano,Mediana de mercado do custo anual no Brasil (benchmark da Comp),premissa
+remuneração,market.median.Sênior,350000,R$/ano,Mediana de mercado do custo anual no Brasil (benchmark da Comp),premissa
+remuneração,market.median.Gestor,470000,R$/ano,Mediana de mercado do custo anual no Brasil (benchmark da Comp),premissa
+remuneração,market.country_factor.Brasil,1.0,x,Fator sobre a mediana brasileira,premissa
+remuneração,market.country_factor.México,0.95,x,Fator sobre a mediana brasileira,premissa
+remuneração,market.country_factor.Colômbia,0.75,x,Fator sobre a mediana brasileira,premissa
+remuneração,market.country_factor.Argentina,0.7,x,Fator sobre a mediana brasileira,premissa
+remuneração,market.country_factor.Chile,0.95,x,Fator sobre a mediana brasileira,premissa
+remuneração,pay.compa_mean,0.97,x,Compa-ratio (salário ÷ mediana de mercado): média,premissa
+remuneração,pay.compa_sd,0.1,x,Compa-ratio: desvio padrão,premissa
+remuneração,pay.compa_min,0.7,x,Compa-ratio: mínimo,premissa
+remuneração,pay.compa_max,1.3,x,Compa-ratio: máximo,premissa
+causas,cause.compensation,0.1,fração,Pessoas com causa de risco em remuneração,premissa
+causas,cause.growth,0.08,fração,Pessoas com causa de risco em crescimento,premissa
+causas,cause.external,0.02,fração,Pessoas com causa externa (sem sinais e sem intervenção eficaz),premissa
+causas,cause.manager.team_share,0.1,fração,Gestores de time com problema de relação com o time,premissa
+causas,cause.manager.member_prob,0.5,fração,Chance de um membro desses times ter a causa gestor (≈5% da população),premissa
+sinais,signals.prob_with_cause,0.6,prob.,Chance de cada sinal aparecer quando a causa dele existe (no nível em que o sinal existe: pessoa ou time),premissa
+sinais,signals.prob_without_cause,0.05,prob.,Chance de cada sinal aparecer quando a causa dele não existe,premissa
+sinais,signals.compa_threshold,0.85,x,Sinal 'abaixo do mercado': compa-ratio abaixo deste valor,premissa
+sinais,signals.no_raise_months,18,meses,Sinal 'sem reajuste': meses desde a última mudança salarial (promoção ou reajuste) acima deste valor,premissa
+sinais,signals.time_in_level_multiple,1.5,x,Sinal 'tempo no nível': tempo no nível acima deste múltiplo da referência do nível,premissa
+sinais,signals.time_in_level_ref.Júnior,1.5,anos,Tempo de referência no nível,premissa
+sinais,signals.time_in_level_ref.Pleno,2.0,anos,Tempo de referência no nível,premissa
+sinais,signals.time_in_level_ref.Sênior,2.5,anos,Tempo de referência no nível,premissa
+sinais,signals.time_in_level_ref.Gestor,3.0,anos,Tempo de referência no nível,premissa
+sinais,signals.milestone_years.1,2,anos,Marco de tempo de casa,premissa
+sinais,signals.milestone_years.2,4,anos,Marco de tempo de casa,premissa
+sinais,signals.milestone_years.3,6,anos,Marco de tempo de casa,premissa
+sinais,signals.milestone_window_months,3,meses,Sinal 'marco': completa um marco nos próximos N meses,premissa
+sinais,signals.manager_change_months,6,meses,Sinal 'troca de gestor': o time trocou de gestor nos últimos N meses,premissa
+sinais,signals.team_exits_min,2,saídas,Sinal 'saídas no time': mínimo de saídas voluntárias no time,premissa
+sinais,signals.team_exits_window_months,6,meses,Janela das saídas no time,premissa
+sinais,signals.pulse_max_score,2,nota (1-5),Sinal 'pulso': nota igual ou abaixo deste valor em 'tenho clareza e apoio do meu gestor',premissa
+sinais,signals.context_window_months,6,meses,"Janela para eventos de contexto (conversas de carreira, atas de projeto)",premissa nova (a validar)
+saídas,exit.annual_prob_no_cause,0.065,prob./ano,Chance de saída voluntária em 12 meses sem causa de risco,premissa
+saídas,exit.annual_prob_with_cause,0.4,prob./ano,Chance de saída voluntária em 12 meses com causa de risco (6 meses = metade),premissa
+saídas,exit.regretted_share,0.5,fração,Fração das saídas que é arrependida (por sorteio),case
+saídas,history.months,12,meses,Meses de histórico de eventos antes de T0,premissa
+intervenções,intervention.effect_right,0.5,fração,Redução da chance de saída quando a intervenção ataca a causa verdadeira,premissa
+intervenções,intervention.effect_wrong,0.1,fração,Redução da chance de saída quando a intervenção não ataca a causa,premissa
+intervenções,cost.compensation_share,0.1,fração do custo anual,Custo do ajuste salarial,premissa
+intervenções,cost.growth,5000,R$,Custo de carreira e projeto,premissa
+intervenções,cost.escalate,3000,R$,Custo de escalar para a liderança acima,premissa
+intervenções,cost.monitor,0,R$,Custo de monitorar,premissa
+intervenções,cost.replacement_share,0.75,fração do custo anual,Custo de reposição de quem sai,documento
+resultado,outcome.performing_if_treated,0.9,prob.,"Chance de seguir performando, se ficou e a causa foi tratada (ou não havia causa)",premissa nova (a validar)
+resultado,outcome.performing_if_untreated,0.75,prob.,"Chance de seguir performando, se ficou e a causa não foi tratada",premissa nova (a validar)
+comportamento,behavior.status_quo_prob_right,0.3333,prob.,"Sem o sistema, chance de o gestor escolher a intervenção certa",premissa
+comportamento,behavior.prediction_bias_pp,15,p.p.,Viés médio dos gestores: superestimam a chance de a pessoa ficar,premissa
+comportamento,behavior.prediction_noise_pp,10,p.p.,Dispersão das previsões dos gestores em torno do viés,premissa nova (a validar)
+comportamento,behavior.follow_recommendation,0.6,prob.,"Com o sistema, chance de o gestor seguir a recomendação",premissa
+casos,case.min_signals_same_cause,2,sinais,Abre-se um caso com este número de sinais da mesma causa,premissa
+rede,network.n_companies,30,empresas,Empresas na rede da Comp,premissa
+rede,network.n_cases,3000,casos,Casos fechados na rede (decisão + resultado em 6 meses),premissa
+rede,network.months,36,meses,Período coberto pela rede,premissa
+geração,generation.max_months_without_raise,36.0,meses,"Limite superior de meses sem mudança salarial, para quem tem o sinal",premissa (detalhe de geração)
+geração,generation.time_in_level_extra_months,12.0,meses,Quem tem o sinal 'tempo no nível' fica até N meses acima do limiar,premissa (detalhe de geração)
+geração,generation.max_months_since_manager_change,48.0,meses,"Para times sem troca recente, meses desde a última troca de gestor (máximo)",premissa (detalhe de geração)
+geração,generation.former_tenure_min_months,6.0,meses,Tempo de casa mínimo de quem saiu,premissa (detalhe de geração)
+geração,generation.former_tenure_max_months,60.0,meses,Tempo de casa máximo de quem saiu,premissa (detalhe de geração)
+geração,generation.neutral_context_share,0.15,fração,Pessoas sem sinal de contexto que têm uma nota neutra (conversa ou ata sem sinal),premissa (detalhe de geração)
+geração,generation.project_end_share,0.5,fração,"Entre sinais de crescimento por contexto, fração que vem de fim de projeto (o resto é pedido de crescimento)",premissa (detalhe de geração)
+geração,generation.network_company_min_employees,200.0,pessoas,Porte mínimo das empresas da rede,premissa (detalhe de geração)
+geração,generation.network_company_max_employees,3000.0,pessoas,Porte máximo das empresas da rede,premissa (detalhe de geração)
+geração,generation.network_min_months_ago,6.0,meses,"Decisões da rede têm pelo menos N meses, para o resultado ser conhecido",premissa (detalhe de geração)

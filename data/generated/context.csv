@@ -1,0 +1,340 @@
+context_id,employee_id,date,source,text,extracted_event,component
+K0001,C0003,2026-04-07,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0002,C0004,2026-06-15,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0003,C0008,2026-07-12,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0004,C0009,2026-07-01,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0005,C0010,2026-07-08,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0006,C0012,2026-04-27,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0007,C0013,2026-09-23,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0008,C0016,2026-08-30,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0009,C0016,2026-08-26,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0010,C0018,2026-08-10,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0011,C0023,2026-04-27,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0012,C0024,2026-09-07,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0013,C0028,2026-06-10,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0014,C0031,2026-09-13,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0015,C0032,2026-04-24,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0016,C0033,2026-04-09,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0017,C0034,2026-09-18,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0018,C0035,2026-07-10,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0019,C0039,2026-09-19,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0020,C0041,2026-08-01,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0021,C0042,2026-04-09,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0022,C0045,2026-05-25,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0023,C0046,2026-06-01,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0024,C0047,2026-06-22,ata de projeto,Projeto Atlas encerrado. Próximos passos de Pedro a definir.,fim_de_projeto_sem_escopo,crescimento
+K0025,C0051,2026-05-20,ata de projeto,Projeto Orion encerrado. Próximos passos de José a definir.,fim_de_projeto_sem_escopo,crescimento
+K0026,C0053,2026-09-17,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0027,C0056,2026-09-13,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0028,C0057,2026-04-18,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0029,C0063,2026-07-24,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0030,C0064,2026-05-31,ata de projeto,Projeto Lyra encerrado. Próximos passos de Mariana a definir.,fim_de_projeto_sem_escopo,crescimento
+K0031,C0065,2026-09-15,ata de projeto,Ata de encerramento do projeto Orion: entregas concluídas; Juliana ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0032,C0067,2026-07-30,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0033,C0074,2026-07-25,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0034,C0075,2026-05-05,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0035,C0079,2026-06-17,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0036,C0082,2026-05-08,ata de projeto,Ata de encerramento do projeto Lyra: entregas concluídas; Pedro ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0037,C0083,2026-05-22,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0038,C0086,2026-07-06,ata de projeto,Ata de encerramento do projeto Nimbus: entregas concluídas; Vinícius ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0039,C0087,2026-04-30,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0040,C0091,2026-07-31,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0041,C0092,2026-07-24,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0042,C0093,2026-05-18,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0043,C0096,2026-06-21,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0044,C0104,2026-08-05,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0045,C0106,2026-04-27,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0046,C0108,2026-05-06,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0047,C0108,2026-05-31,ata de projeto,Ata de encerramento do projeto Lyra: entregas concluídas; Rodrigo ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0048,C0113,2026-06-27,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0049,C0116,2026-05-24,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0050,C0118,2026-04-30,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0051,C0120,2026-06-20,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0052,C0125,2026-05-19,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0053,C0131,2026-07-21,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0054,C0132,2026-04-27,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0055,C0137,2026-05-06,ata de projeto,Projeto Lyra encerrado. Próximos passos de Rodrigo a definir.,fim_de_projeto_sem_escopo,crescimento
+K0056,C0139,2026-06-12,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0057,C0143,2026-08-29,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0058,C0144,2026-05-24,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0059,C0145,2026-06-25,ata de projeto,Projeto Atlas encerrado. Próximos passos de Gabriel a definir.,fim_de_projeto_sem_escopo,crescimento
+K0060,C0146,2026-07-05,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0061,C0150,2026-05-19,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0062,C0155,2026-05-02,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0063,C0158,2026-09-13,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0064,C0161,2026-08-22,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0065,C0163,2026-08-25,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0066,C0164,2026-09-15,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0067,C0166,2026-06-09,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0068,C0173,2026-09-12,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0069,C0174,2026-08-05,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0070,C0177,2026-04-16,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0071,C0180,2026-06-16,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0072,C0181,2026-04-22,ata de projeto,Projeto Nimbus encerrado. Próximos passos de Fernanda a definir.,fim_de_projeto_sem_escopo,crescimento
+K0073,C0183,2026-08-11,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0074,C0184,2026-07-22,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0075,C0185,2026-04-26,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0076,C0191,2026-07-11,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0077,C0194,2026-05-11,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0078,C0196,2026-07-17,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0079,C0197,2026-06-09,ata de projeto,Ata de encerramento do projeto Pulsar: entregas concluídas; Rafael ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0080,C0198,2026-08-30,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0081,C0200,2026-05-12,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0082,C0204,2026-06-13,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0083,C0205,2026-09-14,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0084,C0209,2026-09-15,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0085,C0210,2026-04-11,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0086,C0211,2026-09-23,ata de projeto,Ata de encerramento do projeto Vega: entregas concluídas; Mateus ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0087,C0213,2026-08-08,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0088,C0215,2026-04-12,ata de projeto,Ata de encerramento do projeto Atlas: entregas concluídas; Lucas ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0089,C0218,2026-08-19,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0090,C0219,2026-08-06,ata de projeto,Ata de encerramento do projeto Vega: entregas concluídas; Lucas ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0091,C0221,2026-07-09,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0092,C0224,2026-05-02,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0093,C0228,2026-07-22,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0094,C0228,2026-05-07,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0095,C0229,2026-04-16,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0096,C0231,2026-09-05,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0097,C0233,2026-06-13,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0098,C0234,2026-08-16,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0099,C0240,2026-09-24,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0100,C0241,2026-04-17,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0101,C0243,2026-04-22,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0102,C0246,2026-06-30,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0103,C0249,2026-05-11,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0104,C0252,2026-04-27,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0105,C0255,2026-04-30,ata de projeto,Ata de encerramento do projeto Atlas: entregas concluídas; Sebastián ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0106,C0256,2026-09-22,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0107,C0257,2026-05-13,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0108,C0266,2026-09-14,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0109,C0267,2026-05-29,ata de projeto,Ata de encerramento do projeto Aurora: entregas concluídas; Isabela ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0110,C0272,2026-05-26,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0111,C0274,2026-05-24,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0112,C0277,2026-05-22,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0113,C0284,2026-06-01,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0114,C0287,2026-05-10,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0115,C0304,2026-04-10,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0116,C0305,2026-08-29,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0117,C0310,2026-08-06,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0118,C0312,2026-04-13,ata de projeto,Projeto Orion encerrado. Próximos passos de Daniela a definir.,fim_de_projeto_sem_escopo,crescimento
+K0119,C0314,2026-04-19,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0120,C0315,2026-07-09,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0121,C0320,2026-04-07,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0122,C0321,2026-08-06,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0123,C0329,2026-07-24,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0124,C0330,2026-09-07,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0125,C0336,2026-06-30,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0126,C0337,2026-08-28,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0127,C0339,2026-06-04,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0128,C0342,2026-04-08,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0129,C0344,2026-06-18,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0130,C0345,2026-04-17,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0131,C0347,2026-05-13,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0132,C0349,2026-05-31,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0133,C0350,2026-09-03,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0134,C0352,2026-05-29,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0135,C0355,2026-09-20,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0136,C0356,2026-06-24,ata de projeto,Ata de encerramento do projeto Pulsar: entregas concluídas; Camila ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0137,C0362,2026-06-08,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0138,C0364,2026-07-02,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0139,C0368,2026-06-10,ata de projeto,Projeto Lyra encerrado. Próximos passos de María a definir.,fim_de_projeto_sem_escopo,crescimento
+K0140,C0378,2026-06-12,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0141,C0382,2026-04-11,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0142,C0385,2026-06-26,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0143,C0391,2026-08-30,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0144,C0398,2026-05-18,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0145,C0399,2026-08-22,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0146,C0400,2026-06-08,ata de projeto,Ata de encerramento do projeto Vega: entregas concluídas; Beatriz ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0147,C0402,2026-05-14,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0148,C0404,2026-07-31,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0149,C0410,2026-08-03,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0150,C0413,2026-09-24,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0151,C0418,2026-08-05,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0152,C0423,2026-07-30,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0153,C0426,2026-04-17,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0154,C0428,2026-06-03,ata de projeto,Projeto Vega encerrado. Próximos passos de Florencia a definir.,fim_de_projeto_sem_escopo,crescimento
+K0155,C0431,2026-04-18,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0156,C0433,2026-06-24,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0157,C0434,2026-05-04,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0158,C0436,2026-06-04,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0159,C0438,2026-07-06,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0160,C0441,2026-05-16,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0161,C0442,2026-09-24,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0162,C0444,2026-09-21,ata de projeto,Projeto Atlas encerrado. Próximos passos de Renata a definir.,fim_de_projeto_sem_escopo,crescimento
+K0163,C0446,2026-07-24,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0164,C0448,2026-05-11,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0165,C0451,2026-06-05,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0166,C0452,2026-07-12,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0167,C0457,2026-09-01,ata de projeto,Projeto Nimbus encerrado. Próximos passos de Micaela a definir.,fim_de_projeto_sem_escopo,crescimento
+K0168,C0458,2026-08-24,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0169,C0462,2026-06-11,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0170,C0464,2026-06-23,ata de projeto,Ata de encerramento do projeto Vega: entregas concluídas; Rafael ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0171,C0466,2026-04-24,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0172,C0469,2026-05-05,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0173,C0470,2026-05-10,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0174,C0471,2026-08-12,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0175,C0479,2026-06-01,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0176,C0480,2026-07-07,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0177,C0481,2026-08-12,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0178,C0485,2026-06-20,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0179,C0488,2026-07-27,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0180,C0493,2026-04-19,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0181,C0494,2026-04-08,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0182,C0497,2026-06-01,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0183,C0503,2026-04-20,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0184,C0507,2026-06-14,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0185,C0513,2026-09-07,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0186,C0516,2026-05-12,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0187,C0519,2026-07-11,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0188,C0520,2026-08-17,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0189,C0526,2026-07-23,ata de projeto,Ata de encerramento do projeto Nimbus: entregas concluídas; Renata ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0190,C0531,2026-09-19,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0191,C0532,2026-09-15,ata de projeto,Projeto Vega encerrado. Próximos passos de Vanessa a definir.,fim_de_projeto_sem_escopo,crescimento
+K0192,C0535,2026-09-05,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0193,C0536,2026-08-22,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0194,C0537,2026-08-09,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0195,C0541,2026-08-17,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0196,C0541,2026-04-24,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0197,C0548,2026-08-01,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0198,C0549,2026-07-25,ata de projeto,Projeto Aurora encerrado. Próximos passos de Camila a definir.,fim_de_projeto_sem_escopo,crescimento
+K0199,C0550,2026-06-15,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0200,C0552,2026-07-03,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0201,C0553,2026-07-04,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0202,C0556,2026-07-01,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0203,C0557,2026-05-20,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0204,C0558,2026-05-10,ata de projeto,Ata de encerramento do projeto Aurora: entregas concluídas; Felipe ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0205,C0559,2026-08-15,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0206,C0561,2026-07-08,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0207,C0562,2026-07-20,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0208,C0563,2026-05-04,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0209,C0564,2026-08-25,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0210,C0566,2026-09-25,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0211,C0567,2026-06-09,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0212,C0568,2026-06-22,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0213,C0570,2026-04-26,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0214,C0587,2026-04-09,ata de projeto,Projeto Pulsar encerrado. Próximos passos de Daniela a definir.,fim_de_projeto_sem_escopo,crescimento
+K0215,C0590,2026-04-23,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0216,C0591,2026-07-29,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0217,C0593,2026-06-27,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0218,C0594,2026-06-11,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0219,C0595,2026-08-06,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0220,C0596,2026-07-16,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0221,C0598,2026-05-12,ata de projeto,Projeto Kepler encerrado. Próximos passos de Gustavo a definir.,fim_de_projeto_sem_escopo,crescimento
+K0222,C0599,2026-07-04,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0223,C0604,2026-07-24,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0224,C0607,2026-07-01,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0225,C0608,2026-04-27,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0226,C0609,2026-07-24,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0227,C0612,2026-08-12,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0228,C0621,2026-05-19,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0229,C0621,2026-04-29,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0230,C0627,2026-06-03,ata de projeto,Projeto Orion encerrado. Próximos passos de Natália a definir.,fim_de_projeto_sem_escopo,crescimento
+K0231,C0629,2026-06-27,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0232,C0634,2026-05-09,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0233,C0635,2026-06-06,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0234,C0636,2026-06-13,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0235,C0646,2026-08-30,ata de projeto,Ata de encerramento do projeto Orion: entregas concluídas; Larissa ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0236,C0650,2026-06-12,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0237,C0651,2026-05-01,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0238,C0652,2026-09-10,ata de projeto,Ata de encerramento do projeto Kepler: entregas concluídas; Rodrigo ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0239,C0654,2026-07-03,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0240,C0658,2026-08-24,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0241,C0660,2026-09-15,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0242,C0661,2026-09-13,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0243,C0662,2026-09-06,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0244,C0664,2026-07-17,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0245,C0664,2026-04-29,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0246,C0676,2026-07-09,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0247,C0678,2026-09-08,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0248,C0678,2026-08-28,ata de projeto,Projeto Aurora encerrado. Próximos passos de João a definir.,fim_de_projeto_sem_escopo,crescimento
+K0249,C0680,2026-07-10,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0250,C0681,2026-08-05,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0251,C0682,2026-07-28,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0252,C0687,2026-05-16,ata de projeto,Projeto Nimbus encerrado. Próximos passos de Gustavo a definir.,fim_de_projeto_sem_escopo,crescimento
+K0253,C0688,2026-06-26,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0254,C0695,2026-07-14,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0255,C0696,2026-06-13,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0256,C0699,2026-09-07,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0257,C0703,2026-07-18,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0258,C0705,2026-09-12,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0259,C0708,2026-04-11,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0260,C0715,2026-08-15,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0261,C0719,2026-07-15,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0262,C0724,2026-08-28,ata de projeto,Ata de encerramento do projeto Orion: entregas concluídas; Gustavo ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0263,C0726,2026-09-02,ata de projeto,Projeto Vega encerrado. Próximos passos de Natalia a definir.,fim_de_projeto_sem_escopo,crescimento
+K0264,C0728,2026-06-17,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0265,C0729,2026-09-08,ata de projeto,Projeto Aurora encerrado. Próximos passos de Isabela a definir.,fim_de_projeto_sem_escopo,crescimento
+K0266,C0735,2026-04-21,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0267,C0738,2026-07-09,ata de projeto,Projeto Atlas encerrado. Próximos passos de Rafael a definir.,fim_de_projeto_sem_escopo,crescimento
+K0268,C0743,2026-05-13,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0269,C0749,2026-09-15,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0270,C0753,2026-05-23,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0271,C0755,2026-05-17,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0272,C0757,2026-08-28,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0273,C0760,2026-06-29,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0274,C0761,2026-09-20,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0275,C0763,2026-08-01,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0276,C0765,2026-06-28,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0277,C0769,2026-09-14,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0278,C0769,2026-07-23,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0279,C0781,2026-04-09,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0280,C0782,2026-07-30,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0281,C0785,2026-07-03,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0282,C0790,2026-07-31,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0283,C0793,2026-07-20,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0284,C0794,2026-09-11,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0285,C0795,2026-06-26,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0286,C0800,2026-09-04,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0287,C0807,2026-06-09,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0288,C0813,2026-06-25,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0289,C0824,2026-05-24,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0290,C0826,2026-04-16,ata de projeto,Projeto Lyra encerrado. Próximos passos de Fernanda a definir.,fim_de_projeto_sem_escopo,crescimento
+K0291,C0838,2026-04-15,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0292,C0840,2026-07-02,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0293,C0844,2026-04-27,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0294,C0851,2026-09-10,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0295,C0854,2026-09-21,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0296,C0856,2026-09-06,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0297,C0857,2026-05-10,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0298,C0869,2026-07-18,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0299,C0869,2026-08-30,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0300,C0875,2026-08-13,ata de projeto,Projeto Aurora encerrado. Próximos passos de Ana a definir.,fim_de_projeto_sem_escopo,crescimento
+K0301,C0883,2026-08-25,ata de projeto,Ata de encerramento do projeto Pulsar: entregas concluídas; Constanza ainda sem novo escopo definido.,fim_de_projeto_sem_escopo,crescimento
+K0302,C0884,2026-04-28,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0303,C0885,2026-06-21,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0304,C0886,2026-09-23,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0305,C0887,2026-04-12,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0306,C0891,2026-07-01,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0307,C0892,2026-06-05,nota de conversa de carreira,Pediu para discutir próximos passos de carreira; o plano de desenvolvimento ainda não foi formalizado.,pedido_crescimento_sem_plano,crescimento
+K0308,C0900,2026-06-18,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0309,C0901,2026-04-13,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0310,C0902,2026-04-30,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0311,C0903,2026-07-20,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0312,C0906,2026-08-13,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0313,C0908,2026-09-22,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0314,C0916,2026-06-13,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0315,C0920,2026-05-29,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0316,C0921,2026-05-08,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0317,C0922,2026-04-19,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0318,C0923,2026-05-16,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0319,C0926,2026-06-06,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0320,C0930,2026-09-04,nota de conversa de carreira,Ata de projeto: andamento conforme o planejado.,neutro,
+K0321,C0931,2026-09-10,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0322,C0934,2026-06-15,ata de projeto,Projeto Lyra encerrado. Próximos passos de Paulo a definir.,fim_de_projeto_sem_escopo,crescimento
+K0323,C0935,2026-06-18,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0324,C0938,2026-04-20,ata de projeto,Projeto Lyra encerrado. Próximos passos de Isabela a definir.,fim_de_projeto_sem_escopo,crescimento
+K0325,C0947,2026-05-13,ata de projeto,Projeto Orion encerrado. Próximos passos de Pedro a definir.,fim_de_projeto_sem_escopo,crescimento
+K0326,C0949,2026-06-09,nota de conversa de carreira,Conversa de carreira: sem pedidos ou preocupações registradas.,neutro,
+K0327,C0958,2026-08-08,nota de conversa de carreira,"Na conversa de carreira, disse que quer assumir mais responsabilidade e liderar iniciativas; não há plano de desenvolvimento registrado.",pedido_crescimento_sem_plano,crescimento
+K0328,C0961,2026-07-09,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0329,C0965,2026-05-17,ata de projeto,Projeto Kepler encerrado. Próximos passos de Ximena a definir.,fim_de_projeto_sem_escopo,crescimento
+K0330,C0973,2026-07-23,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0331,C0974,2026-09-19,nota de conversa de carreira,"Na conversa de carreira, comentou que tem recebido abordagens de recrutadores com propostas acima do salário atual.",proposta_externa,remuneração
+K0332,C0977,2026-08-23,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0333,C0978,2026-06-20,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0334,C0981,2026-05-28,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0335,C0983,2026-06-09,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0336,C0985,2026-06-11,nota de conversa de carreira,Conversa de carreira: satisfação com o escopo atual e interesse em aprofundar a área técnica.,neutro,
+K0337,C0986,2026-09-08,ata de projeto,Projeto Nimbus encerrado. Próximos passos de Matías a definir.,fim_de_projeto_sem_escopo,crescimento
+K0338,C0988,2026-06-12,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração
+K0339,C0991,2026-04-28,nota de conversa de carreira,Mencionou ter participado de processos seletivos fora da empresa e que as faixas oferecidas eram maiores.,proposta_externa,remuneração

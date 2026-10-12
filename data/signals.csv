@@ -1,0 +1,10 @@
+signal,component,level,source,description
+compa_below,remuneração,pessoa,estruturado,"Salário abaixo do mercado (compa-ratio abaixo do limiar, benchmark da Comp)"
+no_raise,remuneração,pessoa,estruturado,Sem mudança salarial (promoção ou reajuste) há mais que o limiar
+external_offer,remuneração,pessoa,contexto,Menção a propostas externas em conversa de carreira
+time_in_level,crescimento,pessoa,estruturado,Tempo no nível acima do múltiplo da referência do nível
+tenure_milestone,crescimento,pessoa,estruturado,Completa um marco de tempo de casa nos próximos meses
+growth_request,crescimento,pessoa,contexto,Fim de projeto sem novo escopo ou pedido de crescimento sem plano
+manager_change,gestor,time,estruturado,O time trocou de gestor recentemente
+team_exits,gestor,time,estruturado,Saídas voluntárias recentes no time
+pulse_manager,gestor,pessoa,estruturado,Nota baixa no pulso sobre clareza e apoio do gestor

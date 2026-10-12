@@ -35,3 +35,51 @@ Construção conduzida com AI (Claude), uma fase por vez. Antes de cada fase, as
 - O Streamlit não encontrou a branch `main` na primeira tentativa, por ter lido o repositório ainda vazio. Resolvido ao recarregar o formulário.
 
 **Status:** concluída e aprovada pelo autor.
+
+---
+
+## Fase 1 — Mundo e dados sintéticos
+
+**Objetivo:** gerar os dados sintéticos a partir de regras explícitas e verificáveis, antes de qualquer lógica de produto, porque todas as fases seguintes dependem desses números.
+
+**Decisões validadas antes da execução**
+
+| Decisão | Escolha | Racional |
+|---|---|---|
+| Premissas | Toda regra do mundo numa base editável (`data/assumptions.csv`), lida pelo sistema; nenhum número de regra no código | Pedido do autor: poder revisar regras depois. Cada número do protótipo fica explicável por uma premissa registrada |
+| Dados gerados | Derivados das premissas, nunca editados à mão | Editar dados à mão quebraria a coerência entre regra e dado |
+| Edição | Por commit na base de premissas; edição dentro do app adiada | O Streamlit Cloud não persiste arquivos gravados pelo app; persistir exigiria um banco externo sem ganho relevante agora |
+| Medianas de mercado | +10% sobre a 4.3 (júnior R$ 140 mil a gestor R$ 470 mil) | Com os valores originais a folha ficava em ~R$ 227 mi, abaixo dos ~R$ 250 mi da seção 3.3 |
+| Ordem de geração | Causa oculta → sinais → dados brutos construídos para exibir os sinais → histórico | Coerência por construção; a checagem passa a ser exata |
+| Sinal "abaixo de recém-contratados" | Trocado por "sem mudança salarial há mais de 18 meses" | Media o mesmo que o compa-ratio e contaria remuneração duas vezes |
+| Sinal "tempo no nível" | Comparado a uma referência por nível (premissa), não à mediana dos pares | Evita dependência circular entre pessoas na geração |
+| Causa "gestor" | Nasce no time (10% dos gestores de time têm problema de relação); sinais de time sorteados por time | Troca de gestor e saídas no time são fatos do time, não da pessoa; a visão da liderança passa a mostrar times que concentram risco |
+| Formato e visibilidade | CSV no repositório; página "Como os dados foram gerados" no app | Legível no GitHub e no app sem rodar código |
+
+**O que foi construído**
+
+- Base de premissas com 88 regras, cada uma com origem marcada; catálogos de sinais (9) e de intervenções (4).
+- Módulo único de acesso às premissas: falha se uma premissa não existir e registra quais foram lidas.
+- Gerador do mundo: 1.000 colaboradores ativos, 151 saídas voluntárias nos últimos 12 meses, eventos, benchmark, gestores, pulso, anotações de contexto e a rede da Comp (30 empresas, 3.000 casos fechados).
+- Recálculo dos sinais apenas a partir dos dados brutos (base do motor da Fase 2).
+- 30 checagens com metas derivadas das premissas e página no app com premissas, checagens e tabelas.
+
+**Checagens**
+
+- 30 de 30 checagens passaram (detalhe na página "Como os dados foram gerados").
+- Sinais recalculados dos dados brutos idênticos aos sorteados pelas regras em 100% das pessoas.
+- Folha de R$ 247,4 mi; turnover de 15,1%; custo de reposição das saídas arrependidas de R$ 14,5 mi (seção 3.3: ~R$ 14 mi).
+- 176 casos seriam abertos em T0 (~2 por gestor de time).
+- Testes: 15 passando, incluindo: toda premissa é usada, mudar uma premissa mantém as checagens válidas, o retrato commitado é igual ao que as premissas geram, nenhum módulo do sistema lê a verdade oculta.
+
+**Premissas novas, criadas durante a execução (a validar)**
+
+- Janela de 6 meses para eventos de contexto; chance de seguir performando de 90% (causa tratada) e 75% (não tratada); dispersão de 10 p.p. nas previsões dos gestores.
+- Dez detalhes de geração (faixas de datas, porte das empresas da rede, fração de anotações neutras), marcados como "detalhe de geração".
+
+**Pontos levantados para o autor**
+
+- A causa "gestor" fica em 4,4%, e não 5%: 10% dos times × 90% de pessoas que não são gestoras × 50%.
+- Na rede, a diferença de permanência entre a intervenção certa e as demais é de poucos pontos (ex.: remuneração: ajuste 89,8% contra 87,5% monitorando), porque a chance de saída em 6 meses com causa é de 20%.
+
+**Status:** em validação pelo autor.

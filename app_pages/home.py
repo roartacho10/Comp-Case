@@ -17,7 +17,7 @@ st.markdown(
 | Fase | Conteúdo | Status |
 |---|---|---|
 | 0 | Fundação: repositório, estrutura e publicação | Concluída |
-| 1 | Mundo e dados sintéticos | A fazer |
+| 1 | Mundo e dados sintéticos | Em validação |
 | 2 | Personagens e motor de regras | A fazer |
 | 3 | Fluxo 1: caso do gestor | A fazer |
 | 4 | Fluxos 2 e 3: aprendizado e liderança | A fazer |

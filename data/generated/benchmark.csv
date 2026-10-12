@@ -1,0 +1,121 @@
+area,level,country,median_annual_brl
+Engenharia,Júnior,Brasil,140000.0
+Engenharia,Júnior,México,133000.0
+Engenharia,Júnior,Colômbia,105000.0
+Engenharia,Júnior,Argentina,98000.0
+Engenharia,Júnior,Chile,133000.0
+Engenharia,Pleno,Brasil,230000.0
+Engenharia,Pleno,México,218500.0
+Engenharia,Pleno,Colômbia,172500.0
+Engenharia,Pleno,Argentina,161000.0
+Engenharia,Pleno,Chile,218500.0
+Engenharia,Sênior,Brasil,350000.0
+Engenharia,Sênior,México,332500.0
+Engenharia,Sênior,Colômbia,262500.0
+Engenharia,Sênior,Argentina,245000.0
+Engenharia,Sênior,Chile,332500.0
+Engenharia,Gestor,Brasil,470000.0
+Engenharia,Gestor,México,446500.0
+Engenharia,Gestor,Colômbia,352500.0
+Engenharia,Gestor,Argentina,329000.0
+Engenharia,Gestor,Chile,446500.0
+Vendas,Júnior,Brasil,140000.0
+Vendas,Júnior,México,133000.0
+Vendas,Júnior,Colômbia,105000.0
+Vendas,Júnior,Argentina,98000.0
+Vendas,Júnior,Chile,133000.0
+Vendas,Pleno,Brasil,230000.0
+Vendas,Pleno,México,218500.0
+Vendas,Pleno,Colômbia,172500.0
+Vendas,Pleno,Argentina,161000.0
+Vendas,Pleno,Chile,218500.0
+Vendas,Sênior,Brasil,350000.0
+Vendas,Sênior,México,332500.0
+Vendas,Sênior,Colômbia,262500.0
+Vendas,Sênior,Argentina,245000.0
+Vendas,Sênior,Chile,332500.0
+Vendas,Gestor,Brasil,470000.0
+Vendas,Gestor,México,446500.0
+Vendas,Gestor,Colômbia,352500.0
+Vendas,Gestor,Argentina,329000.0
+Vendas,Gestor,Chile,446500.0
+Customer Success,Júnior,Brasil,140000.0
+Customer Success,Júnior,México,133000.0
+Customer Success,Júnior,Colômbia,105000.0
+Customer Success,Júnior,Argentina,98000.0
+Customer Success,Júnior,Chile,133000.0
+Customer Success,Pleno,Brasil,230000.0
+Customer Success,Pleno,México,218500.0
+Customer Success,Pleno,Colômbia,172500.0
+Customer Success,Pleno,Argentina,161000.0
+Customer Success,Pleno,Chile,218500.0
+Customer Success,Sênior,Brasil,350000.0
+Customer Success,Sênior,México,332500.0
+Customer Success,Sênior,Colômbia,262500.0
+Customer Success,Sênior,Argentina,245000.0
+Customer Success,Sênior,Chile,332500.0
+Customer Success,Gestor,Brasil,470000.0
+Customer Success,Gestor,México,446500.0
+Customer Success,Gestor,Colômbia,352500.0
+Customer Success,Gestor,Argentina,329000.0
+Customer Success,Gestor,Chile,446500.0
+G&A,Júnior,Brasil,140000.0
+G&A,Júnior,México,133000.0
+G&A,Júnior,Colômbia,105000.0
+G&A,Júnior,Argentina,98000.0
+G&A,Júnior,Chile,133000.0
+G&A,Pleno,Brasil,230000.0
+G&A,Pleno,México,218500.0
+G&A,Pleno,Colômbia,172500.0
+G&A,Pleno,Argentina,161000.0
+G&A,Pleno,Chile,218500.0
+G&A,Sênior,Brasil,350000.0
+G&A,Sênior,México,332500.0
+G&A,Sênior,Colômbia,262500.0
+G&A,Sênior,Argentina,245000.0
+G&A,Sênior,Chile,332500.0
+G&A,Gestor,Brasil,470000.0
+G&A,Gestor,México,446500.0
+G&A,Gestor,Colômbia,352500.0
+G&A,Gestor,Argentina,329000.0
+G&A,Gestor,Chile,446500.0
+Produto,Júnior,Brasil,140000.0
+Produto,Júnior,México,133000.0
+Produto,Júnior,Colômbia,105000.0
+Produto,Júnior,Argentina,98000.0
+Produto,Júnior,Chile,133000.0
+Produto,Pleno,Brasil,230000.0
+Produto,Pleno,México,218500.0
+Produto,Pleno,Colômbia,172500.0
+Produto,Pleno,Argentina,161000.0
+Produto,Pleno,Chile,218500.0
+Produto,Sênior,Brasil,350000.0
+Produto,Sênior,México,332500.0
+Produto,Sênior,Colômbia,262500.0
+Produto,Sênior,Argentina,245000.0
+Produto,Sênior,Chile,332500.0
+Produto,Gestor,Brasil,470000.0
+Produto,Gestor,México,446500.0
+Produto,Gestor,Colômbia,352500.0
+Produto,Gestor,Argentina,329000.0
+Produto,Gestor,Chile,446500.0
+Marketing,Júnior,Brasil,140000.0
+Marketing,Júnior,México,133000.0
+Marketing,Júnior,Colômbia,105000.0
+Marketing,Júnior,Argentina,98000.0
+Marketing,Júnior,Chile,133000.0
+Marketing,Pleno,Brasil,230000.0
+Marketing,Pleno,México,218500.0
+Marketing,Pleno,Colômbia,172500.0
+Marketing,Pleno,Argentina,161000.0
+Marketing,Pleno,Chile,218500.0
+Marketing,Sênior,Brasil,350000.0
+Marketing,Sênior,México,332500.0
+Marketing,Sênior,Colômbia,262500.0
+Marketing,Sênior,Argentina,245000.0
+Marketing,Sênior,Chile,332500.0
+Marketing,Gestor,Brasil,470000.0
+Marketing,Gestor,México,446500.0
+Marketing,Gestor,Colômbia,352500.0
+Marketing,Gestor,Argentina,329000.0
+Marketing,Gestor,Chile,446500.0
