@@ -334,4 +334,15 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Nenhuma chave no histórico do git.
 - Capturas de tela das páginas em 1.440 e 1.280 px revisadas.
 
+**Revisão pedida pelo autor após a aprovação**
+
+| Ponto | Mudança | Racional |
+|---|---|---|
+| Previsão do gestor | Escala verbal de 4 respostas (quase certo que fica, provavelmente fica, provavelmente sai, quase certo que sai), convertida em 90%, 70%, 30% e 10% de chance de ficar (premissas `prediction.scale.*`); a resposta é obrigatória | Ninguém tem um percentual na cabeça. O binário "fica / não fica" esconderia o viés (a maioria fica, então "fica" acerta sem informação) e impediria somar previsões; a escala é o binário com um grau de confiança |
+| Opções lado a lado | Colunas "Custo", "Perda que evita" e "Saldo" (saldo = perda que evita − custo, no tempo em que a pessoa deve ficar); para carreira e projeto, a perda que evita é o máximo que vale investir, também em horas do tempo do gestor (premissa `general.work_hours_per_year`) | "Compensa se custar até R$ X" não dizia com o que comparar o número |
+| Custo de carreira e projeto nos totais | Explícito nas páginas 3 e 4: estimado em R$ 5 mil por caso (premissa `cost.growth`) | Para o gestor o custo é "você estima"; nos totais, o sistema usa a referência, e isso precisa estar dito |
+| "Onde entra a AI" | Texto da página inicial e do README reescrito: a AI transforma texto em dado e escreve; o motor calcula e aprende com a rede, o cliente e cada gestor | Alinhado à discussão sobre o papel estrutural da AI |
+
+Testes: 52 passando, incluindo a previsão obrigatória no formulário e no teste do navegador.
+
 **Status:** concluída e aprovada pelo autor.
