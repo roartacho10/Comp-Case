@@ -69,6 +69,7 @@ Os dados em `data/generated/` são **derivados** dessas tabelas e não são edit
 - O Slack é uma imagem da conversa, sem integração; não há integração com HRIS.
 - Duas causas tratáveis: remuneração e crescimento. Problemas na relação com a gestão são uma causa possível na solução, mas ficaram fora do protótipo.
 - O aprendizado usa regras simples e transparentes, sem modelo treinado.
+- A checagem de números garante que todo número citado pela AI existe nos fatos recebidos, mas não que ele esteja associado ao indicador certo. O risco é baixo, porque cada mensagem trata de uma pessoa e a AI reescreve um texto padrão que já traz os números no lugar; a defesa completa seria a AI devolver o texto com marcadores e o sistema inserir os números.
 - A visão do colaborador, as flags de priorização e a redução de dependência ficam descritas no documento, não construídas.
 
 ## Construção em fases
@@ -89,7 +90,8 @@ Os dados em `data/generated/` são **derivados** dessas tabelas e não são edit
 pip install -r requirements.txt
 streamlit run app.py
 python scripts/generate_data.py   # regenera os CSVs a partir das premissas e roda as checagens
-pytest                            # o teste no navegador roda se o Playwright estiver instalado
+pytest                            # suíte principal; o teste no navegador roda se o Playwright estiver instalado
+pytest -m slow                    # testes demorados: outras sementes do mundo e todas as páginas com cada decisão
 ```
 
 ## Estrutura

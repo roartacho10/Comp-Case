@@ -346,3 +346,26 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 Testes: 52 passando, incluindo a previsão obrigatória no formulário e no teste do navegador.
 
 **Status:** concluída e aprovada pelo autor.
+
+---
+
+## Auditoria independente do código
+
+O autor pediu a outros modelos uma auditoria do código, com um relatório de achados e um arquivo de testes que reproduz cada um. Os 15 achados se reproduziram; cada um foi avaliado e corrigido com aprovação do autor.
+
+| Achado | Avaliação | Correção |
+|---|---|---|
+| Valor preservado com reposição média | Confirmado: saídas de quem ganha mais pesam mais | Soma caso a caso: (chance de sair sem ação − saiu ou não) × reposição da pessoa. Reposição evitada de R$ 4,0 para R$ 4,7 mi; valor preservado de ~R$ 2,2 para ~R$ 3,0 mi |
+| Custo das intervenções no resultado | Parcial: o custo planejado é válido na decisão, não no resultado | Página 4 usa o custo pago (ajuste salarial só enquanto a pessoa ficou): R$ 1,7 mi, contra R$ 1,8 mi planejados |
+| Casos sem quem decida | Confirmado: 3 diretores sem superior | Vão para o time de People (RH); a calibração cobre todos os casos |
+| Aprendizado com dois critérios de causa | Confirmado | Agrupado pela causa do motor; a crença do gestor fica em `manager_cause` |
+| Personagem sem decisão com previsão de 50% | Confirmado | Sem previsão; fora das saídas esperadas pelos gestores |
+| Evidência de contexto repetida | Confirmado | Anotação filtrada pelo tipo de sinal e pela janela de contexto |
+| Rótulo "/ano", turnover em períodos diferentes, textos fixos ("metade", "75%", "2 ou mais", "3 sinais", 365 dias) | Confirmados; só aparecem com premissas editadas | Custo anual em coluna própria; mesmo período antes e depois; textos derivados das premissas |
+| Casos de borda: múltiplo de risco, "R$ 1000 mil", frase sobre gestão, "rede" no texto padrão, comentários de 6 meses | Confirmados | Corrigidos |
+| Números por extenso na checagem da AI | Confirmado | Reconhecidos de dois a cem e checados como dígitos |
+| AI trocar números verdadeiros entre si | Risco teórico, sem caso reproduzido | Registrado como limitação no README |
+| Mapa por área e causa com células menores que o grupo mínimo | Parcial: a regra vale para times de pessoas; a contagem por área não identifica ninguém | Legenda corrigida para "times com menos de 5 pessoas" |
+| Checagens que falham em 3 de 58 sementes | Variação estatística esperada | Registrado |
+
+Os testes da auditoria entraram na suíte (`tests/test_auditoria.py`); três foram ajustados à correção escolhida. Suíte principal: 81 testes; testes demorados (outras sementes e todas as páginas com cada decisão): 37, com `pytest -m slow`. Todos passando.
