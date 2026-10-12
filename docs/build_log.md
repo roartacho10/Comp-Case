@@ -199,4 +199,9 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Testes: 28 passando, incluindo: nenhuma mensagem usa rótulos ou tom de comando, todas dizem "a decisão é sua" e "não é uma previsão sobre", o caso escalado explica o roteamento, e divergir sem justificativa é bloqueado.
 - Fluxo percorrido no navegador: caso da Mariana; caso da Lucía com ajuste salarial (bloqueado sem justificativa, registrado com justificativa, resposta e confirmação na conversa).
 
+**Ocorrência no app publicado**
+
+- Depois do push, a página "1. Caso do gestor" quebrou no Streamlit Cloud (`AttributeError` em `a.questions`). Causa: o servidor recarrega só os módulos cujos arquivos mudaram; módulos inalterados continuam apontando para versões antigas dos que mudaram, e o app mistura código velho e novo. Reproduzido localmente (servidor iniciado no commit da Fase 2, arquivos trocados pelos da Fase 3 com o servidor no ar).
+- Correção: o `app.py` calcula uma impressão digital do código e dos dados; se mudou desde a última execução, descarta todos os módulos do projeto e o cache de dados antes de carregar as páginas. Verificado com o mesmo procedimento de reprodução: as páginas carregam sem erro.
+
 **Status:** em validação pelo autor.
