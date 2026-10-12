@@ -171,7 +171,7 @@ if st.session_state["advanced"]:
         ignore_index=True,
     )
     outcomes = simulation.advance_window(ctx, decisions, a)
-    learn = simulation.learning(engine, decisions, outcomes)
+    learn = simulation.learning(engine, decisions, outcomes, a.num("ev.interval_level"))
     s = learn["summary"].iloc[0]
 
     m1, m2, m3, m4 = st.columns(4)
@@ -179,9 +179,16 @@ if st.session_state["advanced"]:
     m2.metric("Seguiram a recomendação", pct(s["followed"], 0))
     m3.metric(f"Ficaram em {W} meses", pct(s["stayed"], 0))
     m4.metric(f"Custo das intervenções ({W} meses)", brl(s["cost_window"]))
+    lo_m, hi_m = s["exits_range_manager"]
+    lo_s, hi_s = s["exits_range_system"]
     st.markdown(
-        f"**Saídas nos casos abertos: os gestores esperavam {s['exits_expected_manager']:.0f}, o sistema esperava "
-        f"{s['exits_expected_system']:.0f} e ocorreram {int(s['exits_realized'])}.**"
+        f"**Saídas nos casos abertos: os gestores esperavam {s['exits_expected_manager']:.0f} "
+        f"(faixa provável: {lo_m} a {hi_m}), o sistema esperava {s['exits_expected_system']:.0f} "
+        f"(faixa provável: {lo_s} a {hi_s}) e ocorreram {int(s['exits_realized'])}.**"
+    )
+    st.caption(
+        f"Faixa provável: onde o número de saídas cai em {pct(a.num('ev.interval_level'), 0)} das vezes se as "
+        "probabilidades previstas estiverem certas. Uma rodada isolada oscila em torno do esperado."
     )
     st.caption(
         f"Em chance de ficar: gestores {pct(s['manager_predicted'], 0)}, sistema {pct(s['system_predicted'], 0)}, "

@@ -147,7 +147,16 @@ def advance_window(ctx: SimContext, decisions: pd.DataFrame, a: Assumptions) -> 
     return pd.DataFrame(rows)
 
 
-def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFrame) -> dict[str, pd.DataFrame]:
+def _exit_range(probs: pd.Series, level: float) -> tuple[int, int]:
+    """Likely range of the number of exits if the forecast probabilities are right (normal approximation)."""
+    from statistics import NormalDist
+
+    z = NormalDist().inv_cdf(1 - (1 - level) / 2)
+    mean, sd = probs.sum(), float(np.sqrt((probs * (1 - probs)).sum()))
+    return int(np.floor(mean - z * sd)), int(np.ceil(mean + z * sd))
+
+
+def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFrame, level: float = 0.8) -> dict[str, pd.DataFrame]:
     closed = decisions.merge(outcomes[["employee_id", "stayed", "performing", "exit_month", "note"]],
                              on="employee_id")
 
@@ -179,6 +188,8 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
         manager_predicted=closed["manager_prediction"].mean(), system_predicted=closed["system_prediction"].mean(),
         exits_expected_manager=(1 - closed["manager_prediction"]).sum(),
         exits_expected_system=(1 - closed["system_prediction"]).sum(),
+        exits_range_manager=_exit_range(1 - closed["manager_prediction"], level),
+        exits_range_system=_exit_range(1 - closed["system_prediction"], level),
         exits_realized=int((~closed["stayed"]).sum()),
         company_exits=int((~outcomes["stayed"]).sum()), company_regretted=int(outcomes["regretted"].sum()),
     )])
