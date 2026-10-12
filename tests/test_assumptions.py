@@ -58,7 +58,10 @@ def test_every_assumption_is_used(monkeypatch):
     monkeypatch.setattr(anthropic, "Anthropic", _FakeAnthropic)  # exercises the real call path, offline
     ai._store().clear()
     ai.write_summary("texto", {}, a)
-    assert _FakeAnthropic.last["create"]["model"] == a.text("ai.model")
+    sent = _FakeAnthropic.last["create"]
+    assert sent["model"] == a.text("ai.model")
+    assert sent["output_config"]["effort"] == a.text("ai.effort")
+    assert sent["output_config"]["format"]["type"] == "json_schema"
     assert a.unused() == []
 
 

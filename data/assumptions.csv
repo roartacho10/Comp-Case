@@ -99,4 +99,5 @@ privacidade,privacy.min_group_size,5,pessoas,Tamanho mínimo de grupo exibido na
 AI,ai.model,claude-sonnet-5-5,-,Modelo usado para escrever as mensagens e ler as anotações,Equilíbrio entre qualidade de texto e velocidade recomendado pela documentação da Anthropic; custo de centavos por demonstração,premissa
 AI,ai.timeout_seconds,20,segundos,Tempo máximo de espera por uma resposta da AI,"Acima disso, a tela usa o texto padrão para não travar a demonstração",premissa (detalhe de cálculo)
 AI,ai.max_calls_per_session,20,chamadas,Limite de chamadas à AI por sessão,O app é público: protege a chave contra uso abusivo; os textos ficam guardados no servidor e não contam de novo,premissa (detalhe de cálculo)
-AI,ai.max_tokens,1500,tokens,Tamanho máximo de cada resposta da AI,Folga para as mensagens mais longas (cerca de 220 palavras) em formato JSON,premissa (detalhe de cálculo)
+AI,ai.max_tokens,4000,tokens,Tamanho máximo de cada resposta da AI,"Folga para a resposta (até ~220 palavras em JSON) e para algum raciocínio interno do modelo, que também conta nesse limite",premissa (detalhe de cálculo)
+AI,ai.effort,low,-,Nível de esforço de raciocínio pedido ao modelo,Reescrever texto a partir de fatos prontos é tarefa simples: esforço baixo responde mais rápido e não consome o limite de tamanho com raciocínio,premissa (detalhe de cálculo)

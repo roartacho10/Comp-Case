@@ -36,7 +36,7 @@ def fake(monkeypatch):
     ai._store().clear()
     monkeypatch.setattr(ai, "available", lambda: True)
 
-    def call(system, user, a):
+    def call(system, user, a, task="summary"):
         f.calls += 1
         if isinstance(f.reply, Exception):
             raise f.reply

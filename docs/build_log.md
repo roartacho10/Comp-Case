@@ -295,4 +295,9 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - App verificado no navegador sem chave: seletor desabilitado, textos padrão com o motivo.
 - **Pendente:** teste com a API real, que depende da chave do autor nos secrets do Streamlit.
 
+**Ocorrência no primeiro teste com a API real**
+
+- Com a chave configurada, a página 1 caiu no texto padrão com "falha na chamada: ValueError": a resposta não chegou como JSON utilizável. Causa mais provável: o Sonnet 5.5 usa raciocínio adaptativo com esforço alto por padrão, e o raciocínio conta no limite de tamanho da resposta (1.500 tokens); o texto final pode ter vindo vazio ou cortado. O motivo exato não aparecia, porque a mensagem de erro só mostrava o tipo.
+- Correção, seguindo a documentação da Anthropic: esforço baixo (`output_config.effort = low`, nova premissa), raciocínio mínimo (`thinking: between_tools`), resposta obrigada a seguir o esquema JSON de cada tarefa (`output_config.format`, saídas estruturadas) e limite de 4.000 tokens. O selo passa a mostrar o detalhe da falha (tipo, mensagem e motivo de parada), para diagnóstico direto na tela.
+
 **Status:** em validação pelo autor.

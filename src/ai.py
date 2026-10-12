@@ -93,7 +93,37 @@ def _parse(text: str) -> dict:
     return json.loads(text[start:end + 1])
 
 
-def _call_model(system: str, user: str, a: Assumptions) -> str:
+STRING = {"type": "string"}
+SCHEMAS = {
+    "case": {
+        "type": "object",
+        "properties": {
+            "intro": STRING, "signals": {"type": "array", "items": STRING}, "risk": STRING, "cause": STRING,
+            "suggestion": STRING, "questions": {"type": "array", "items": STRING}, "closing": STRING,
+        },
+        "required": ["intro", "signals", "risk", "cause", "suggestion", "questions", "closing"],
+        "additionalProperties": False,
+    },
+    "followup": {"type": "object", "properties": {"text": STRING}, "required": ["text"], "additionalProperties": False},
+    "summary": {"type": "object", "properties": {"text": STRING}, "required": ["text"], "additionalProperties": False},
+    "extract": {
+        "type": "object",
+        "properties": {
+            "signal": {"type": "string", "enum": ["external_offer", "growth_request", "manager_relationship", "none"]},
+            "quote": STRING,
+        },
+        "required": ["signal", "quote"],
+        "additionalProperties": False,
+    },
+}
+
+
+class EmptyResponse(ValueError):
+    pass
+
+
+def _call_model(system: str, user: str, a: Assumptions, task: str = "summary") -> str:
+    """One call with low effort, minimal thinking and the answer constrained to the task's JSON schema."""
     import anthropic
 
     client = anthropic.Anthropic(api_key=_api_key(), timeout=a.num("ai.timeout_seconds"), max_retries=1)
@@ -102,8 +132,13 @@ def _call_model(system: str, user: str, a: Assumptions) -> str:
         max_tokens=a.int("ai.max_tokens"),
         system=system,
         messages=[{"role": "user", "content": user}],
+        thinking={"type": "between_tools"},
+        output_config={"effort": a.text("ai.effort"), "format": {"type": "json_schema", "schema": SCHEMAS[task]}},
     )
-    return "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
+    text = "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
+    if not text.strip():
+        raise EmptyResponse(f"resposta vazia (stop_reason={getattr(response, 'stop_reason', '?')})")
+    return text
 
 
 def generate(task: str, payload: dict, fallback: dict, required_keys: list[str], a: Assumptions,
@@ -124,10 +159,11 @@ def generate(task: str, payload: dict, fallback: dict, required_keys: list[str],
     st.session_state["ai_calls"] = calls + 1
     try:
         system = _prompt("system") + "\n\n" + _prompt(task)
-        raw = _call_model(system, json.dumps(payload, ensure_ascii=False, indent=1), a)
+        raw = _call_model(system, json.dumps(payload, ensure_ascii=False, indent=1), a, task)
         output = _parse(raw)
-    except Exception as exc:  # timeout, network, parsing
-        return AIResult(fallback, "padrão", f"falha na chamada: {type(exc).__name__}")
+    except Exception as exc:  # timeout, network, API error, empty or invalid answer
+        detail = str(exc).replace("\n", " ")[:140]
+        return AIResult(fallback, "padrão", f"falha na chamada: {type(exc).__name__}: {detail}")
     reason = check(output, payload, required_keys, required_phrase)
     if reason:
         return AIResult(fallback, "padrão", reason)
