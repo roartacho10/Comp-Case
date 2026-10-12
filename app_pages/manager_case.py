@@ -5,7 +5,7 @@ import streamlit as st
 
 from src.app_data import assumptions, load_world
 from src.case_text import build_case_message, confirmation_message
-from src.engine import MONITOR, comparable_cases, signal_evidence
+from src.engine import MONITOR, signal_evidence
 from src.format import brl, pct
 from src.ui import md, message_header, synthetic_data_banner
 
@@ -13,7 +13,7 @@ synthetic_data_banner()
 st.title("1. Caso do gestor")
 st.caption(
     "O gestor recebe o caso numa conversa de Slack (simulado; sem integração real), com o contexto do que os dados "
-    "indicam e do que a rede aprendeu. A decisão é dele, e a previsão registrada agora é comparada com o resultado depois."
+    "indicam. A decisão é dele, e a previsão registrada agora é comparada com o resultado depois."
 )
 
 world = load_world()
@@ -25,7 +25,6 @@ cases = engine.cases.set_index("employee_id")
 personas = tables["personas"].set_index("persona_id")
 hris = tables["hris"].set_index("employee_id")
 managers = tables["managers"].set_index("manager_id")
-companies = tables["network_companies"].set_index("company_id")
 
 st.session_state.setdefault("persona_decisions", {})
 st.session_state.setdefault("advanced", False)
@@ -68,49 +67,40 @@ with right, st.container(border=True):
     message_header("Comp · Retenção", "hoje, 09:12")
     md(msg["intro"])
 
-    st.markdown("**Por que agora**")
+    st.markdown("**O que chamou atenção**")
     md("\n".join(f"- {s}" for s in msg["signals"]))
     md(msg["risk"])
 
-    st.markdown("**Causa provável**")
-    md(msg["cause"])
+    md(f"**O motivo mais provável:** {msg['cause']}")
 
-    st.markdown("**O que a rede aprendeu**")
-    md(msg["learned"])
-
-    st.markdown("**Sugestão**")
+    st.markdown("**O que os dados sugerem**")
     md(msg["suggestion"])
 
     st.markdown("**Perguntas que podem ajudar na conversa**")
     st.markdown("\n".join(f"{i}. {q}" for i, q in enumerate(msg["questions"], 1)))
 
-    st.markdown("**Opções e o que os dados dizem sobre cada uma**")
+    st.markdown("**As opções lado a lado**")
     table = pd.DataFrame({
         "": opts["intervention"].eq(case["recommended"]).map({True: "★", False: ""}).values,
         "Opção": opts["intervention"].values,
-        f"Chance de ficar em {W} meses": [f"{pct(r, 0)} ({pct(lo, 0)} a {pct(hi, 0)})"
-                                          for r, lo, hi in zip(opts["stay_rate"], opts["stay_lo"], opts["stay_hi"])],
-        "Custo": [("—" if i == MONITOR else f"{brl(c)} em {W} meses" if rec else brl(c))
+        f"Fica em {W} meses": [pct(r, 0) for r in opts["stay_rate"]],
+        "Custo": [("—" if i == MONITOR else f"{brl(c)} por ano" if rec else f"você avalia (ref.: {brl(c)})")
                   for i, c, rec in zip(opts["intervention"], opts["cost_window"], opts["recurring"])],
-        "Retorno esperado": [("referência" if i == MONITOR else f"{brl(e)} ({brl(lo)} a {brl(hi)})")
-                             for i, e, lo, hi in zip(opts["intervention"], opts["ev"], opts["ev_lo"], opts["ev_hi"])],
+        "Saldo estimado": [("referência" if i == MONITOR else brl(e))
+                           for i, e in zip(opts["intervention"], opts["ev"])],
     })
-    st.dataframe(table, hide_index=True, width="stretch")
+    st.dataframe(table, hide_index=True, width="stretch", column_config={
+        "": st.column_config.TextColumn(width=30),
+        "Opção": st.column_config.TextColumn(width="medium"),
+        f"Fica em {W} meses": st.column_config.TextColumn(width="small"),
+        "Custo": st.column_config.TextColumn(width="medium"),
+        "Saldo estimado": st.column_config.TextColumn(width="small"),
+    })
     st.caption(
-        "Retorno esperado: quanto a empresa tende a economizar com a opção, descontado o custo, no tempo em que a pessoa "
-        f"ainda ficaria (reposição de quem sai e diferença de mercado do substituto). O resultado é verificado em {W} meses; "
-        "o restante é estimativa."
+        "★ opção sugerida. Saldo estimado: o que a empresa tende a economizar evitando a saída (reposição e substituto a valor de mercado), "
+        "menos o custo da opção, no tempo em que a pessoa ainda deve ficar. Para ações cujo custo você conhece melhor, "
+        f"o saldo usa um custo de referência. O resultado é medido em {W} meses."
     )
-
-    comps = comparable_cases(tables["network_cases"], a, case["cause"], case["level"], case["recommended"])
-    with st.expander(f"Casos parecidos na rede ({case['recommended'].lower()}, mesmo nível)"):
-        st.dataframe(pd.DataFrame({
-            "Empresa": [f"SaaS B2B, {companies.loc[c, 'employees']} pessoas" for c in comps["company_id"]],
-            "País": comps["country"].values,
-            "Opção": comps["intervention"].values,
-            f"Ficou em {W} meses": comps["stayed"].map({True: "sim", False: "não"}).values,
-            "Segue performando": comps["performing"].map({True: "sim", False: "não"}).values,
-        }), hide_index=True, width="stretch")
 
     md(msg["closing"])
     st.caption(f"{case['name'].split()[0]} não vê esta mensagem nem nenhum número.")
@@ -134,7 +124,7 @@ with right, st.container(border=True):
             names = opts["intervention"].tolist()
             chosen = st.radio("O que você vai fazer", names, index=names.index(case["recommended"]))
             tied = case["tied_causes"].split(", ")
-            belief = st.selectbox("Causa em que você acredita, depois da conversa",
+            belief = st.selectbox("O motivo em que você acredita, depois da conversa",
                                   tied + [c for c in ("remuneração", "crescimento", "gestor") if c not in tied])
             prediction = st.slider(f"Sua previsão: chance de {case['name'].split()[0]} continuar em {W} meses (%)",
                                    0, 100, 80, 5)

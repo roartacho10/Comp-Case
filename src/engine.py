@@ -196,49 +196,65 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
 
 
 def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id: str, active_signals: list[str]) -> list[dict]:
-    """Human-readable evidence for each active signal, built only from raw data."""
+    """Evidence for each active signal, built only from raw data: a technical version (for the engine page)
+    and a plain-language version (for the manager)."""
     t0 = a.date("general.reference_date")
     hris = tables["hris"].set_index("employee_id")
     p = hris.loc[employee_id]
     catalog = a.signals.set_index("signal")
     bench = tables["benchmark"].drop_duplicates(["level", "country"]).set_index(["level", "country"])["median_annual_brl"]
+    ctx = tables["context"]
+    notes = ctx[ctx["employee_id"] == employee_id]["text"].tolist()
     out = []
     for s in active_signals:
         if s == "compa_below":
             median = bench[(p["level"], p["country"])]
+            gap = 1 - p["annual_cost_brl"] / median
             ev = (f"Custo anual de R$ {p['annual_cost_brl']/1000:.0f} mil, contra mediana de mercado de R$ {median/1000:.0f} mil "
                   f"(compa-ratio {num(p['annual_cost_brl']/median, 2)}; limiar {num(a.num('signals.compa_threshold'), 2)})")
+            plain = (f"ganha R$ {p['annual_cost_brl']/1000:.0f} mil por ano; empresas parecidas pagam em média "
+                     f"R$ {median/1000:.0f} mil para o mesmo cargo e senioridade ({gap*100:.0f}% abaixo).")
         elif s == "no_raise":
             months = (t0 - pd.Timestamp(p["last_pay_change_date"])).days / DAYS_PER_MONTH
             ev = f"Última mudança salarial há {months:.0f} meses (limiar: {a.int('signals.no_raise_months')})"
+            plain = f"o último aumento (promoção ou reajuste) foi há {months:.0f} meses."
         elif s == "time_in_level":
             years = (t0 - pd.Timestamp(p["last_promotion_date"])).days / 365.25
-            ref = a.group("signals.time_in_level_ref")[p["level"]] * a.num("signals.time_in_level_multiple")
+            typical = a.group("signals.time_in_level_ref")[p["level"]]
+            ref = typical * a.num("signals.time_in_level_multiple")
             ev = f"{num(years)} anos no nível {p['level']} (limiar: {num(ref, 2)} anos)"
+            yrs = f"{years:.0f}" if abs(years - round(years)) < 0.05 else num(years)
+            plain = (f"está há {yrs} anos no mesmo cargo e senioridade ({p['level']}); "
+                     f"o comum é haver uma promoção em cerca de {num(typical)} anos.")
         elif s == "tenure_milestone":
             years = (t0 - pd.Timestamp(p["hire_date"])).days / 365.25
             ev = f"{num(years)} anos de casa; completa um marco de tempo de casa nos próximos {a.int('signals.milestone_window_months')} meses"
+            plain = (f"completa {int(round(years))} anos de empresa nos próximos meses, momento em que muita gente "
+                     "reavalia a carreira.")
         elif s in ("external_offer", "growth_request"):
-            ctx = tables["context"]
-            rows = ctx[ctx["employee_id"] == employee_id]
-            ev = " / ".join(rows["text"]) if len(rows) else ""
+            ev = " / ".join(notes)
+            plain = ev[0].lower() + ev[1:] if ev else ""
         elif s == "manager_change":
             mgr = tables["managers"].set_index("team_id").loc[p["team_id"]]
             months = (t0 - pd.Timestamp(mgr["team_start_date"])).days / DAYS_PER_MONTH
             ev = f"O time {p['team_id']} trocou de gestor há {months:.0f} meses"
+            plain = f"a troca aconteceu há {months:.0f} meses."
         elif s == "team_exits":
             ex = tables["hris"]
             ex = ex[(ex["team_id"] == p["team_id"]) & (ex["status"] == "desligado") & (ex["exit_type"] == "voluntário")]
-            ex = ex[(t0 - pd.to_datetime(ex["exit_date"])).dt.days <= a.num("signals.team_exits_window_months") * DAYS_PER_MONTH]
-            ev = f"{len(ex)} saídas voluntárias no time nos últimos {a.int('signals.team_exits_window_months')} meses"
+            window = a.int("signals.team_exits_window_months")
+            ex = ex[(t0 - pd.to_datetime(ex["exit_date"])).dt.days <= window * DAYS_PER_MONTH]
+            ev = f"{len(ex)} saídas voluntárias no time nos últimos {window} meses"
+            plain = f"{len(ex)} pessoas do time pediram demissão nos últimos {window} meses."
         elif s == "pulse_manager":
             pl = tables["pulse"]
             score = pl[pl["employee_id"] == employee_id].sort_values("date")["score"].iloc[-1]
             ev = f"Nota {score} de 5 em 'tenho clareza e apoio do meu gestor'"
+            plain = f"na pesquisa interna, deu nota {score} de 5 para \u201ctenho clareza e apoio do meu gestor\u201d."
         else:
-            ev = ""
-        out.append(dict(signal=s, description=catalog.loc[s, "description"], cause=catalog.loc[s, "component"],
-                        source=catalog.loc[s, "source"], evidence=ev))
+            ev, plain = "", ""
+        out.append(dict(signal=s, description=catalog.loc[s, "description"], label=catalog.loc[s, "manager_label"],
+                        cause=catalog.loc[s, "component"], source=catalog.loc[s, "source"], evidence=ev, plain=plain))
     return out
 
 

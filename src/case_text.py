@@ -16,7 +16,7 @@ from src.format import brl, num, pct
 CAUSE_PHRASE = {
     "remuneração": "remuneração",
     "crescimento": "crescimento na carreira",
-    "gestor": "a dinâmica de gestão do time",
+    "gestor": "dinâmica de gestão do time",
 }
 
 
@@ -28,6 +28,16 @@ def _thousands(n: int) -> str:
     return f"{n:,}".replace(",", ".")
 
 
+def _times(ratio: float) -> str:
+    if ratio < 1.3:
+        return "um pouco acima da média da sua empresa"
+    return f"cerca de {int(ratio + 0.5)} vezes a média da sua empresa"
+
+
+def _in_ten(p: float) -> str:
+    return f"{max(1, int(round(p * 10)))} em cada 10 pessoas"
+
+
 def build_case_message(
     case: pd.Series,
     options: pd.DataFrame,
@@ -36,12 +46,12 @@ def build_case_message(
     a: Assumptions,
     team_manager_name: str | None,
 ) -> dict:
+    """Plain-language case message. Only numbers that change the decision; the detail stays on the engine page."""
     window = a.int("outcome.window_months")
     person, decider = _first(case["name"]), _first(case["decision_maker_name"])
     opts = options.set_index("intervention")
     rec = case["recommended"]
 
-    # Greeting and why the message arrives now.
     if case["escalated"]:
         intro = (
             f"Oi, {decider}. Trazemos para você um caso do time {case['team_id']}"
@@ -51,82 +61,80 @@ def build_case_message(
         )
     else:
         intro = (
-            f"Oi, {decider}. Os dados desta semana trouxeram um ponto de atenção sobre {case['name']} "
+            f"Oi, {decider}. Os dados desta semana trouxeram um ponto de atenção sobre **{case['name']}** "
             f"({case['level']}, {case['area']}) que pode valer uma conversa nas próximas semanas."
         )
 
-    signals = [f"**{e['description']}.** {e['evidence']}" for e in evidence]
+    signals = [f"**{e['label']}:** {e['plain']}" for e in evidence]
 
     risk = (
-        f"Em casos parecidos na rede da Comp (mesma causa e mesmo número de sinais), "
-        f"**{pct(case['exit_window_no_action'], 0)} das pessoas saíram em {window} meses quando nada foi feito**, "
-        f"cerca de {num(case['risk_multiple'])}x a média da sua empresa. "
-        f"Não é uma previsão sobre {person}; é o que aconteceu com pessoas em situação parecida "
-        f"(faixa provável de {pct(case['exit_window_lo'], 0)} a {pct(case['exit_window_hi'], 0)}, "
-        f"com base em {_thousands(case['exit_window_n'])} casos)."
+        f"Em casos parecidos na base da Comp, **{_in_ten(case['exit_window_no_action'])} saíram em {window} meses** "
+        f"quando nada foi feito, {_times(case['risk_multiple'])}. Não é uma previsão sobre {person}; é o que aconteceu "
+        "com pessoas em situação parecida."
     )
 
     if case["tie"]:
         causes = case["tied_causes"].split(", ")
         cause_text = (
-            f"Os sinais se dividem igualmente entre {CAUSE_PHRASE[causes[0]]} e {CAUSE_PHRASE[causes[1]]}. "
-            f"Os dados não permitem dizer qual pesa mais; a conversa com {person} é o melhor caminho para definir. "
-            f"Os números abaixo partem de {CAUSE_PHRASE[case['cause']]}."
+            f"Os sinais se dividem igualmente entre {CAUSE_PHRASE[causes[0]]} e {CAUSE_PHRASE[causes[1]]}, e os dados não "
+            f"permitem dizer qual pesa mais. A conversa com {person} é o melhor caminho para definir; a sugestão abaixo "
+            f"parte de {CAUSE_PHRASE[case['cause']]}."
         )
     else:
-        cause_text = (
-            f"A hipótese mais provável é **{CAUSE_PHRASE[case['cause']]}** ({case['n_signals']} de 3 sinais). "
-            f"Vale confirmar com {person} antes de agir; as perguntas abaixo podem ajudar."
-        )
+        cause_text = (f"{CAUSE_PHRASE[case['cause']].capitalize()}. Vale confirmar com {person} antes de agir; "
+                      "as perguntas abaixo podem ajudar.")
 
-    # What the network learned for this cause.
-    pooled = network_stats[network_stats["attributed_cause"] == case["cause"]].groupby("intervention")[["n", "stayed"]].sum()
-    pooled["rate"] = pooled["stayed"] / pooled["n"]
-    total = int(network_stats["n"].sum())
-    best_net = pooled["rate"].idxmax()
-    others = [i for i in pooled.index if i not in (best_net, MONITOR)]
-    learned = (
-        f"Em {_thousands(total)} casos já acompanhados na rede, quando a causa provável era {CAUSE_PHRASE[case['cause']]}, "
-        f"**{best_net.lower()}** foi a intervenção com mais gente ficando: {pct(pooled.loc[best_net, 'rate'], 0)} "
-        f"continuaram depois de {window} meses, contra {pct(pooled.loc[MONITOR, 'rate'], 0)} quando o caso só foi acompanhado. "
-        + (
-            "As demais opções ficaram perto de quem não recebeu nenhuma ação: "
-            + " e ".join(f"{o.lower()} ({pct(pooled.loc[o, 'rate'], 0)})" for o in others) + "."
-            if others else ""
-        )
-    )
+    exit_now = case["exit_window_no_action"]
+    replacement = a.num("cost.replacement_share") * case["salary"]
+    gap = max(0.0, a.num("cost.replacement_hire_compa") * case["market_median"] - case["salary"])
+    years = case["horizon_years"]
+    years_txt = "cerca de 1 ano" if years < 1.5 else f"cerca de {int(years + 0.5)} anos"
+    loss_txt = f"Se {person} sair, repor custaria cerca de {brl(replacement)} (recrutamento, vaga aberta e tempo até a nova pessoa render)"
+    loss_txt += (f", e o substituto seria contratado pelo valor de mercado, {brl(gap)} por ano acima do salário atual."
+                 if gap >= 0.05 * case["salary"] else ".")
 
-    # Suggestion, in a guiding tone.
     if rec == MONITOR:
         suggestion = (
-            f"Pelas contas do sistema, nenhuma das intervenções tende a compensar o custo neste caso. "
-            f"A sugestão é acompanhar de perto e, se {person} for peça-chave, pensar em reduzir a dependência "
-            "(distribuir conhecimento, preparar alguém para a função). A decisão é sua."
+            "Pelas contas do sistema, nenhuma das ações tende a compensar o custo neste caso. A sugestão é acompanhar de "
+            f"perto e, se {person} for peça-chave, reduzir a dependência (distribuir conhecimento, preparar alguém para a "
+            "função). **A decisão é sua: você conhece o contexto que os dados não mostram.**"
         )
     else:
         o = opts.loc[rec]
-        cost = (f"custo estimado de {brl(o['cost_window'])} em {window} meses" if o["recurring"]
-                else f"custo estimado de {brl(o['cost_window'])}")
-        lead = ("Por isso, o caminho que os dados sugerem é" if not case["escalated"]
-                else "Nesses casos, gastar com salário ou com projeto quase não muda o resultado. O que tende a funcionar é")
-        action = {
-            "Ajuste salarial": "considerar um ajuste salarial",
-            "Carreira e projeto": "conversar sobre um próximo passo de carreira e um novo projeto",
-            "Escalar para a liderança": "você olhar de perto para o time, com uma conversa direta com a equipe",
-        }.get(rec, rec.lower())
-        suggestion = (
-            f"{lead} {action} ({cost}). Com essa opção, a chance estimada de {person} ficar em {window} meses vai a "
-            f"{pct(o['stay_rate'], 0)} (de {pct(o['stay_lo'], 0)} a {pct(o['stay_hi'], 0)}), e o retorno esperado é de "
-            f"{brl(o['ev'])} no tempo em que {person} ainda ficaria (de {brl(o['ev_lo'])} a {brl(o['ev_hi'])}). "
-            f"A decisão é sua: você conhece o contexto que os dados não mostram."
-        )
+        exit_with = 1 - o["stay_rate"]
+        effect = f"de {pct(exit_now, 0)} para {pct(exit_with, 0)}"
+        if o["recurring"]:
+            yearly = a.num(a.interventions.set_index("intervention").loc[rec, "cost_key"]) * case["salary"]
+            suggestion = (
+                f"Considerar um ajuste salarial. Ele custa cerca de {brl(yearly)} por ano. {loss_txt} "
+                f"Em casos parecidos, o ajuste reduziu as saídas {effect} em {window} meses. Somando custos e ganhos no "
+                f"tempo em que {person} ainda deve ficar ({years_txt}), o ajuste se paga e sobram cerca de {brl(o['ev'])}. "
+                "**A decisão é sua: você conhece o contexto que os dados não mostram.**"
+            )
+        else:
+            break_even = o["ev"] + o["cost_window"]
+            action = {
+                "Carreira e projeto": ("Conversar sobre um próximo passo de carreira e um novo projeto. Isso tem custo "
+                                       f"(o seu tempo e o de outras pessoas para desenhar e acompanhar o escopo, e tirar "
+                                       f"{person} do que faz hoje), e você o estima melhor do que nós."),
+                "Escalar para a liderança": ("Olhar de perto para o time: uma conversa direta com a equipe e com o "
+                                             "gestor sobre prioridades e apoio. Isso tem custo (sobretudo o seu tempo e o "
+                                             "do RH), e você o estima melhor do que nós."),
+            }.get(rec, f"{rec}. Isso tem custo, e você o estima melhor do que nós.")
+            extra = (" Nesses casos, gastar com salário ou com projeto quase não mudou o resultado."
+                     if case["escalated"] else "")
+            suggestion = (
+                f"{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses.{extra} "
+                f"{loss_txt} Por isso, **a iniciativa compensa enquanto o custo total ficar abaixo de cerca de "
+                f"{brl(break_even)}.** A decisão é sua: você conhece o contexto que os dados não mostram."
+            )
 
     questions = a.questions[a.questions["cause"] == case["cause"]].sort_values("order")["question"].tolist()
     closing = (
         f"Quando decidir, registre abaixo o que vai fazer e a sua previsão. Em {window} meses voltamos com o resultado "
         "e com a comparação entre a sua previsão e o que aconteceu."
     )
-    return dict(intro=intro, signals=signals, risk=risk, cause=cause_text, learned=learned,
+    return dict(intro=intro, signals=signals, risk=risk, cause=cause_text,
                 suggestion=suggestion, questions=questions, closing=closing)
 
 

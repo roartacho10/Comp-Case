@@ -245,4 +245,14 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Nos times com problema de gestão, todos os membros herdam os 2 sinais de time e abrem caso individual (4 times com 100% de casos; 13 casos para um mesmo diretor). Para a liderança é um sinal claro, mas talvez o certo seja um único caso de time, e não N casos individuais.
 - Atualizar a página ou abrir o link de novo começa uma sessão nova: as decisões registradas se perdem. É o esperado num protótipo sem banco de dados; na gravação, navegar pelo menu.
 
+### Revisão da Fase 4: Fluxo 1 mais claro para o gestor (pedidos do autor)
+
+| Ponto do autor | Mudança |
+|---|---|
+| O retorno esperado parecia próximo do custo e não ficava claro por que compensa | A sugestão compara o custo da ação com o custo de perder a pessoa (reposição e substituto a valor de mercado) e só então dá o saldo, no tempo em que a pessoa ainda deve ficar. O "retorno" já era líquido do custo e cobria ~2 anos, enquanto o texto citava o custo de 12 meses |
+| Números em excesso | Saíram intervalos, bases de casos e múltiplos com decimal; ficaram só os números que mudam a decisão. Risco em linguagem simples ("4 em cada 10 pessoas"). Detalhes seguem na página de bastidores |
+| Casos parecidos sem contexto | Removidos da tela do gestor |
+| Termos técnicos | Sinais com rótulo e evidência em linguagem direta (nova coluna `manager_label` no catálogo de sinais); "nível" → "cargo e senioridade", "causa provável" → "o motivo mais provável", "rede" → "base da Comp", "retorno esperado" → "saldo estimado" |
+| Custos que o gestor conhece melhor | Valor no texto só para o ajuste salarial (dado de remuneração). Para carreira e projeto e escalar, o texto diz do que é feito o custo e até quanto vale gastar ("compensa enquanto o custo total ficar abaixo de ~R$ 26 mil"); na tabela, o custo padrão aparece como referência |
+
 **Status:** em validação pelo autor.
