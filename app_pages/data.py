@@ -85,5 +85,12 @@ with tab_tables:
     }
     name = st.selectbox("Tabela", list(labels), format_func=labels.get)
     df: pd.DataFrame = world["public"][name]
-    st.caption(f"{len(df):,} linhas".replace(",", "."))
+    sample_size = 1000
+    if len(df) > sample_size:
+        st.caption(
+            f"{len(df):,} linhas; exibindo uma amostra de {sample_size:,}. A tabela completa está no repositório.".replace(",", ".")
+        )
+        df = df.head(sample_size)
+    else:
+        st.caption(f"{len(df):,} linhas".replace(",", "."))
     st.dataframe(df, hide_index=True, width="stretch", height=520)

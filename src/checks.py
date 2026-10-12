@@ -124,7 +124,14 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
 
     # Network -------------------------------------------------------------------
     net = pub["network_cases"]
-    add("Rede", "Casos fechados na rede", str(a.int("network.n_cases")), str(len(net)), len(net) == a.int("network.n_cases"))
+    companies = pub["network_companies"]
+    employees = int(companies["employees"].sum())
+    years = (a.num("network.months") - a.num("generation.network_min_months_ago")) / 12
+    expected_cases = int(round(employees * world.notes["case_rate"] * years))
+    add("Rede", "Colaboradores nos clientes da rede (informativo)", "—", f"{employees:,}".replace(",", "."), True)
+    add("Rede", "Casos fechados na rede", f"{expected_cases:,}".replace(",", "."), f"{len(net):,}".replace(",", "."),
+        len(net) == expected_cases,
+        "Colaboradores da rede × fração com caso aberto no cliente × anos de decisões com resultado")
     add("Rede", "Empresas na rede", str(a.int("network.n_companies")), str(net["company_id"].nunique()),
         net["company_id"].nunique() == a.int("network.n_companies"))
     by_cause = dict(zip(a.interventions["target_cause"], a.interventions["intervention"]))

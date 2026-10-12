@@ -74,9 +74,8 @@ comportamento,behavior.prediction_bias_pp,15,p.p.,"Quanto os gestores superestim
 comportamento,behavior.prediction_noise_pp,10,p.p.,Dispersão das previsões dos gestores em torno do viés,Previsões variam entre gestores e casos,premissa
 comportamento,behavior.follow_recommendation,0.6,prob.,Chance de o gestor seguir a recomendação do sistema,Adesão parcial: o gestor decide e às vezes discorda,premissa
 casos,case.min_signals_same_cause,2,sinais,Número de sinais da mesma causa para abrir um caso,Um sinal isolado é ruído frequente; dois da mesma causa indicam padrão,premissa
-rede,network.n_companies,30,empresas,Empresas na rede da Comp,Base de clientes plausível para a Comp,premissa
-rede,network.n_cases,3000,casos,Casos fechados na rede (decisão e resultado em 6 meses),Dá pelo menos 30 casos por combinação de causa e intervenção,premissa
-rede,network.months,36,meses,Período coberto pela rede,Três anos de histórico,premissa
+rede,network.n_companies,500,empresas,Clientes da Comp que formam a rede,Referência do autor: 500 clientes,premissa
+rede,network.months,18,meses,"Idade máxima das decisões na rede, em meses","12 meses de decisões com resultado conhecido (de 6 a 18 meses atrás): supõe que o produto já roda há ~1,5 ano na base",premissa
 geração,generation.max_months_without_raise,36.0,meses,"Máximo de meses sem mudança salarial, para quem tem o sinal",Limite plausível,premissa (detalhe de geração)
 geração,generation.time_in_level_extra_months,12.0,meses,Quanto acima do limiar fica quem tem o sinal 'tempo no nível',Espalha os casos em até 1 ano acima do limiar,premissa (detalhe de geração)
 geração,generation.max_months_since_manager_change,48.0,meses,"Máximo de meses desde a última troca de gestor, em times sem troca recente",Times estáveis têm o mesmo gestor há até 4 anos,premissa (detalhe de geração)
@@ -84,6 +83,6 @@ geração,generation.former_tenure_min_months,6.0,meses,Tempo de casa mínimo de
 geração,generation.former_tenure_max_months,60.0,meses,Tempo de casa máximo de quem saiu,Faixa plausível,premissa (detalhe de geração)
 geração,generation.neutral_context_share,0.15,fração,Fração de pessoas sem sinal de contexto que têm uma anotação neutra,Nem toda anotação indica risco; evita que existir anotação já seja um sinal,premissa (detalhe de geração)
 geração,generation.project_end_share,0.5,fração,"Entre sinais de crescimento por contexto, fração que vem de fim de projeto",Divide igualmente as duas origens (fim de projeto e pedido de crescimento),premissa (detalhe de geração)
-geração,generation.network_company_min_employees,200.0,pessoas,Porte mínimo das empresas da rede,Empresas de porte comparável ao cliente,premissa (detalhe de geração)
-geração,generation.network_company_max_employees,3000.0,pessoas,Porte máximo das empresas da rede,Empresas de porte comparável ao cliente,premissa (detalhe de geração)
+geração,generation.network_company_min_employees,100,pessoas,Porte mínimo dos clientes da rede,Média de 500 colaboradores por cliente (referência do autor),premissa (detalhe de geração)
+geração,generation.network_company_max_employees,900,pessoas,Porte máximo dos clientes da rede,Média de 500 colaboradores por cliente (referência do autor),premissa (detalhe de geração)
 geração,generation.network_min_months_ago,6.0,meses,Idade mínima das decisões da rede,O resultado só é conhecido 6 meses depois,premissa (detalhe de geração)

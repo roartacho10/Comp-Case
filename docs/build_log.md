@@ -82,4 +82,30 @@ Construção conduzida com AI (Claude), uma fase por vez. Antes de cada fase, as
 - A causa "gestor" fica em 4,4%, e não 5%: 10% dos times × 90% de pessoas que não são gestoras × 50%.
 - Na rede, a diferença de permanência entre a intervenção certa e as demais é de poucos pontos (ex.: remuneração: ajuste 89,8% contra 87,5% monitorando), porque a chance de saída em 6 meses com causa é de 20%.
 
-**Status:** em validação pelo autor.
+### Revisão da Fase 1
+
+**Pedidos e decisões do autor**
+
+| Ponto | Decisão | Racional |
+|---|---|---|
+| Base de premissas | Colunas "O que é" e "Racional do valor" em todas as premissas | Cada valor precisa ser explicável e defensável, não só registrado |
+| Causa "gestor" | Chance por membro de time com problema de 50% para 55% | Leva a causa a ~5% da população, como na seção 4.3 (antes, 4,4%) |
+| Premissas novas | Validadas | — |
+| Tamanho da rede | Derivado da base de clientes da Comp: 500 clientes com média de 500 colaboradores, 12 meses de decisões com resultado conhecido | O sistema decide com dados de muitas empresas, não só do cliente do case. Com 3.000 casos, o ruído era maior que o efeito |
+
+**Ocorrência que motivou a mudança da rede**
+
+Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da rede falharam: em "crescimento", monitorar apareceu com permanência maior que carreira e projeto. Não era erro de código, e sim ruído: com 3.000 casos e 60% de adesão à recomendação, as intervenções alternativas tinham só 50 a 130 casos, e o acaso movia as taxas em até ±8 pontos, mais do que a diferença real (~8 pontos). A revisão foi mantida fora da `main` (branch `fase-1-revisao`) até a decisão, para não publicar dados em que a rede indicava a intervenção errada.
+
+**O que mudou**
+
+- Rede com 500 clientes (100 a 900 colaboradores, ~251 mil no total) e 46.708 casos fechados. O tamanho é calculado, não fixado: colaboradores da rede × fração com caso aberto no cliente (18,6%) × 1 ano de decisões.
+- Geração da rede reescrita para processar todos os casos de uma vez (geração completa em ~3 s).
+- Tabelas da rede guardadas compactadas (`.csv.gz`), porque passam de 10 MB; o app mostra uma amostra de 1.000 linhas.
+
+**Checagens**
+
+- 31 de 31 checagens passaram; testes: 15 passando.
+- Permanência em 6 meses na rede, intervenção certa contra monitorar: remuneração 90,0% × 81,8%; crescimento 90,5% × 82,9%; gestor 91,3% × 81,1%. Menor grupo de comparação: 922 casos.
+
+**Status:** concluída e aprovada pelo autor.
