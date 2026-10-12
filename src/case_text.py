@@ -141,3 +141,60 @@ def confirmation_message(decision: dict, case: pd.Series, a: Assumptions) -> str
         text += (" Você seguiu um caminho diferente da sugestão; sua justificativa fica registrada e entra no aprendizado "
                  "junto com o resultado.")
     return text + f" Em {window} meses mostramos o que aconteceu."
+
+
+QUADRANTS = {
+    (True, True): "Seguiu a sugestão e a pessoa ficou: decisão consistente, resultado esperado",
+    (True, False): "Seguiu a sugestão e a pessoa saiu: decisão consistente com a evidência, resultado adverso; o risco existia",
+    (False, True): "Divergiu e a pessoa ficou: o contexto de quem decidiu pode ter acrescentado algo que os dados não viam",
+    (False, False): "Divergiu e a pessoa saiu: a sugestão tinha mais chance; o caso entra no aprendizado",
+}
+
+
+def quadrant(followed: bool, stayed: bool) -> str:
+    return QUADRANTS[(bool(followed), bool(stayed))]
+
+
+def outcome_message(closed: pd.Series, case: pd.Series, options: pd.DataFrame, decider_calib: pd.Series | None,
+                    a: Assumptions) -> str:
+    """Follow-up sent to the decision maker after the window. Same guiding tone, no blame."""
+    window = a.int("outcome.window_months")
+    person, decider = _first(case["name"]), _first(case["decision_maker_name"])
+    opts = options.set_index("intervention")
+    chosen, rec = closed["intervention"], case["recommended"]
+    stayed = bool(closed["stayed"])
+
+    if stayed:
+        result = f"{person} continua no time" + (" e segue performando." if closed["performing"] else ".")
+        if closed["note"]:
+            result += f" {closed['note']}"
+    else:
+        result = f"{person} saiu no mês {int(closed['exit_month'])}. {closed['note']}"
+    text = f"Oi, {decider}. {window} meses depois: {result} "
+
+    if str(closed.get("origin", "")).endswith("(sem decisão)"):
+        text += (f"Não houve decisão registrada; o caso ficou só em acompanhamento. Para casos parecidos, a chance "
+                 f"estimada de ficar era de {pct(opts.loc[MONITOR, 'stay_rate'], 0)} sem ação e "
+                 f"{pct(opts.loc[rec, 'stay_rate'], 0)} com {rec.lower()}. ")
+    elif chosen == rec:
+        text += (f"Você seguiu a sugestão ({chosen.lower()}) e previu {pct(closed['manager_prediction'], 0)} de chance de "
+                 f"{person} ficar; para casos parecidos, o sistema estimava {pct(opts.loc[chosen, 'stay_rate'], 0)}. ")
+        text += ("O resultado confirma o que a rede indicava. " if stayed else
+                 f"A decisão foi consistente com a evidência: mesmo assim, cerca de "
+                 f"{pct(1 - opts.loc[chosen, 'stay_rate'], 0)} das pessoas em casos parecidos saem. O risco existia, "
+                 "e um resultado ruim não torna a decisão ruim. ")
+    else:
+        why = f" (justificativa: \u201c{closed['justification']}\u201d)" if closed["justification"] else ""
+        text += (f"Você escolheu {chosen.lower()} em vez da sugestão ({rec.lower()}){why} e previu "
+                 f"{pct(closed['manager_prediction'], 0)} de chance de {person} ficar. Para casos parecidos, a chance "
+                 f"estimada era de {pct(opts.loc[chosen, 'stay_rate'], 0)} com {chosen.lower()} e "
+                 f"{pct(opts.loc[rec, 'stay_rate'], 0)} com {rec.lower()}. ")
+        text += ("Deu certo: o seu contexto pode ter acrescentado algo que os dados não viam. " if stayed else
+                 "A sugestão tinha mais chance, mas nenhuma opção garantia o resultado. ")
+    text += "O caso entra no aprendizado da rede."
+    if decider_calib is not None and decider_calib["n"] > 1:
+        expected = decider_calib["exits_expected_manager"]
+        realized = int(round(decider_calib["exits_realized"]))
+        text += (f" Somando os seus {int(decider_calib['n'])} casos deste ciclo, as suas previsões indicavam "
+                 f"{num(expected)} {'saída' if expected < 2 else 'saídas'}; ocorreram {realized}.")
+    return text

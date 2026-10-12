@@ -204,4 +204,45 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Depois do push, a página "1. Caso do gestor" quebrou no Streamlit Cloud (`AttributeError` em `a.questions`). Causa: o servidor recarrega só os módulos cujos arquivos mudaram; módulos inalterados continuam apontando para versões antigas dos que mudaram, e o app mistura código velho e novo. Reproduzido localmente (servidor iniciado no commit da Fase 2, arquivos trocados pelos da Fase 3 com o servidor no ar).
 - Correção: o `app.py` calcula uma impressão digital do código e dos dados; se mudou desde a última execução, descarta todos os módulos do projeto e o cache de dados antes de carregar as páginas. Verificado com o mesmo procedimento de reprodução: as páginas carregam sem erro.
 
+**Status:** concluída e aprovada pelo autor.
+
+---
+
+## Fase 4 — Fluxos 2 e 3, controle de tempo e alinhamento visual
+
+**Objetivo:** fechar o ciclo da solução (decisão → resultado → aprendizado) e dar à liderança a visão agregada, com a aparência alinhada à da Comp.
+
+**Decisões validadas antes da execução**
+
+| Decisão | Escolha | Racional |
+|---|---|---|
+| Estética | Alinhamento leve ao site da Comp (pedido do autor, a partir de um print): fundo claro, cartões brancos arredondados, coral como destaque, botões em pílula, fonte Inter; sem logotipo | Parecer algo desenvolvido pela Comp sem se passar por produto oficial |
+| Tempo | "Avançar 12 meses" e "Reiniciar" na barra lateral, com a data atual | O tempo é estado do app inteiro |
+| Retorno | Mensagem no Slack simulado para cada decisor, no tom de orientação, com resultado, previsão e calibração | O aprendizado chega a quem decidiu, no mesmo canal |
+| Decisão × resultado | Matriz 2×2 (seguiu ou divergiu × ficou ou saiu), com leitura sem culpa | Decisões são avaliadas pela informação e pelo raciocínio no momento, não só pelo resultado (seção 4.1) |
+| Aprendizado | Taxas da rede antes e depois e dos casos do cliente, com n | O ativo é a rede; o que se move é o aprendizado local |
+| Calibração | Saídas esperadas (gestores e sistema) com faixa provável × ocorridas, no total e por decisor | Formato validado na Fase 2 |
+| Liderança | Saídas e perda esperadas, mapa área × causa, times com concentração de casos (sem nomes, grupos ≥ 5), intervenções e, após 12 meses, saídas evitadas e valor preservado como estimativa | Valor em risco e resultado, sem expor pessoas; estimativa explícita |
+| Bastidores | Fora do menu, acessível por link direto (`/bastidores`) | Demonstração limpa sem perder a ferramenta de defesa |
+
+**O que foi construído**
+
+- Tema visual em `.streamlit/config.toml` e CSS leve compartilhado (`src/ui.py`).
+- Estado global (`src/state.py`): decisões dos personagens, relógio e resultados calculados uma vez por estado.
+- Página "2. Retorno e aprendizado" e página "3. Visão da liderança" (`src/leadership.py` para os agregados).
+- Mensagens de retorno (`outcome_message`) e matriz decisão × resultado (`quadrant`) em `src/case_text.py`.
+- Nova premissa: tamanho mínimo de grupo exibido à liderança (5 pessoas).
+- Roteiros dos personagens reescritos para não repetir o mês de saída nas mensagens.
+
+**Checagens**
+
+- Testes: 33 passando, incluindo páginas antes e depois da janela, cada personagem no seu quadrante, rótulos sem culpa e nenhum nome de pessoa na visão da liderança.
+- Demonstração percorrida no navegador: decisões dos três personagens (Lucía divergindo com justificativa) → liderança em T0 → avançar 12 meses → liderança e retorno. Mariana: seguiu e ficou; Diego: seguiu e saiu; Lucía: divergiu e saiu.
+- Números coerentes com a seção 3.3: perda esperada nos casos de R$ 12,3 mi (R$ 6,2 mi em saídas arrependidas); após 12 meses, ~25 saídas evitadas e ~R$ 2,7 mi preservados já descontado o custo das intervenções (3.3: ~R$ 3 mi por ano).
+
+**Pontos levantados para o autor**
+
+- Nos times com problema de gestão, todos os membros herdam os 2 sinais de time e abrem caso individual (4 times com 100% de casos; 13 casos para um mesmo diretor). Para a liderança é um sinal claro, mas talvez o certo seja um único caso de time, e não N casos individuais.
+- Atualizar a página ou abrir o link de novo começa uma sessão nova: as decisões registradas se perdem. É o esperado num protótipo sem banco de dados; na gravação, navegar pelo menu.
+
 **Status:** em validação pelo autor.

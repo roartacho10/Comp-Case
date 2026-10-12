@@ -1,6 +1,22 @@
 [theme]
 base = "light"
-primaryColor = "#1F4E79"
+primaryColor = "#EF3F50"
+backgroundColor = "#F5F5F5"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#141414"
+linkColor = "#EF3F50"
+borderColor = "#E5E5E5"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+headingFontWeights = [400, 500, 500]
+baseRadius = "0.9rem"
+buttonRadius = "full"
+showSidebarBorder = false
+dataframeHeaderBackgroundColor = "#FAFAFA"
+chartCategoricalColors = ["#EF3F50", "#141414", "#9AA0A6", "#F7A8B0"]
+chartSequentialColors = ["#FDEBED", "#FBD3D8", "#F7A8B0", "#F27D89", "#EF3F50", "#D42A3C", "#B01E2F"]
+
+[theme.sidebar]
+backgroundColor = "#FFFFFF"
 
 [client]
 toolbarMode = "minimal"

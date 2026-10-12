@@ -15,8 +15,8 @@ Construção em fases, cada uma revisada e aprovada antes da seguinte. O histór
 | 0 | Fundação: repositório, estrutura e publicação | Concluída |
 | 1 | Mundo e dados sintéticos | Concluída |
 | 2 | Personagens e motor de regras | Concluída |
-| 3 | Fluxo 1: caso do gestor | Em validação |
-| 4 | Fluxos 2 e 3: aprendizado e liderança | A fazer |
+| 3 | Fluxo 1: caso do gestor | Concluída |
+| 4 | Fluxos 2 e 3: aprendizado e liderança | Em validação |
 | 5 | Camada de AI | A fazer |
 | 6 | Testes, README e publicação final | A fazer |
 

@@ -1,13 +1,13 @@
 persona_id,intervention,stays,exit_month,performing,note
-P1,Ajuste salarial,True,,True,O ajuste reduziu a defasagem; recusou as propostas externas e segue performando.
-P1,Carreira e projeto,False,4,False,Aceitou a proposta de uma fintech com salário 30% acima.
-P1,Escalar para a liderança,False,4,False,Aceitou a proposta de uma fintech com salário 30% acima.
-P1,Monitorar,False,4,False,Aceitou a proposta de uma fintech com salário 30% acima.
-P2,Carreira e projeto,False,5,False,"Assumiu a liderança de um squad, mas saiu no mês 5 por uma oferta externa muito acima. Na entrevista de desligamento: o novo escopo ajudou; a diferença da oferta decidiu."
-P2,Ajuste salarial,False,3,False,Saiu para uma posição de liderança em outra empresa.
-P2,Escalar para a liderança,False,3,False,Saiu para uma posição de liderança em outra empresa.
-P2,Monitorar,False,3,False,Saiu para uma posição de liderança em outra empresa.
-P3,Escalar para a liderança,True,,True,A diretora conversou com a equipe; Lucía mudou de time no mês 2 e segue performando.
-P3,Ajuste salarial,False,5,False,"Recebeu o ajuste, mas saiu no mês 5. Na entrevista de desligamento: falta de clareza e de apoio da gestão."
-P3,Carreira e projeto,False,4,False,Saiu no mês 4. Na entrevista de desligamento: falta de clareza e de apoio da gestão.
-P3,Monitorar,False,3,False,Saiu no mês 3. Na entrevista de desligamento: falta de clareza e de apoio da gestão.
+P1,Ajuste salarial,True,,True,O ajuste reduziu a defasagem; ela recusou as propostas externas.
+P1,Carreira e projeto,False,4.0,False,Ela aceitou a proposta de uma fintech com salário 30% acima.
+P1,Escalar para a liderança,False,4.0,False,Ela aceitou a proposta de uma fintech com salário 30% acima.
+P1,Monitorar,False,4.0,False,Ela aceitou a proposta de uma fintech com salário 30% acima.
+P2,Carreira e projeto,False,5.0,False,"Ele assumiu a liderança de um squad, mas recebeu uma oferta externa muito acima. Na entrevista de desligamento: o novo escopo ajudou; a diferença da oferta decidiu."
+P2,Ajuste salarial,False,3.0,False,Ele aceitou uma posição de liderança em outra empresa.
+P2,Escalar para a liderança,False,3.0,False,Ele aceitou uma posição de liderança em outra empresa.
+P2,Monitorar,False,3.0,False,Ele aceitou uma posição de liderança em outra empresa.
+P3,Escalar para a liderança,True,,True,A liderança conversou com a equipe e ela mudou de time no mês 2.
+P3,Ajuste salarial,False,5.0,False,"Ela recebeu o ajuste, mas não ficou. Na entrevista de desligamento: falta de clareza e de apoio da gestão."
+P3,Carreira e projeto,False,4.0,False,Na entrevista de desligamento: falta de clareza e de apoio da gestão.
+P3,Monitorar,False,3.0,False,Na entrevista de desligamento: falta de clareza e de apoio da gestão.

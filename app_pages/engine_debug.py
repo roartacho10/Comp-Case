@@ -5,12 +5,13 @@ from src import simulation
 from src.app_data import assumptions, load_world
 from src.engine import MONITOR, comparable_cases, signal_evidence
 from src.format import brl, num, pct, pp
+from src.state import results
 from src.ui import synthetic_data_banner
 
 synthetic_data_banner()
 st.title("Bastidores do motor")
 st.caption(
-    "Página provisória: mostra o motor de regras funcionando, sem interface final e sem AI, "
+    "Página de bastidores (fora do menu; acesso por link direto): mostra o motor de regras funcionando, sem interface final e sem AI, "
     "para validar a lógica antes de construir os fluxos."
 )
 
@@ -149,28 +150,14 @@ if persona_id:
                     )
                     st.rerun()
 
-# Six months later --------------------------------------------------------------
+# After the window ----------------------------------------------------------------
 st.divider()
 st.subheader(f"{W} meses depois")
-left, right = st.columns(2)
-pending = [pid for pid in personas.index if pid not in st.session_state["persona_decisions"]]
-if left.button(f"Avançar {W} meses", type="primary", disabled=st.session_state["advanced"]):
-    st.session_state["advanced"] = True
-    st.rerun()
-if right.button("Reiniciar"):
-    st.session_state["persona_decisions"] = {}
-    st.session_state["advanced"] = False
-    st.rerun()
-if pending and not st.session_state["advanced"]:
-    st.caption(f"Personagens sem decisão ({', '.join(pending)}) serão registrados como 'monitorar' ao avançar.")
-
-if st.session_state["advanced"]:
-    decisions = pd.concat(
-        [world["simulated_decisions"], simulation.persona_decision_rows(ctx, engine, st.session_state["persona_decisions"])],
-        ignore_index=True,
-    )
-    outcomes = simulation.advance_window(ctx, decisions, a)
-    learn = simulation.learning(engine, decisions, outcomes, a.num("ev.interval_level"))
+res = results(world, a)
+if res is None:
+    st.caption(f"Use 'Avançar {W} meses' na barra lateral.")
+else:
+    decisions, outcomes, learn = res["decisions"], res["outcomes"], res["learning"]
     s = learn["summary"].iloc[0]
 
     m1, m2, m3, m4 = st.columns(4)

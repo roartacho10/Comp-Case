@@ -7,7 +7,7 @@ from src.app_data import assumptions, load_world
 from src.case_text import build_case_message, confirmation_message
 from src.engine import MONITOR, comparable_cases, signal_evidence
 from src.format import brl, pct
-from src.ui import synthetic_data_banner
+from src.ui import md, message_header, synthetic_data_banner
 
 synthetic_data_banner()
 st.title("1. Caso do gestor")
@@ -30,38 +30,6 @@ companies = tables["network_companies"].set_index("company_id")
 st.session_state.setdefault("persona_decisions", {})
 st.session_state.setdefault("advanced", False)
 
-st.markdown(
-    """
-<style>
-.fake-sidebar {background:#1f2933; color:#d9e2ec; border-radius:10px; padding:14px 12px; font-size:0.86rem; min-height:520px;}
-.fake-sidebar .ws {font-weight:700; color:#fff; margin-bottom:12px;}
-.fake-sidebar .sec {color:#9fb3c8; margin:12px 0 4px; font-size:0.78rem; text-transform:uppercase; letter-spacing:.04em;}
-.fake-sidebar .item {padding:3px 6px; border-radius:6px;}
-.fake-sidebar .active {background:#3e5468; color:#fff; font-weight:600;}
-.msg-head {display:flex; align-items:center; gap:10px; margin-bottom:4px;}
-.msg-avatar {width:34px; height:34px; border-radius:8px; background:#1f4e79; color:#fff; display:flex;
-             align-items:center; justify-content:center; font-weight:700;}
-.msg-name {font-weight:700;}
-.msg-badge {font-size:0.68rem; background:#e4e7eb; color:#3e4c59; border-radius:4px; padding:1px 5px;}
-.msg-time {color:#7b8794; font-size:0.8rem;}
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
-
-def md(text: str) -> None:
-    """Markdown with dollar signs escaped (otherwise 'R$ ... R$' renders as math)."""
-    st.markdown(text.replace("$", "\\$"))
-
-
-def message_header(name: str, initials: str, time: str, app: bool = True) -> None:
-    badge = '<span class="msg-badge">APP</span>' if app else ""
-    st.markdown(
-        f'<div class="msg-head"><div class="msg-avatar">{initials}</div>'
-        f'<span class="msg-name">{html.escape(name)}</span>{badge}<span class="msg-time">{time}</span></div>',
-        unsafe_allow_html=True,
-    )
 
 
 # Whose case -------------------------------------------------------------------
@@ -97,7 +65,7 @@ with left:
     )
 
 with right, st.container(border=True):
-    message_header("Comp · Retenção", "C", "hoje, 09:12")
+    message_header("Comp · Retenção", "hoje, 09:12")
     md(msg["intro"])
 
     st.markdown("**Por que agora**")
@@ -151,12 +119,12 @@ with right, st.container(border=True):
     registered = st.session_state["persona_decisions"].get(pid)
     if registered:
         st.divider()
-        message_header(decider, "".join(w[0] for w in decider.split()[:2]), "hoje, 16:40", app=False)
+        message_header(decider, "hoje, 16:40", app=False)
         reply = f"Vou seguir com **{registered['intervention'].lower()}**. Minha previsão: {pct(registered['prediction'], 0)}."
         if registered["justification"]:
             reply += f" {registered['justification']}"
         md(reply)
-        message_header("Comp · Retenção", "C", "hoje, 16:40")
+        message_header("Comp · Retenção", "hoje, 16:40")
         md(confirmation_message(registered, case, a))
     elif st.session_state["advanced"]:
         st.info(f"Os {W} meses já avançaram sem uma decisão registrada aqui. Reinicie para decidir.")

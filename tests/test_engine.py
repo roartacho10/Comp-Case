@@ -66,12 +66,13 @@ def test_persona_scripts(setup, pid, intervention, stays, month):
         assert out.loc[emp, "exit_month"] == month
 
 
-def test_engine_page_full_flow():
+def test_engine_page_after_window():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    at = AppTest.from_file(str(root / "app_pages" / "engine_debug.py"), default_timeout=120).run()
-    assert not at.exception
-    next(b for b in at.button if b.label.startswith("Avançar")).click().run()  # undecided personas -> monitor
+    at = AppTest.from_file(str(root / "app_pages" / "engine_debug.py"), default_timeout=120)
+    at.session_state["persona_decisions"] = {}
+    at.session_state["advanced"] = True
+    at.run()
     assert not at.exception
     assert any("Personagens: previsto contra realizado" in m.value for m in at.markdown)
