@@ -3,9 +3,11 @@ import html
 import streamlit as st
 
 from src.app_data import assumptions, load_world
-from src.case_text import build_case_message, confirmation_message
+from src.case_text import build_case_message, confirmation_message, hours_of
 from src.engine import MONITOR, signal_evidence
 from src.format import brl, pct
+from src.prediction import label as prediction_label
+from src.prediction import scale as prediction_scale
 from src.signals import CAUSES
 from src import ai
 from src.state import ai_badge, ai_on
@@ -95,20 +97,44 @@ with right, st.container(border=True):
     st.markdown("\n".join(f"{i}. {q}" for i, q in enumerate(msg["questions"], 1)))
 
     st.markdown("**As opções lado a lado**")
-    rows = [f"| | Opção | Fica em {W} meses | Custo | Saldo estimado |", "|:-:|---|---|---|---|"]
+    first = case["name"].split()[0]
+    years = case["horizon_years"]
+    years_txt = "cerca de 1 ano" if years < 1.5 else f"cerca de {int(years + 0.5)} anos"
+    exit_now = case["exit_window_no_action"]
+    rows = [f"| | Opção | Fica em {W} meses | Custo | Perda que evita | Saldo |", "|:-:|---|---|---|---|---|"]
+    notes = []
     for _, o in opts.iterrows():
-        name, ev, cost, rec = o["intervention"], o["ev"], o["cost_window"], o["recurring"]
+        name, rec = o["intervention"], o["recurring"]
         star = "★" if name == case["recommended"] else ""
-        cost_txt = "—" if name == MONITOR else f"{brl(cost)} por ano" if rec else "você avalia"
-        balance = ("referência" if name == MONITOR else brl(ev) if rec
-                   else f"compensa se custar até {brl(ev + cost)}" if ev + cost > 0 else "não compensa")
-        rows.append(f"| {star} | {name} | {pct(o['stay_rate'], 0)} | {cost_txt} | {balance} |")
+        if name == MONITOR:
+            cost_txt, avoided, balance = "—", "—", "referência"
+        elif rec:
+            # Rounded so that the row adds up as shown: perda que evita − custo = saldo.
+            cost_r, ev_r = round(o["expected_cost"], -3), round(o["ev"], -3)
+            cost_txt = f"{brl(cost_r)} ({brl(o['cost_window'])}/ano)"
+            avoided, balance = brl(cost_r + ev_r), brl(ev_r)
+        else:
+            cost_txt = "você estima"
+            avoided = brl(o["benefit"]) if o["benefit"] > 0 else "—"
+            balance = f"positivo se custar menos de {brl(o['benefit'])}" if o["benefit"] > 0 else "não compensa"
+            if o["benefit"] > 0:
+                h = hours_of(o["benefit"], case, a)
+                notes.append(
+                    f"**{name}:** reduz a chance de saída de {pct(exit_now, 0)} para {pct(1 - o['stay_rate'], 0)} e evita cerca "
+                    f"de {brl(o['benefit'])} em perda esperada. Esse é o máximo que vale investir: se o seu tempo, a mentoria e "
+                    f"tirar {first} do que faz hoje custarem menos que isso, compensa."
+                    + (f" {brl(o['benefit'])} equivalem a cerca de {h} horas do seu tempo." if h else "")
+                )
+        rows.append(f"| {star} | {name} | {pct(o['stay_rate'], 0)} | {cost_txt} | {avoided} | {balance} |")
     md("\n".join(rows))
-    st.caption(
-        "★ opção sugerida. Saldo estimado: o que a empresa tende a economizar evitando a saída (reposição e substituto a valor de mercado), "
-        "menos o custo da opção, no tempo em que a pessoa ainda deve ficar. Para ações cujo custo você conhece melhor, "
-        f"o sistema mostra até quanto vale gastar. O resultado é medido em {W} meses."
+    md(
+        f"**Como ler:** saldo = perda que evita − custo, no tempo em que {first} ainda deve ficar ({years_txt}). A perda que "
+        f"evita vem da redução na chance de saída, aplicada ao custo de perder {first}: reposição e substituto contratado "
+        "a valor de mercado."
     )
+    for note in notes:
+        md(note)
+    st.caption(f"★ opção sugerida. O resultado é medido em {W} meses.")
 
     md(msg["closing"])
     ai_badge(written)
@@ -119,7 +145,8 @@ with right, st.container(border=True):
     if registered:
         st.divider()
         message_header(decider, "hoje, 16:40", app=False)
-        reply = f"Vou seguir com **{registered['intervention'].lower()}**. Minha previsão: {pct(registered['prediction'], 0)}."
+        reply = (f"Vou seguir com **{registered['intervention'].lower()}**. Minha previsão: "
+                 f"{prediction_label(registered['prediction'], a).lower()}.")
         if registered["justification"]:
             reply += f" {registered['justification']}"
         md(reply)
@@ -135,16 +162,20 @@ with right, st.container(border=True):
             tied = case["tied_causes"].split(", ")
             belief = st.selectbox("O motivo em que você acredita, depois da conversa",
                                   tied + [c for c in CAUSES if c not in tied])
-            prediction = st.slider(f"Sua previsão: chance de {case['name'].split()[0]} continuar em {W} meses (%)",
-                                   0, 100, 80, 5)
+            levels = dict(prediction_scale(a))
+            prediction = st.radio(f"Sua previsão: {case['name'].split()[0]} continua no time daqui a {W} meses?",
+                                  list(levels), index=None)
             justification = st.text_area("Por que este caminho? (obrigatório se for diferente da sugestão)")
             if st.form_submit_button("Registrar decisão", type="primary"):
-                if chosen != case["recommended"] and not justification.strip():
+                if prediction is None:
+                    st.error("Registre a sua previsão. Ela é comparada com o resultado depois, e é assim que o "
+                             "sistema aprende a calibrar as previsões de cada gestor.")
+                elif chosen != case["recommended"] and not justification.strip():
                     st.error("Você escolheu um caminho diferente da sugestão: conte em uma frase o porquê. "
                              "Isso entra no aprendizado junto com o resultado.")
                 else:
                     st.session_state["persona_decisions"][pid] = dict(
-                        intervention=chosen, cause=belief, prediction=prediction / 100,
+                        intervention=chosen, cause=belief, prediction=levels[prediction],
                         justification=justification.strip(),
                     )
                     st.rerun()

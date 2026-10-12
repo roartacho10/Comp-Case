@@ -12,6 +12,8 @@ import pandas as pd
 from src.assumptions import Assumptions
 from src.engine import MONITOR
 from src.format import brl, num, pct
+from src.prediction import label as prediction_label
+from src.prediction import sentence
 
 CAUSE_PHRASE = {
     "remuneração": "remuneração",
@@ -35,6 +37,15 @@ def _times(ratio: float) -> str:
 
 def _in_ten(p: float) -> str:
     return f"{max(1, int(round(p * 10)))} em cada 10 pessoas"
+
+
+def hours_of(value: float, case: pd.Series, a: Assumptions) -> int | None:
+    """A value in hours of the decision maker's time (their annual cost / working hours per year)."""
+    hourly = case.get("decision_maker_hourly_cost")
+    if hourly is None or pd.isna(hourly) or hourly <= 0 or value <= 0:
+        return None
+    h = value / hourly
+    return int(round(h / 5) * 5) if h >= 20 else max(1, int(round(h)))
 
 
 def build_case_message(
@@ -102,7 +113,9 @@ def build_case_message(
                 "**A decisão é sua: você conhece o contexto que os dados não mostram.**"
             )
         else:
-            break_even = o["ev"] + o["cost_window"]
+            break_even = o["benefit"]
+            h = hours_of(break_even, case, a)
+            hours_txt = f", o equivalente a cerca de {h} horas do seu tempo" if h else ""
             action = {
                 "Carreira e projeto": ("Conversar sobre um próximo passo de carreira e um novo projeto. Isso tem custo "
                                        f"(o seu tempo e o de outras pessoas para desenhar e acompanhar o escopo, e tirar "
@@ -111,7 +124,7 @@ def build_case_message(
             suggestion = (
                 f"{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses. "
                 f"{loss_txt} Por isso, **a iniciativa compensa enquanto o custo total ficar abaixo de cerca de "
-                f"{brl(break_even)}.** A decisão é sua: você conhece o contexto que os dados não mostram."
+                f"{brl(break_even)}**{hours_txt}. A decisão é sua: você conhece o contexto que os dados não mostram."
             )
 
     questions = a.questions[a.questions["cause"] == case["cause"]].sort_values("order")["question"].tolist()
@@ -125,10 +138,9 @@ def build_case_message(
 
 def confirmation_message(decision: dict, case: pd.Series, a: Assumptions) -> str:
     window = a.int("outcome.window_months")
-    person = _first(case["name"])
     text = (
-        f"Registrado: **{decision['intervention'].lower()}**. Sua previsão: {pct(decision['prediction'], 0)} de chance de "
-        f"{person} continuar em {window} meses."
+        f"Registrado: **{decision['intervention'].lower()}**. Sua previsão para os próximos {window} meses: "
+        f"{prediction_label(decision['prediction'], a).lower()}."
     )
     if decision["intervention"] != case["recommended"]:
         text += (" Você seguiu um caminho diferente da sugestão; sua justificativa fica registrada e entra no aprendizado "
@@ -170,16 +182,16 @@ def outcome_message(closed: pd.Series, case: pd.Series, options: pd.DataFrame, d
                  f"estimada de ficar era de {pct(opts.loc[MONITOR, 'stay_rate'], 0)} sem ação e "
                  f"{pct(opts.loc[rec, 'stay_rate'], 0)} com {rec.lower()}. ")
     elif chosen == rec:
-        text += (f"Você seguiu a sugestão ({chosen.lower()}) e previu {pct(closed['manager_prediction'], 0)} de chance de "
-                 f"{person} ficar; para casos parecidos, o sistema estimava {pct(opts.loc[chosen, 'stay_rate'], 0)}. ")
+        text += (f"Você seguiu a sugestão ({chosen.lower()}) e considerava {sentence(closed['manager_prediction'], person, a)}; "
+                 f"para casos parecidos, o sistema estimava {pct(opts.loc[chosen, 'stay_rate'], 0)} de chance de ficar. ")
         text += ("O resultado confirma o que a rede indicava. " if stayed else
                  f"A decisão foi consistente com a evidência: mesmo assim, cerca de "
                  f"{pct(1 - opts.loc[chosen, 'stay_rate'], 0)} das pessoas em casos parecidos saem. O risco existia, "
                  "e um resultado ruim não torna a decisão ruim. ")
     else:
         why = f" (justificativa: \u201c{closed['justification']}\u201d)" if closed["justification"] else ""
-        text += (f"Você escolheu {chosen.lower()} em vez da sugestão ({rec.lower()}){why} e previu "
-                 f"{pct(closed['manager_prediction'], 0)} de chance de {person} ficar. Para casos parecidos, a chance "
+        text += (f"Você escolheu {chosen.lower()} em vez da sugestão, {rec.lower()}{why}, e considerava "
+                 f"{sentence(closed['manager_prediction'], person, a)}. Para casos parecidos, a chance de ficar "
                  f"estimada era de {pct(opts.loc[chosen, 'stay_rate'], 0)} com {chosen.lower()} e "
                  f"{pct(opts.loc[rec, 'stay_rate'], 0)} com {rec.lower()}. ")
         text += ("Deu certo: o seu contexto pode ter acrescentado algo que os dados não viam. " if stayed else

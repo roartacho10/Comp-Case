@@ -63,6 +63,11 @@ def _pick(page, prefix):
     _settle(page, "Sua decisão")
 
 
+def _predict(page, text="Provavelmente fica"):
+    page.get_by_text(text, exact=True).last.click()
+    page.wait_for_timeout(300)
+
+
 def _register(page, wait="Registrado:"):
     page.get_by_role("button", name="Registrar decisão").click()
     _settle(page, wait)
@@ -79,11 +84,15 @@ def test_demo_script(base_url):
         _settle(page, "Como navegar")
 
         _nav(page, "1. Caso do gestor", "Sua decisão")
+        _register(page, "Registre a sua previsão")        # the prediction is required
+        _predict(page, "Quase certo que fica")
         _register(page)                                   # Mariana: follows the suggestion
         _pick(page, "Diego")
+        _predict(page)
         _register(page)                                   # Diego: follows the suggestion
         _pick(page, "Lucía")
         page.get_by_text("Ajuste salarial", exact=True).last.click()
+        _predict(page)
         _register(page, "conte em uma frase o porquê")   # diverging without a reason is blocked
         page.locator("textarea").fill("Acho que um aumento resolve.")
         page.wait_for_timeout(300)

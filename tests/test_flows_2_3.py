@@ -7,9 +7,9 @@ from src.case_text import quadrant
 
 ROOT = Path(__file__).resolve().parents[1]
 DECISIONS = {
-    "P1": dict(intervention="Ajuste salarial", cause="remuneração", prediction=0.8, justification=""),
-    "P2": dict(intervention="Carreira e projeto", cause="crescimento", prediction=0.85, justification=""),
-    "P3": dict(intervention="Ajuste salarial", cause="remuneração", prediction=0.75, justification="Acho que um aumento resolve"),
+    "P1": dict(intervention="Ajuste salarial", cause="remuneração", prediction=0.9, justification=""),
+    "P2": dict(intervention="Carreira e projeto", cause="crescimento", prediction=0.7, justification=""),
+    "P3": dict(intervention="Ajuste salarial", cause="remuneração", prediction=0.7, justification="Acho que um aumento resolve"),
 }
 
 

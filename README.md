@@ -35,18 +35,21 @@ O motor de regras (sem AI) lê só o que o sistema enxerga: os dados brutos do c
 - **Caso:** abre com 2 ou mais sinais da mesma causa. A causa provável é a que tem mais sinais; em empate, as duas aparecem e a decisão fica com o gestor.
 - **Risco:** a taxa de saída em 12 meses, na rede, de casos com a mesma causa e o mesmo número de sinais em que nada foi feito.
 - **Valor de cada opção:** o que a empresa economiza evitando a saída (reposição e substituto contratado a valor de mercado), menos o custo da opção, no tempo em que a pessoa ainda deve ficar (até 5 anos). O efeito de ações pontuais dura 12 meses; o do ajuste salarial dura enquanto ele é pago.
-- **Sugestão:** a opção de maior valor, se for positivo; senão, monitorar. Para ações cujo custo o gestor conhece melhor, o sistema mostra até quanto vale gastar.
+- **Sugestão:** a opção de maior valor, se for positivo; senão, monitorar. Para ações cujo custo o gestor conhece melhor (carreira e projeto), o sistema mostra a perda que a ação evita, que é o máximo que vale investir, também em horas do tempo do gestor. Nos totais, essas ações entram com um custo de referência de R$ 5 mil por caso.
 - **Resultado:** a simulação aplica as mesmas regras do mundo aos 12 meses seguintes. Os três personagens seguem um roteiro por decisão.
+- **Previsão do gestor:** uma frase, e não um percentual (quase certo que fica, provavelmente fica, provavelmente sai, quase certo que sai), convertida em chance de ficar pela escala das premissas.
 - **Aprendizado:** as taxas de permanência por causa e intervenção são recalculadas com os casos novos, e as previsões de cada gestor são comparadas com o que aconteceu.
 
 ## Onde entra a AI
 
-A AI (Claude, pela API da Anthropic, chamada pelo servidor do app) **lê e escreve, mas não calcula nem decide**:
+A AI (Claude, pela API da Anthropic, chamada pelo servidor do app) faz o que regras não conseguem: transforma texto solto em dado e escreve para quem decide.
 
-- lê a anotação da conversa de carreira e indica o sinal que ela contém;
-- escreve a mensagem do caso para quem decide (com perguntas adaptadas à pessoa), o retorno após 12 meses e os resumos para a liderança.
+- Lê anotações de conversas de carreira e atas de projeto e identifica sinais (proposta externa, pedido de crescimento sem plano). Sem ela, esses sinais não existiriam.
+- Escreve cada caso no contexto do gestor, com perguntas adaptadas à pessoa, o retorno depois de 12 meses e os resumos para a liderança. Isso reduz o esforço de decidir e registrar, e sem decisão registrada não há aprendizado.
 
-Ela recebe só os fatos já calculados pelo motor. Antes de aparecer, cada texto passa por quatro checagens: formato, **todo número do texto existe nos fatos recebidos**, nenhum termo vetado (rótulos, tom de comando, jargão) e a frase "a decisão é sua" na mensagem do caso. Se falhar, se não houver chave ou se a chamada demorar, a tela usa o texto padrão revisado e diz o motivo. As regras estão em [`prompts/`](prompts/). Os textos aprovados ficam guardados no servidor, e cada sessão tem um limite de chamadas.
+O cálculo fica num motor de regras transparente. Risco, valor de cada opção e recomendação vêm das taxas observadas na rede da Comp e são reestimados a cada caso fechado: na rede, no cliente e na calibração de cada gestor. Assim os números são auditáveis e a vantagem está nos dados e no aprendizado, não no modelo de AI, que qualquer concorrente pode usar. Numa versão completa, a AI também leria as justificativas de quem diverge da sugestão e as entrevistas de desligamento, para confirmar ou corrigir a causa atribuída.
+
+A AI recebe só os fatos já calculados pelo motor. Antes de aparecer, cada texto passa por quatro checagens: formato, **todo número do texto existe nos fatos recebidos**, nenhum termo vetado (rótulos, tom de comando, jargão) e a frase "a decisão é sua" na mensagem do caso. Se falhar, se não houver chave ou se a chamada demorar, a tela usa o texto padrão revisado e diz o motivo. As regras estão em [`prompts/`](prompts/). Os textos aprovados ficam guardados no servidor, e cada sessão tem um limite de chamadas.
 
 Para ativar, coloque a chave nos secrets do Streamlit (`ANTHROPIC_API_KEY = "..."`). Nunca no código.
 

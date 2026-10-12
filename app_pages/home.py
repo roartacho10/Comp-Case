@@ -42,9 +42,23 @@ st.markdown(
 
 st.subheader("Onde entra a AI")
 st.markdown(
-    "A AI lê a anotação da conversa de carreira e escreve as mensagens para quem decide, a partir dos números que o "
-    "motor de regras já calculou. Ela não calcula nem decide. Cada texto passa por checagens antes de aparecer; o selo "
-    "abaixo do texto indica se ele foi **✦ escrito por AI** ou se é o **texto padrão** revisado."
+    f"""
+A AI faz o que regras não conseguem: transforma texto solto em dado e escreve para quem decide.
+
+- Lê anotações de conversas de carreira e atas de projeto e identifica sinais (proposta externa, pedido de crescimento
+  sem plano). Sem ela, esses sinais não existiriam.
+- Escreve cada caso no contexto do gestor, com perguntas adaptadas à pessoa, e o retorno depois de {W} meses. Isso
+  reduz o esforço de decidir e registrar, e sem decisão registrada não há aprendizado.
+
+O cálculo fica num motor de regras transparente. Risco, valor de cada opção e recomendação vêm das taxas observadas
+na rede da Comp e são reestimados a cada caso fechado: na rede, no cliente e na calibração de cada gestor. Assim os
+números são auditáveis, nenhum texto cita um número que não existe, e a vantagem está nos dados e no aprendizado, não
+no modelo de AI, que qualquer concorrente pode usar.
+
+Numa versão completa, a AI também leria as justificativas de quem diverge da sugestão e as entrevistas de
+desligamento, para confirmar ou corrigir a causa atribuída. O selo abaixo de cada texto indica se ele foi
+**✦ escrito por AI** ou se é o **texto padrão** revisado.
+"""
 )
 
 st.subheader("O que é simulado")

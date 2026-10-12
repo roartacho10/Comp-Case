@@ -4,6 +4,7 @@ import streamlit as st
 from src.app_data import assumptions, load_world
 from src.case_text import outcome_message, quadrant
 from src.format import num, pct
+from src.prediction import scale as prediction_scale
 from src.state import dates, month_label, results
 from src import ai
 from src.state import ai_badge, ai_on
@@ -93,7 +94,9 @@ md(
     f"**{int(s['exits_realized'])}**. Os gestores tendem a subestimar o risco do próprio time; registrar a previsão antes de "
     "agir é o que permite medir isso e, com o tempo, ponderar recomendações pela calibração de quem decide."
 )
-st.caption("Faixa provável: onde o número de saídas cai em 80% das vezes se as probabilidades previstas estiverem certas.")
+levels = ", ".join(f"{lbl.lower()} = {pct(v, 0)}" for lbl, v in prediction_scale(a))
+st.caption("Faixa provável: onde o número de saídas cai em 80% das vezes se as probabilidades previstas estiverem certas. "
+           f"Os gestores respondem com uma frase, convertida em chance de ficar: {levels}.")
 
 deciders = set(personas["decision_maker_id"])
 view = learn["calibration"][learn["calibration"]["decision_maker_id"].isin(deciders)]

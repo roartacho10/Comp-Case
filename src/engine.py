@@ -142,7 +142,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             recurring = name in inter.index and inter.loc[name, "cost_rule"] == "share_of_annual_cost"
             h1 = h0 * (1 - reduction)
             if name == MONITOR:
-                ev = np.zeros(draws)
+                ev = benefit = np.zeros(draws)
                 cost_total, cost_window = 0.0, 0.0
             else:
                 paths = np.repeat(np.broadcast_to(h1, (draws,))[:, None], months, axis=1)
@@ -152,6 +152,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 rec_cost = rate_cost * salary if recurring else 0.0
                 one_cost = 0.0 if recurring else rate_cost
                 ev = base_cost - _cost_of_path(paths, months, salary, median, a, rec_cost, one_cost)
+                benefit = base_cost - _cost_of_path(paths, months, salary, median, a, 0.0, 0.0)
                 cost_total = round(rec_cost * horizon_years, -2) if recurring else one_cost
                 cost_window = round(rec_cost * window / 12, -2) if recurring else one_cost
             option_rows.append(dict(
@@ -163,7 +164,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 network_stay_rate=float(row["stayed"] / row["n"]), n=int(row["n"]),
                 reduction=float(np.median(reduction)) if name != MONITOR else 0.0,
                 cost_window=cost_window, cost_horizon=cost_total, recurring=bool(recurring),
-                ev=float(np.median(ev)), ev_lo=float(np.quantile(ev, (1 - level) / 2)),
+                ev=float(np.median(ev)), expected_cost=float(np.median(benefit - ev)),
+                benefit=float(np.median(ev) + np.median(benefit - ev)), ev_lo=float(np.quantile(ev, (1 - level) / 2)),
                 ev_hi=float(np.quantile(ev, 1 - (1 - level) / 2)),
             ))
 
@@ -175,6 +177,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             employee_id=emp, name=person["name"], area=person["area"], team_id=person["team_id"], level=person["level"],
             country=person["country"], role=person["role"], decision_maker_id=decider,
             decision_maker_name=managers.loc[decider, "name"] if decider in managers.index else None,
+            decision_maker_hourly_cost=(float(active.loc[decider, "annual_cost_brl"]) / a.num("general.work_hours_per_year")
+                                        if decider in active.index else np.nan),
             cause=cause, tied_causes=", ".join(tied), tie=len(tied) > 1,
             n_signals=k, signals=", ".join(s for s in signals.columns if signals.loc[emp, s]),
             exit_window_no_action=float(exit_w), exit_window_lo=float(1 - base["stay_hi"]), exit_window_hi=float(1 - base["stay_lo"]),

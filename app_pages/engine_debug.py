@@ -5,6 +5,8 @@ from src import simulation
 from src.app_data import assumptions, load_world
 from src.engine import MONITOR, comparable_cases, signal_evidence
 from src.format import brl, num, pct, pp
+from src.prediction import label as prediction_label
+from src.prediction import scale as prediction_scale
 from src.signals import CAUSES
 from src.state import results
 from src.ui import synthetic_data_banner
@@ -122,7 +124,7 @@ if persona_id:
     registered = st.session_state["persona_decisions"].get(persona_id)
     if registered:
         st.success(
-            f"Registrado: {registered['intervention']} · previsão de ficar em {W} meses: {pct(registered['prediction'], 0)}"
+            f"Registrado: {registered['intervention']} · previsão em {W} meses: {prediction_label(registered['prediction'], a).lower()}"
             + (f" · justificativa: {registered['justification']}" if registered["justification"] else "")
         )
     elif st.session_state["advanced"]:
@@ -133,14 +135,15 @@ if persona_id:
             chosen = st.radio("Intervenção", interventions, index=interventions.index(case["recommended"]))
             belief = st.selectbox("Causa em que você acredita", case["tied_causes"].split(", ") +
                                   [c for c in CAUSES if c not in case["tied_causes"]])
-            prediction = st.slider(f"Chance de a pessoa ficar em {W} meses (%)", 0, 100, 80, 5)
+            levels = dict(prediction_scale(a))
+            prediction = st.radio(f"A pessoa continua em {W} meses?", list(levels), index=1, horizontal=True)
             justification = st.text_area("Justificativa (obrigatória se a escolha diverge da recomendação)")
             if st.form_submit_button("Registrar decisão"):
                 if chosen != case["recommended"] and not justification.strip():
                     st.error("A escolha diverge da recomendação: registre a justificativa.")
                 else:
                     st.session_state["persona_decisions"][persona_id] = dict(
-                        intervention=chosen, cause=belief, prediction=prediction / 100, justification=justification.strip()
+                        intervention=chosen, cause=belief, prediction=levels[prediction], justification=justification.strip()
                     )
                     st.rerun()
 
@@ -184,7 +187,7 @@ else:
         rows.append({
             "Personagem": f"{pid} · {p['name']}",
             "Decisão": r["intervention"] + (" (seguiu)" if r["followed"] else " (divergiu)"),
-            "Previsão do gestor": pct(r["manager_prediction"], 0),
+            "Previsão do gestor": prediction_label(r["manager_prediction"], a),
             "Previsão do sistema": pct(r["system_prediction"], 0),
             "Resultado": "ficou" if r["stayed"] else f"saiu no mês {int(r['exit_month'])}",
             "O que aconteceu": r["note"],

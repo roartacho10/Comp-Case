@@ -52,8 +52,12 @@ def test_rejection_requires_justification():
     at.selectbox[0].select(lucia).run()
     at.radio[0].set_value("Ajuste salarial").run()
     next(b for b in at.button if b.label == "Registrar decisão").click().run()
+    assert any("Registre a sua previsão" in e.value for e in at.error)
+    at.radio[1].set_value("Provavelmente fica").run()
+    next(b for b in at.button if b.label == "Registrar decisão").click().run()
     assert any("caminho diferente da sugestão" in e.value for e in at.error)
     assert "P3" not in at.session_state["persona_decisions"]
     at.text_area[0].input("Acho que um aumento resolve.").run()
     next(b for b in at.button if b.label == "Registrar decisão").click().run()
     assert at.session_state["persona_decisions"]["P3"]["intervention"] == "Ajuste salarial"
+    assert at.session_state["persona_decisions"]["P3"]["prediction"] == 0.7

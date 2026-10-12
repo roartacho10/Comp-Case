@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from src.app_data import assumptions, load_world
-from src.format import brl, num, pct
+from src.format import brl, cost_note, num, pct
 from src.leadership import after_window, at_t0
 from src.state import dates, month_label, results
 from src import ai
@@ -49,6 +49,7 @@ md(
     f"**{brl(after['value'])}**: cada R$ 1 investido nas intervenções evitou cerca de "
     f"R$ {num(after['return_per_real'])} em reposição."
 )
+st.caption(cost_note(a))
 
 # Following the suggestion ---------------------------------------------------------------
 st.subheader("Seguir a sugestão fez diferença")

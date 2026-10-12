@@ -20,6 +20,7 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.names import unique_name
+from src.prediction import scale
 from src.signals import CAUSES, DAYS_PER_MONTH, DAYS_PER_YEAR, milestone_active, milestones
 
 NO_CAUSE, EXTERNAL = "nenhuma", "externa"
@@ -472,8 +473,9 @@ def generate_network(a: Assumptions, rng, case_rate: float):
     perf_p = np.where(treated, a.num("outcome.performing_if_treated"), a.num("outcome.performing_if_untreated"))
     performing = stayed & (rng.random(n_cases) < perf_p)
     under, noise = a.num("behavior.risk_underestimation"), a.num("behavior.prediction_noise_pp") / 100
-    prediction = np.clip(np.round((1 - p_after * (1 - under) + rng.normal(0, noise, n_cases)) * 20) / 20,
-                         a.num("behavior.prediction_min"), a.num("behavior.prediction_max"))
+    raw_prediction = 1 - p_after * (1 - under) + rng.normal(0, noise, n_cases)
+    levels = np.array(sorted({v for _, v in scale(a)}, reverse=True))  # verbal scale (src/prediction.py)
+    prediction = levels[np.abs(raw_prediction[:, None] - levels[None, :]).argmin(axis=1)]
     exit_month = np.where(stayed, np.nan, rng.integers(1, int(window) + 1, n_cases))
 
     cost_rule = dict(zip(inter["intervention"], inter["cost_rule"]))

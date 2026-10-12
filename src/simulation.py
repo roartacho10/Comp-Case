@@ -15,6 +15,7 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.engine import MONITOR, EngineResult
+from src.prediction import nearest
 
 NO_CAUSE = "nenhuma"
 
@@ -79,8 +80,7 @@ def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -
             pool = [o for o in options if o != right]
             chosen = pool[int(u_pick * len(pool))]
         true_exit = _p_window(a, cause) * (1 - _effect(a, chosen, cause))
-        prediction = float(np.clip(np.round((1 - true_exit * (1 - under) + noise * u_noise) * 20) / 20,
-                                   a.num("behavior.prediction_min"), a.num("behavior.prediction_max")))
+        prediction = nearest(1 - true_exit * (1 - under) + noise * u_noise, a)  # verbal scale
         rows.append(dict(
             employee_id=case["employee_id"], decision_maker_id=case["decision_maker_id"],
             decision_maker_name=case["decision_maker_name"], cause=case["cause"],
