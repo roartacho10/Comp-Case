@@ -29,7 +29,7 @@ def test_every_assumption_is_used():
     engine = run_engine(world.public, a)
     ctx = simulation.make_context(world, a)
     decisions = simulation.simulated_decisions(ctx, engine, a)
-    simulation.advance_six_months(ctx, decisions, a)
+    simulation.advance_window(ctx, decisions, a)
     first = engine.cases.iloc[0]
     comparable_cases(world.public["network_cases"], a, first["cause"], first["level"], first["recommended"])
     assert a.unused() == []

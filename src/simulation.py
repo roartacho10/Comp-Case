@@ -1,4 +1,4 @@
-"""The world's clock: what happens in the 6 months after the decisions.
+"""The world's clock: what happens in the outcome window (premissa outcome.window_months) after the decisions.
 
 This module plays the role of reality, so it may read the hidden truth (the true cause of each
 person). The engine and the interface never do. Outcomes follow the world rules; the three personas
@@ -45,9 +45,10 @@ def _effect(a: Assumptions, intervention: str, cause: str) -> float:
     return a.num("intervention.effect_right") if target == cause else a.num("intervention.effect_wrong")
 
 
-def _p6(a: Assumptions, cause: str) -> float:
+def _p_window(a: Assumptions, cause: str) -> float:
+    """Exit probability within the outcome window, assuming a constant exit rate over the year."""
     annual = a.num("exit.annual_prob_no_cause") if cause == NO_CAUSE else a.num("exit.annual_prob_with_cause")
-    return annual / 2
+    return 1 - (1 - annual) ** (a.num("outcome.window_months") / 12)
 
 
 def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -> pd.DataFrame:
@@ -77,7 +78,7 @@ def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -
         else:
             pool = [o for o in options if o != right]
             chosen = pool[int(u_pick * len(pool))]
-        true_exit = _p6(a, cause) * (1 - _effect(a, chosen, cause))
+        true_exit = _p_window(a, cause) * (1 - _effect(a, chosen, cause))
         prediction = float(np.clip(np.round((1 - true_exit * (1 - under) + noise * u_noise) * 20) / 20,
                                    a.num("behavior.prediction_min"), a.num("behavior.prediction_max")))
         rows.append(dict(
@@ -85,7 +86,7 @@ def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -
             decision_maker_name=case["decision_maker_name"], cause=case["cause"],
             recommended=case["recommended"], intervention=chosen, followed=chosen == case["recommended"],
             manager_prediction=prediction, system_prediction=float(opts.loc[(case["employee_id"], chosen), "stay_rate"]),
-            cost_6m=float(opts.loc[(case["employee_id"], chosen), "cost_6m"]), justification="", origin="simulado",
+            cost_window=float(opts.loc[(case["employee_id"], chosen), "cost_window"]), justification="", origin="simulado",
         ))
     return pd.DataFrame(rows)
 
@@ -105,16 +106,17 @@ def persona_decision_rows(ctx: SimContext, engine: EngineResult, persona_decisio
             recommended=case["recommended"], intervention=chosen, followed=chosen == case["recommended"],
             manager_prediction=float(d.get("prediction", 0.5)),
             system_prediction=float(opts.loc[(p["employee_id"], chosen), "stay_rate"]),
-            cost_6m=float(opts.loc[(p["employee_id"], chosen), "cost_6m"]),
+            cost_window=float(opts.loc[(p["employee_id"], chosen), "cost_window"]),
             justification=d.get("justification", "" if d else "Sem decisão registrada: monitorar"),
             origin="personagem" if d else "personagem (sem decisão)",
         ))
     return pd.DataFrame(rows)
 
 
-def advance_six_months(ctx: SimContext, decisions: pd.DataFrame, a: Assumptions) -> pd.DataFrame:
+def advance_window(ctx: SimContext, decisions: pd.DataFrame, a: Assumptions) -> pd.DataFrame:
     """Outcome after 6 months for every active employee."""
     rng = np.random.default_rng([a.int("general.simulation_seed"), 2])
+    window = a.int("outcome.window_months")
     chosen = decisions.set_index("employee_id")["intervention"].to_dict()
     script = ctx.persona_outcomes.set_index(["persona_id", "intervention"])
     persona_of = dict(zip(ctx.personas["employee_id"], ctx.personas["persona_id"]))
@@ -124,36 +126,36 @@ def advance_six_months(ctx: SimContext, decisions: pd.DataFrame, a: Assumptions)
 
     rows = []
     for emp in sorted(ctx.active_ids):
-        u_exit, u_month, u_perf, u_reg = rng.random(), rng.integers(1, 7), rng.random(), rng.random()
+        u_exit, u_month, u_perf, u_reg = rng.random(), rng.integers(1, window + 1), rng.random(), rng.random()
         cause = ctx.true_cause[emp]
         action = chosen.get(emp)
         effect = _effect(a, action, cause) if action else 0.0
         treated = cause == NO_CAUSE or (action is not None and targets.get(action) == cause)
-        stayed = u_exit >= _p6(a, cause) * (1 - effect)
+        stayed = u_exit >= _p_window(a, cause) * (1 - effect)
         month = None if stayed else int(u_month)
         performing = bool(stayed and u_perf < (perf_t if treated else perf_u))
         note = ""
         if emp in persona_of:
             s = script.loc[(persona_of[emp], action or MONITOR)]
-            stayed = bool(s["stays_6m"])
+            stayed = bool(s["stays"])
             month = None if stayed else int(s["exit_month"])
-            performing = bool(s["performing_6m"])
+            performing = bool(s["performing"])
             note = s["note"]
-        rows.append(dict(employee_id=emp, stayed_6m=stayed, exit_month=month, performing_6m=performing,
+        rows.append(dict(employee_id=emp, stayed=stayed, exit_month=month, performing=performing,
                          regretted=bool(not stayed and u_reg < regretted_share), had_case=action is not None,
                          intervention=action, note=note))
     return pd.DataFrame(rows)
 
 
 def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFrame) -> dict[str, pd.DataFrame]:
-    closed = decisions.merge(outcomes[["employee_id", "stayed_6m", "performing_6m", "exit_month", "note"]],
+    closed = decisions.merge(outcomes[["employee_id", "stayed", "performing", "exit_month", "note"]],
                              on="employee_id")
 
     # Success rates: network before, client cases, network after (network + client).
     net = engine.network_stats.groupby(["attributed_cause", "intervention"])[["n", "stayed"]].sum().reset_index()
     net = net.rename(columns={"attributed_cause": "cause"})
-    cli = closed.groupby(["cause", "intervention"]).agg(n_client=("stayed_6m", "size"),
-                                                         stayed_client=("stayed_6m", "sum")).reset_index()
+    cli = closed.groupby(["cause", "intervention"]).agg(n_client=("stayed", "size"),
+                                                         stayed_client=("stayed", "sum")).reset_index()
     rates = net.merge(cli, on=["cause", "intervention"], how="left").fillna({"n_client": 0, "stayed_client": 0})
     rates["network_before"] = rates["stayed"] / rates["n"]
     rates["client_rate"] = np.where(rates["n_client"] > 0, rates["stayed_client"] / rates["n_client"].clip(lower=1), np.nan)
@@ -162,8 +164,8 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
 
     # Calibration of each decision maker and of the system, on the same cases.
     calib = closed.groupby(["decision_maker_id", "decision_maker_name"]).agg(
-        n=("stayed_6m", "size"), predicted=("manager_prediction", "mean"),
-        system=("system_prediction", "mean"), realized=("stayed_6m", "mean"),
+        n=("stayed", "size"), predicted=("manager_prediction", "mean"),
+        system=("system_prediction", "mean"), realized=("stayed", "mean"),
     ).reset_index()
     calib["bias_pp"] = (calib["predicted"] - calib["realized"]) * 100
     calib["exits_expected_manager"] = (1 - calib["predicted"]) * calib["n"]
@@ -172,12 +174,12 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
     calib["system_bias_pp"] = (calib["system"] - calib["realized"]) * 100
 
     summary = pd.DataFrame([dict(
-        cases=len(closed), followed=closed["followed"].mean(), stayed=closed["stayed_6m"].mean(),
-        performing=closed["performing_6m"].mean(), cost_6m=closed["cost_6m"].sum(),
+        cases=len(closed), followed=closed["followed"].mean(), stayed=closed["stayed"].mean(),
+        performing=closed["performing"].mean(), cost_window=closed["cost_window"].sum(),
         manager_predicted=closed["manager_prediction"].mean(), system_predicted=closed["system_prediction"].mean(),
         exits_expected_manager=(1 - closed["manager_prediction"]).sum(),
         exits_expected_system=(1 - closed["system_prediction"]).sum(),
-        exits_realized=int((~closed["stayed_6m"]).sum()),
-        company_exits=int((~outcomes["stayed_6m"]).sum()), company_regretted=int(outcomes["regretted"].sum()),
+        exits_realized=int((~closed["stayed"]).sum()),
+        company_exits=int((~outcomes["stayed"]).sum()), company_regretted=int(outcomes["regretted"].sum()),
     )])
     return dict(closed=closed, rates=rates, calibration=calib, summary=summary)

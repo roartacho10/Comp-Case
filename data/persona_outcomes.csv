@@ -1,4 +1,4 @@
-persona_id,intervention,stays_6m,exit_month,performing_6m,note
+persona_id,intervention,stays,exit_month,performing,note
 P1,Ajuste salarial,True,,True,O ajuste reduziu a defasagem; recusou as propostas externas e segue performando.
 P1,Carreira e projeto,False,4,False,Aceitou a proposta de uma fintech com salário 30% acima.
 P1,Escalar para a liderança,False,4,False,Aceitou a proposta de uma fintech com salário 30% acima.

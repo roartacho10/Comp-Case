@@ -22,6 +22,7 @@ cases = engine.cases.set_index("employee_id")
 options = engine.options
 personas = ctx.personas.set_index("persona_id")
 tables = world["public"]
+W = a.int("outcome.window_months")
 
 st.session_state.setdefault("persona_decisions", {})
 st.session_state.setdefault("advanced", False)
@@ -32,7 +33,7 @@ c1, c2, c3, c4 = st.columns(4)
 c1.metric("Casos abertos", len(cases))
 c2.metric("Escalados (causa gestor)", int(cases["escalated"].sum()))
 c3.metric("Empates de causa", int(cases["tie"].sum()))
-c4.metric("Saída voluntária média em 6 meses", pct(engine.company_exit_6m))
+c4.metric(f"Saída voluntária média em {W} meses", pct(engine.company_exit_window))
 by = cases.groupby(["cause", "recommended"]).size().unstack(fill_value=0)
 by.index.name, by.columns.name = "Causa provável", None
 st.caption("Casos por causa provável (linhas) e intervenção recomendada (colunas)")
@@ -77,8 +78,8 @@ if case["tie"]:
     )
 st.markdown(
     f"**Causa provável:** {case['cause']} ({case['n_signals']} de 3 sinais).  \n"
-    f"**Risco se nada for feito:** {pct(case['exit_6m_no_action'])} de chance de sair em 6 meses "
-    f"(intervalo de 80%: {pct(case['exit_6m_lo'])} a {pct(case['exit_6m_hi'])}; {case['exit_6m_n']} casos semelhantes na rede), "
+    f"**Risco se nada for feito:** {pct(case['exit_window_no_action'])} de chance de sair em {W} meses "
+    f"(intervalo de 80%: {pct(case['exit_window_lo'])} a {pct(case['exit_window_hi'])}; {case['exit_window_n']} casos semelhantes na rede), "
     f"{num(case['risk_multiple'])}x a média da empresa.  \n"
     f"**Horizonte do valor esperado:** {num(case['horizon_years'])} anos, o tempo que a pessoa ainda ficaria sem ação."
 )
@@ -88,12 +89,12 @@ opts["Recomendada"] = opts["intervention"].eq(case["recommended"]).map({True: "�
 view = pd.DataFrame({
     "": opts["Recomendada"],
     "Intervenção": opts["intervention"],
-    "Chance de ficar em 6 meses": [f"{pct(r)} ({pct(lo, 0)}–{pct(hi, 0)})" for r, lo, hi in
+    f"Chance de ficar em {W} meses": [f"{pct(r)} ({pct(lo, 0)}–{pct(hi, 0)})" for r, lo, hi in
                                    zip(opts["stay_rate"], opts["stay_lo"], opts["stay_hi"])],
     "Evidência na rede": [f"{pct(r)} ficaram (n={format(int(n), ',').replace(',', '.')})"
                           for r, n in zip(opts["network_stay_rate"], opts["n"])],
     "Redução do risco": [pct(x, 0) for x in opts["reduction"]],
-    "Custo em 6 meses": [brl(x) for x in opts["cost_6m"]],
+    f"Custo em {W} meses": [brl(x) for x in opts["cost_window"]],
     "Custo no horizonte": [brl(x) for x in opts["cost_horizon"]],
     "Valor esperado no horizonte": [f"{brl(e)} ({brl(lo)} a {brl(hi)})" if i != MONITOR else "referência"
                                     for e, lo, hi, i in zip(opts["ev"], opts["ev_lo"], opts["ev_hi"], opts["intervention"])],
@@ -103,7 +104,7 @@ st.caption(
     "Valor esperado = custo esperado de não agir − custo esperado com a intervenção, mês a mês no horizonte: "
     "custo da intervenção, reposição de quem sai (75% do custo anual) e diferença de mercado paga ao substituto. "
     "A chance de ficar combina o risco deste caso (mesma causa e número de sinais) com o efeito de cada intervenção "
-    "na rede (mesma causa). O resultado é verificado em 6 meses; o restante do horizonte é extrapolação."
+    f"na rede (mesma causa). O resultado é verificado em {W} meses; o restante do horizonte é extrapolação."
 )
 
 comps = comparable_cases(tables["network_cases"], a, case["cause"], case["level"], case["recommended"])
@@ -114,8 +115,8 @@ if len(comps):
             "Empresa": comps["company_id"],
             "País": comps["country"],
             "Decisão em": comps["decision_date"],
-            "Ficou em 6 meses": comps["stayed_6m"].map({True: "sim", False: "não"}),
-            "Segue performando": comps["performing_6m"].map({True: "sim", False: "não"}),
+            f"Ficou em {W} meses": comps["stayed"].map({True: "sim", False: "não"}),
+            "Segue performando": comps["performing"].map({True: "sim", False: "não"}),
         }),
         hide_index=True,
         width="stretch",
@@ -127,18 +128,18 @@ if persona_id:
     registered = st.session_state["persona_decisions"].get(persona_id)
     if registered:
         st.success(
-            f"Registrado: {registered['intervention']} · previsão de ficar em 6 meses: {pct(registered['prediction'], 0)}"
+            f"Registrado: {registered['intervention']} · previsão de ficar em {W} meses: {pct(registered['prediction'], 0)}"
             + (f" · justificativa: {registered['justification']}" if registered["justification"] else "")
         )
     elif st.session_state["advanced"]:
-        st.info("Os 6 meses já avançaram. Reinicie para decidir de novo.")
+        st.info(f"Os {W} meses já avançaram. Reinicie para decidir de novo.")
     else:
         with st.form(f"decision_{persona_id}"):
             interventions = opts["intervention"].tolist()
             chosen = st.radio("Intervenção", interventions, index=interventions.index(case["recommended"]))
             belief = st.selectbox("Causa em que você acredita", case["tied_causes"].split(", ") +
                                   [c for c in ("remuneração", "crescimento", "gestor") if c not in case["tied_causes"]])
-            prediction = st.slider("Chance de a pessoa ficar em 6 meses (%)", 0, 100, 80, 5)
+            prediction = st.slider(f"Chance de a pessoa ficar em {W} meses (%)", 0, 100, 80, 5)
             justification = st.text_area("Justificativa (obrigatória se a escolha diverge da recomendação)")
             if st.form_submit_button("Registrar decisão"):
                 if chosen != case["recommended"] and not justification.strip():
@@ -151,10 +152,10 @@ if persona_id:
 
 # Six months later --------------------------------------------------------------
 st.divider()
-st.subheader("Seis meses depois")
+st.subheader(f"{W} meses depois")
 left, right = st.columns(2)
 pending = [pid for pid in personas.index if pid not in st.session_state["persona_decisions"]]
-if left.button("Avançar 6 meses", type="primary", disabled=st.session_state["advanced"]):
+if left.button(f"Avançar {W} meses", type="primary", disabled=st.session_state["advanced"]):
     st.session_state["advanced"] = True
     st.rerun()
 if right.button("Reiniciar"):
@@ -169,15 +170,15 @@ if st.session_state["advanced"]:
         [world["simulated_decisions"], simulation.persona_decision_rows(ctx, engine, st.session_state["persona_decisions"])],
         ignore_index=True,
     )
-    outcomes = simulation.advance_six_months(ctx, decisions, a)
+    outcomes = simulation.advance_window(ctx, decisions, a)
     learn = simulation.learning(engine, decisions, outcomes)
     s = learn["summary"].iloc[0]
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Casos fechados", int(s["cases"]))
     m2.metric("Seguiram a recomendação", pct(s["followed"], 0))
-    m3.metric("Ficaram em 6 meses", pct(s["stayed"], 0))
-    m4.metric("Custo das intervenções (6 meses)", brl(s["cost_6m"]))
+    m3.metric(f"Ficaram em {W} meses", pct(s["stayed"], 0))
+    m4.metric(f"Custo das intervenções ({W} meses)", brl(s["cost_window"]))
     st.markdown(
         f"**Saídas nos casos abertos: os gestores esperavam {s['exits_expected_manager']:.0f}, o sistema esperava "
         f"{s['exits_expected_system']:.0f} e ocorreram {int(s['exits_realized'])}.**"
@@ -185,7 +186,7 @@ if st.session_state["advanced"]:
     st.caption(
         f"Em chance de ficar: gestores {pct(s['manager_predicted'], 0)}, sistema {pct(s['system_predicted'], 0)}, "
         f"realizado {pct(s['stayed'], 0)}. Como a maioria fica, a diferença aparece melhor no número de saídas. "
-        f"Saídas voluntárias na empresa inteira em 6 meses: {int(s['company_exits'])}."
+        f"Saídas voluntárias na empresa inteira em {W} meses: {int(s['company_exits'])}."
     )
 
     st.markdown("**Personagens: previsto contra realizado**")
@@ -198,12 +199,12 @@ if st.session_state["advanced"]:
             "Decisão": r["intervention"] + (" (seguiu)" if r["followed"] else " (divergiu)"),
             "Previsão do gestor": pct(r["manager_prediction"], 0),
             "Previsão do sistema": pct(r["system_prediction"], 0),
-            "Resultado": "ficou" if r["stayed_6m"] else f"saiu no mês {int(r['exit_month'])}",
+            "Resultado": "ficou" if r["stayed"] else f"saiu no mês {int(r['exit_month'])}",
             "O que aconteceu": r["note"],
         })
     st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
-    st.markdown("**Aprendizado: taxa de permanência em 6 meses por causa e intervenção**")
+    st.markdown(f"**Aprendizado: taxa de permanência em {W} meses por causa e intervenção**")
     rates = learn["rates"]
     st.dataframe(pd.DataFrame({
         "Causa": rates["cause"],

@@ -25,7 +25,7 @@ class EngineResult:
     cases: pd.DataFrame            # one row per open case
     options: pd.DataFrame          # one row per case x intervention
     network_stats: pd.DataFrame    # stay rates by attributed cause x number of signals x intervention
-    company_exit_6m: float         # observed voluntary exit rate in 6 months (client history)
+    company_exit_window: float     # observed voluntary exit rate within the outcome window (client history)
 
 
 def _beta_interval(successes, n, level):
@@ -45,7 +45,7 @@ def network_stats(network: pd.DataFrame, a: Assumptions) -> pd.DataFrame:
         mask = net["attributed_cause"] == c
         net.loc[mask, "n_signals"] = net.loc[mask, cols].sum(axis=1)
     g = net.groupby(["attributed_cause", "n_signals", "intervention"])
-    stats = g.agg(n=("stayed_6m", "size"), stayed=("stayed_6m", "sum"), performing=("performing_6m", "sum")).reset_index()
+    stats = g.agg(n=("stayed", "size"), stayed=("stayed", "sum"), performing=("performing", "sum")).reset_index()
     stats["stay_rate"] = stats["stayed"] / stats["n"]
     stats["success_rate"] = stats["performing"] / stats["n"]
     level = a.num("ev.interval_level")
@@ -87,7 +87,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
     # Client history: voluntary exits in the last 12 months, per 6 months.
     former = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")]
     recent = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= 12 * DAYS_PER_MONTH]
-    company_exit_6m = len(recent) / len(active) / 2
+    window = a.num("outcome.window_months")
+    company_exit_window = 1 - (1 - len(recent) / len(active)) ** (window / 12)
 
     stats = network_stats(tables["network_cases"], a)
     pooled_stats = stats.groupby(["attributed_cause", "intervention"])[["n", "stayed"]].sum()
@@ -119,8 +120,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
         # Risk if nothing is done: same cause and same number of signals (monitored cases).
         st_k = stats[(stats["attributed_cause"] == cause) & (stats["n_signals"] == k)].set_index("intervention")
         base = st_k.loc[MONITOR]
-        exit6 = 1 - base["stay_rate"]
-        hazard = -2 * np.log(1 - exit6)  # annual
+        exit_w = 1 - base["stay_rate"]
+        hazard = -(12 / window) * np.log(1 - exit_w)  # annual
         horizon_years = min(1 / hazard, cap_years)
         months = max(1, int(round(horizon_years * 12)))
         salary = float(person["annual_cost_brl"])
@@ -134,7 +135,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             return rng.beta(1 + stayed, 1 + n - stayed, draws)
 
         base_draws = np.clip(1 - sample(base["stayed"], base["n"]), 1e-4, 0.9999)
-        h0 = -2 * np.log(1 - base_draws)
+        h0 = -(12 / window) * np.log(1 - base_draws)
         base_cost = _cost_of_path(np.repeat(h0[:, None], months, axis=1), months, salary, median, a, 0.0, 0.0)
         pool_monitor = np.clip(1 - sample(pooled.loc[MONITOR, "stayed"], pooled.loc[MONITOR, "n"]), 1e-4, 0.9999)
 
@@ -146,7 +147,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             h1 = h0 * (1 - reduction)
             if name == MONITOR:
                 ev = np.zeros(draws)
-                cost_total, cost_6m = 0.0, 0.0
+                cost_total, cost_window = 0.0, 0.0
             else:
                 paths = np.repeat(np.broadcast_to(h1, (draws,))[:, None], months, axis=1)
                 if not recurring:
@@ -156,7 +157,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 one_cost = 0.0 if recurring else rate_cost
                 ev = base_cost - _cost_of_path(paths, months, salary, median, a, rec_cost, one_cost)
                 cost_total = round(rec_cost * horizon_years, -2) if recurring else one_cost
-                cost_6m = round(rec_cost / 2, -2) if recurring else one_cost
+                cost_window = round(rec_cost * window / 12, -2) if recurring else one_cost
             option_rows.append(dict(
                 employee_id=emp, intervention=name,
                 target_cause=inter.loc[name, "target_cause"] if name in inter.index else "",
@@ -165,7 +166,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 stay_hi=float(np.quantile(stay_case, 1 - (1 - level) / 2)),
                 network_stay_rate=float(row["stayed"] / row["n"]), n=int(row["n"]),
                 reduction=float(np.median(reduction)) if name != MONITOR else 0.0,
-                cost_6m=cost_6m, cost_horizon=cost_total, recurring=bool(recurring),
+                cost_window=cost_window, cost_horizon=cost_total, recurring=bool(recurring),
                 ev=float(np.median(ev)), ev_lo=float(np.quantile(ev, (1 - level) / 2)),
                 ev_hi=float(np.quantile(ev, 1 - (1 - level) / 2)),
             ))
@@ -180,16 +181,16 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             decision_maker_name=managers.loc[decider, "name"] if decider in managers.index else None,
             escalated=cause == "gestor", cause=cause, tied_causes=", ".join(tied), tie=len(tied) > 1,
             n_signals=k, signals=", ".join(s for s in signals.columns if signals.loc[emp, s]),
-            exit_6m_no_action=float(exit6), exit_6m_lo=float(1 - base["stay_hi"]), exit_6m_hi=float(1 - base["stay_lo"]),
-            exit_6m_n=int(base["n"]), risk_multiple=float(exit6 / company_exit_6m) if company_exit_6m else np.nan,
+            exit_window_no_action=float(exit_w), exit_window_lo=float(1 - base["stay_hi"]), exit_window_hi=float(1 - base["stay_lo"]),
+            exit_window_n=int(base["n"]), risk_multiple=float(exit_w / company_exit_window) if company_exit_window else np.nan,
             horizon_years=float(horizon_years), salary=salary, market_median=median,
             recommended=recommended, recommended_ev=float(opts.loc[recommended, "ev"]),
-            system_stay_6m=float(opts.loc[recommended, "stay_rate"]),
+            system_stay=float(opts.loc[recommended, "stay_rate"]),
         ))
 
     return EngineResult(
         signals=signals, cases=pd.DataFrame(case_rows), options=pd.DataFrame(option_rows),
-        network_stats=stats, company_exit_6m=company_exit_6m,
+        network_stats=stats, company_exit_window=company_exit_window,
     )
 
 

@@ -454,7 +454,8 @@ def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float
     min_signals = a.int("case.min_signals_same_cause")
     n_companies = a.int("network.n_companies")
     max_months = a.num("network.months")
-    min_months = a.num("generation.network_min_months_ago")
+    window = a.num("outcome.window_months")
+    min_months = window  # a case only closes after the outcome window
 
     country_dist = a.distribution("population.country")
     area_dist = a.distribution("population.area")
@@ -532,15 +533,16 @@ def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float
     eff_right, eff_wrong = a.num("intervention.effect_right"), a.num("intervention.effect_wrong")
     target = np.array([target_of[x] for x in chosen], dtype=object)
     effect = np.where(target == "", 0.0, np.where(target == cause, eff_right, eff_wrong))
-    p6_after = np.where(cause == NO_CAUSE, p_no, p_yes) / 2 * (1 - effect)
-    stayed = rng.random(n_cases) >= p6_after
+    p_window = 1 - (1 - np.where(cause == NO_CAUSE, p_no, p_yes)) ** (window / 12)
+    p_after = p_window * (1 - effect)
+    stayed = rng.random(n_cases) >= p_after
     treated = (chosen == right) | (cause == NO_CAUSE)
     perf_p = np.where(treated, a.num("outcome.performing_if_treated"), a.num("outcome.performing_if_untreated"))
     performing = stayed & (rng.random(n_cases) < perf_p)
     under, noise = a.num("behavior.risk_underestimation"), a.num("behavior.prediction_noise_pp") / 100
-    prediction = np.clip(np.round((1 - p6_after * (1 - under) + rng.normal(0, noise, n_cases)) * 20) / 20,
+    prediction = np.clip(np.round((1 - p_after * (1 - under) + rng.normal(0, noise, n_cases)) * 20) / 20,
                          a.num("behavior.prediction_min"), a.num("behavior.prediction_max"))
-    exit_month = np.where(stayed, np.nan, rng.integers(1, 7, n_cases))
+    exit_month = np.where(stayed, np.nan, rng.integers(1, int(window) + 1, n_cases))
 
     cost_rule = dict(zip(inter["intervention"], inter["cost_rule"]))
     cost_value = {k: a.num(v) for k, v in zip(inter["intervention"], inter["cost_key"])}
@@ -562,8 +564,8 @@ def generate_network(a: Assumptions, rng, manager_share: float, case_rate: float
         network[f"sig_{s}"] = active[:, j]
     network = network.assign(
         attributed_cause=attributed, recommended_intervention=recommended, intervention=chosen,
-        followed_recommendation=followed, cost_brl=cost, manager_prediction_stay_6m=prediction,
-        stayed_6m=stayed, performing_6m=performing, exit_month=pd.array(exit_month, dtype="Int64"),
+        followed_recommendation=followed, cost_brl=cost, manager_prediction_stay=prediction,
+        stayed=stayed, performing=performing, exit_month=pd.array(exit_month, dtype="Int64"),
     )
     truth = pd.DataFrame(dict(case_id=case_ids, true_cause=cause))
     return network, truth, companies

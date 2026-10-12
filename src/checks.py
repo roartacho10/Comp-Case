@@ -126,7 +126,7 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     net = pub["network_cases"]
     companies = pub["network_companies"]
     employees = int(companies["employees"].sum())
-    years = (a.num("network.months") - a.num("generation.network_min_months_ago")) / 12
+    years = (a.num("network.months") - a.num("outcome.window_months")) / 12
     expected_cases = int(round(employees * world.notes["case_rate"] * years))
     add("Rede", "Colaboradores nos clientes da rede (informativo)", "—", f"{employees:,}".replace(",", "."), True)
     add("Rede", "Casos fechados na rede", f"{expected_cases:,}".replace(",", "."), f"{len(net):,}".replace(",", "."),
@@ -137,10 +137,10 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     by_cause = dict(zip(a.interventions["target_cause"], a.interventions["intervention"]))
     for c in CAUSES:
         sub = net[net["attributed_cause"] == c]
-        rates = sub.groupby("intervention")["stayed_6m"].agg(["mean", "size"])
+        rates = sub.groupby("intervention")["stayed"].agg(["mean", "size"])
         best = rates["mean"].idxmax()
         detail = "; ".join(f"{k}: {_pct(r['mean'])} (n={int(r['size'])})" for k, r in rates.iterrows())
-        add("Rede", f"Causa atribuída '{c}': intervenção certa tem a maior permanência em 6 meses",
+        add("Rede", f"Causa atribuída '{c}': intervenção certa tem a maior permanência na janela de resultado",
             by_cause[c], best, best == by_cause[c], detail)
     cell_min = int(net.groupby(["attributed_cause", "intervention"]).size().min())
     add("Rede", "Menor número de casos por combinação causa × intervenção", "≥ 30", str(cell_min), cell_min >= 30)

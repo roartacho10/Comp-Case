@@ -1,6 +1,6 @@
 group,key,value,unit,description,rationale,origin
 geral,general.seed,42,-,Semente do sorteio aleatório,Valor arbitrário; fixá-lo garante que os dados sejam sempre os mesmos,premissa
-geral,general.reference_date,2026-10-01,data,Data de hoje no protótipo (T0),Próxima da entrega do case; avançar 6 meses leva a abril de 2027,premissa
+geral,general.reference_date,2026-10-01,data,Data de hoje no protótipo (T0),Próxima da entrega do case; avançar a janela de resultado (12 meses) leva a outubro de 2027,premissa
 geral,general.n_employees,1000,pessoas,Colaboradores ativos em T0,Porte informado no case,case
 população,population.country.Brasil,0.7,fração,Fração dos colaboradores no Brasil,Sede em São Paulo concentra a maior parte do time,premissa
 população,population.country.México,0.12,fração,Fração dos colaboradores no México,Segundo maior mercado de tecnologia da região,premissa
@@ -57,7 +57,7 @@ sinais,signals.team_exits_window_months,6,meses,Janela das saídas no time,Mesmo
 sinais,signals.pulse_max_score,2,nota (1-5),Limiar do sinal de pulso sobre o gestor (escala de 1 a 5),Notas 1 e 2 indicam insatisfação clara,premissa
 sinais,signals.context_window_months,6,meses,"Janela dos eventos de contexto (conversas de carreira, atas)",Eventos mais antigos perdem relevância para a decisão de agora,premissa
 saídas,exit.annual_prob_no_cause,0.065,prob./ano,Chance de saída voluntária em 12 meses sem causa de risco,Calibrada com a de quem tem causa para o turnover total ficar em ~15% (seção 3.3),premissa
-saídas,exit.annual_prob_with_cause,0.4,prob./ano,"Chance de saída voluntária em 12 meses com causa de risco (em 6 meses, metade)",Risco muito maior quando há causa; calibrada para o turnover total de ~15%,premissa
+saídas,exit.annual_prob_with_cause,0.4,prob./ano,Chance de saída voluntária em 12 meses com causa de risco,Risco muito maior quando há causa; calibrada para o turnover total de ~15%,premissa
 saídas,exit.regretted_share,0.5,fração,Fração das saídas que é arrependida,Seção 3.3: metade das saídas é arrependida,documento
 saídas,history.months,12,meses,Meses de histórico de eventos antes de T0,Cobre as janelas dos sinais e o turnover anual,premissa
 intervenções,intervention.effect_right,0.5,fração,Redução da chance de saída quando a intervenção ataca a causa verdadeira,"Efeito relevante, mas parcial: nem a ação certa garante a permanência",premissa
@@ -75,7 +75,7 @@ comportamento,behavior.prediction_noise_pp,5,p.p.,Dispersão das previsões dos 
 comportamento,behavior.follow_recommendation,0.6,prob.,Chance de o gestor seguir a recomendação do sistema,Adesão parcial: o gestor decide e às vezes discorda,premissa
 casos,case.min_signals_same_cause,2,sinais,Número de sinais da mesma causa para abrir um caso,Um sinal isolado é ruído frequente; dois da mesma causa indicam padrão,premissa
 rede,network.n_companies,500,empresas,Clientes da Comp que formam a rede,Referência do autor: 500 clientes,premissa
-rede,network.months,18,meses,"Idade máxima das decisões na rede, em meses","12 meses de decisões com resultado conhecido (de 6 a 18 meses atrás): supõe que o produto já roda há ~1,5 ano na base",premissa
+rede,network.months,24,meses,"Idade máxima das decisões na rede, em meses","12 meses de decisões com resultado conhecido (de 12 a 24 meses atrás, porque o resultado só fecha após a janela): supõe que o produto já roda há ~2 anos na base",premissa
 geração,generation.max_months_without_raise,36.0,meses,"Máximo de meses sem mudança salarial, para quem tem o sinal",Limite plausível,premissa (detalhe de geração)
 geração,generation.time_in_level_extra_months,12.0,meses,Quanto acima do limiar fica quem tem o sinal 'tempo no nível',Espalha os casos em até 1 ano acima do limiar,premissa (detalhe de geração)
 geração,generation.max_months_since_manager_change,48.0,meses,"Máximo de meses desde a última troca de gestor, em times sem troca recente",Times estáveis têm o mesmo gestor há até 4 anos,premissa (detalhe de geração)
@@ -85,13 +85,13 @@ geração,generation.neutral_context_share,0.15,fração,Fração de pessoas sem
 geração,generation.project_end_share,0.5,fração,"Entre sinais de crescimento por contexto, fração que vem de fim de projeto",Divide igualmente as duas origens (fim de projeto e pedido de crescimento),premissa (detalhe de geração)
 geração,generation.network_company_min_employees,100,pessoas,Porte mínimo dos clientes da rede,Média de 500 colaboradores por cliente (referência do autor),premissa (detalhe de geração)
 geração,generation.network_company_max_employees,900,pessoas,Porte máximo dos clientes da rede,Média de 500 colaboradores por cliente (referência do autor),premissa (detalhe de geração)
-geração,generation.network_min_months_ago,6.0,meses,Idade mínima das decisões da rede,O resultado só é conhecido 6 meses depois,premissa (detalhe de geração)
 valor esperado,ev.horizon_cap_years,5,anos,Teto do horizonte do valor esperado,O horizonte é o tempo que a pessoa ainda ficaria sem ação (1 ÷ chance anual de saída); o teto evita horizontes de décadas para quem tem risco baixo,premissa
 intervenções,intervention.one_off_effect_months,12,meses,"Duração do efeito das intervenções pontuais (carreira e projeto, escalar)",Ações pontuais perdem força se não forem renovadas; o ajuste salarial dura enquanto for pago,premissa
 intervenções,cost.replacement_hire_compa,1.0,x,Compa-ratio de quem é contratado para substituir quem sai,O substituto é contratado pela mediana de mercado: a diferença para o salário atual é um custo recorrente da saída,premissa
 valor esperado,ev.uncertainty_draws,500,sorteios,Sorteios usados para estimar a incerteza do valor esperado,Suficiente para um intervalo estável; mais sorteios só deixariam o cálculo mais lento,premissa (detalhe de cálculo)
 valor esperado,ev.interval_level,0.8,prob.,Nível do intervalo mostrado para taxas e valores esperados,80% é um intervalo legível para decisão gerencial; 95% seria largo demais para orientar escolhas,premissa (detalhe de cálculo)
 casos,case.comparable_cases,3,casos,Casos comparáveis da rede mostrados em cada caso,Suficiente para dar exemplos concretos sem poluir o caso,premissa (detalhe de cálculo)
-geral,general.simulation_seed,7,-,Semente da simulação dos 6 meses seguintes,"Separada da semente dos dados: avançar 6 meses dá sempre o mesmo resultado, sem alterar os dados de T0",premissa (detalhe de cálculo)
+geral,general.simulation_seed,7,-,Semente da simulação da janela de resultado,"Separada da semente dos dados: avançar a janela dá sempre o mesmo resultado, sem alterar os dados de T0",premissa (detalhe de cálculo)
 comportamento,behavior.prediction_max,0.99,prob.,Maior chance de ficar que um gestor simulado prevê,"Ninguém prevê certeza absoluta; um teto mais baixo (ex.: 95%) esconderia o viés, porque a maioria das pessoas em risco fica",premissa (detalhe de cálculo)
 comportamento,behavior.prediction_min,0.01,prob.,Menor chance de ficar que um gestor simulado prevê,Simétrico ao teto,premissa (detalhe de cálculo)
+resultado,outcome.window_months,12,meses,Janela em que se mede o resultado de cada decisão (ficou e segue performando),Seção 3.2: o resultado aparece em 6 a 12 meses; 12 meses mostra o efeito das intervenções com clareza e coincide com a duração do efeito das ações pontuais. Custo: cada decisão leva 12 meses para virar aprendizado,premissa
