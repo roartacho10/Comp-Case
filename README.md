@@ -17,7 +17,7 @@ Construção em fases, cada uma revisada e aprovada antes da seguinte. O histór
 | 2 | Personagens e motor de regras | Concluída |
 | 3 | Fluxo 1: caso do gestor | Concluída |
 | 4 | Fluxos 2 e 3 (aprendizado, liderança) e resultado | Concluída |
-| 5 | Camada de AI | Em validação |
+| 5 | Camada de AI | Concluída |
 | 6 | Testes, README e publicação final | A fazer |
 
 ## Como rodar localmente
