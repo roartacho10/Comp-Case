@@ -253,6 +253,6 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 | Números em excesso | Saíram intervalos, bases de casos e múltiplos com decimal; ficaram só os números que mudam a decisão. Risco em linguagem simples ("4 em cada 10 pessoas"). Detalhes seguem na página de bastidores |
 | Casos parecidos sem contexto | Removidos da tela do gestor |
 | Termos técnicos | Sinais com rótulo e evidência em linguagem direta (nova coluna `manager_label` no catálogo de sinais); "nível" → "cargo e senioridade", "causa provável" → "o motivo mais provável", "rede" → "base da Comp", "retorno esperado" → "saldo estimado" |
-| Custos que o gestor conhece melhor | Valor no texto só para o ajuste salarial (dado de remuneração). Para carreira e projeto e escalar, o texto diz do que é feito o custo e até quanto vale gastar ("compensa enquanto o custo total ficar abaixo de ~R$ 26 mil"); na tabela, o custo padrão aparece como referência |
+| Custos que o gestor conhece melhor | Valor no texto só para o ajuste salarial (dado de remuneração). Para carreira e projeto e escalar, o texto diz do que é feito o custo e até quanto vale gastar ("compensa enquanto o custo total ficar abaixo de ~R$ 26 mil"). Na tabela, sem valor de referência (pedido do autor): custo "você avalia" e saldo "compensa se custar até R$ X" |
 
 **Status:** em validação pelo autor.
