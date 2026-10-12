@@ -301,3 +301,37 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Correção, seguindo a documentação da Anthropic: esforço baixo (`output_config.effort = low`, nova premissa), raciocínio mínimo (`thinking: between_tools`), resposta obrigada a seguir o esquema JSON de cada tarefa (`output_config.format`, saídas estruturadas) e limite de 4.000 tokens. O selo passa a mostrar o detalhe da falha (tipo, mensagem e motivo de parada), para diagnóstico direto na tela.
 
 **Status:** concluída e aprovada pelo autor (AI funcionando com a API real no app publicado).
+
+---
+
+## Fase 6 — Testes, README e publicação final
+
+**Objetivo:** fechar o protótipo para a apresentação: foco no que prova o ponto, roteiro para quem avalia, testes de ponta a ponta e documentação final.
+
+**Decisões validadas antes da execução**
+
+| Decisão | Escolha | Racional |
+|---|---|---|
+| Causa gestão | Retirada do protótipo e dos dados; o peso (~5,5% das pessoas) foi dividido entre remuneração (10% → 13%) e crescimento (8% → 10,5%), na proporção atual | Decisão do autor: é uma causa possível, mas não é necessária para provar o ponto e desviava o foco. Ela concentrava 27% dos casos em 5 times, e os diretores recebiam 10 ou 11 mensagens quase iguais. Manter a fração total com causa preserva a calibração do turnover (~15%) |
+| Lucía | Passa a ser um caso de crescimento com dois sinais; o roteiro mantém o papel dela (recomendação rejeitada): se o gestor dá um aumento em vez de carreira e projeto, ela sai | Mostra que dinheiro não resolve falta de perspectiva, e com números diferentes dos do Diego |
+| Página inicial | Roteiro de navegação para quem avalia; o status das fases fica só no README | Quem abre o link é a Comp; o status é informação interna |
+| README | Roteiro, ligação com as seções 4.1 a 4.3, cálculo dos números, limitações; também em .docx | Deixar claro o que o protótipo prova e o que não prova |
+| Testes | Roteiro completo num navegador real; suíte em Python 3.12 (versão do Streamlit Cloud); varredura de segredos no histórico | Garantir que o que a Comp vai clicar funciona |
+| Documento | Um documento só com mudanças e novidades em relação às seções 4.1, 4.2 e 4.3 | Pedido do autor |
+
+**O que foi construído**
+
+- Causa gestão retirada: sinais de time (troca de gestor, saídas no time, pulso sobre o gestor), tabela de pulso, intervenção "Escalar para a liderança", encaminhamento para a liderança acima, perguntas e textos ligados a ela. Sinais e personagens passam a ter os sinais listados explicitamente (`data/personas.csv`).
+- Semente da simulação revista (14): com as sementes 1 a 20, as saídas nos casos abertos variaram de 26 a 52 (média 41; o sistema esperava ~39); a 14 dá 40.
+- Página inicial com roteiro; tabela de opções que quebra linha em telas menores; visão da liderança sem cortes em 1.280 px; números no padrão brasileiro.
+- Teste de ponta a ponta no navegador (`tests/test_e2e_browser.py`).
+- README final e versão .docx.
+
+**Checagens**
+
+- 40 checagens do mundo passando (163 casos abertos; causa provável igual à verdadeira em 92% dos casos).
+- Testes: 52 passando em Python 3.13 (incluindo o navegador); 51 passando e 1 pulado (sem Playwright) em Python 3.12.
+- Nenhuma chave no histórico do git.
+- Capturas de tela das páginas em 1.440 e 1.280 px revisadas.
+
+**Status:** em validação pelo autor.
