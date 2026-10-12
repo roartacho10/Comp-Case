@@ -255,4 +255,6 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 | Termos técnicos | Sinais com rótulo e evidência em linguagem direta (nova coluna `manager_label` no catálogo de sinais); "nível" → "cargo e senioridade", "causa provável" → "o motivo mais provável", "rede" → "base da Comp", "retorno esperado" → "saldo estimado" |
 | Custos que o gestor conhece melhor | Valor no texto só para o ajuste salarial (dado de remuneração). Para carreira e projeto e escalar, o texto diz do que é feito o custo e até quanto vale gastar ("compensa enquanto o custo total ficar abaixo de ~R$ 26 mil"). Na tabela, sem valor de referência (pedido do autor): custo "você avalia" e saldo "compensa se custar até R$ X" |
 
+- **Página própria para o resultado (pedido do autor):** "4. Resultado em 12 meses", separada da visão da liderança, que perdia destaque. Mostra saídas esperadas sem ação × ocorridas, saídas evitadas e valor preservado (com quanto cada R$ 1 em intervenções evitou em reposição), permanência quando a sugestão foi seguida × quando a decisão divergiu (com a ressalva de que é comparação descritiva), resultado por motivo e turnover e saídas arrependidas da empresa inteira contra os 12 meses anteriores.
+
 **Status:** em validação pelo autor.

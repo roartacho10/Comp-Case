@@ -4,7 +4,7 @@ import streamlit as st
 
 from src.app_data import assumptions, load_world
 from src.format import brl, num, pct
-from src.leadership import after_window, at_t0
+from src.leadership import at_t0
 from src.state import current_decisions, dates, month_label, results
 from src.ui import ACCENT, md, synthetic_data_banner
 
@@ -85,24 +85,8 @@ st.dataframe(pd.DataFrame({
 }), hide_index=True, width="stretch")
 
 # After the window --------------------------------------------------------------------
-st.subheader(f"{W} meses depois ({month_label(t1)})")
-if res is None:
-    st.info(f"Use **Avançar {W} meses** na barra lateral para ver o resultado das decisões.")
-    st.stop()
-after = after_window(world, a, view, res)
-d1, d2, d3, d4 = st.columns(4)
-d1.metric("Saídas esperadas sem ação", num(view["exits_no_action"], 0))
-d2.metric("Saídas que ocorreram", after["exits_realized"])
-d3.metric("Saídas evitadas (estimativa)", num(after["avoided"], 0))
-d4.metric("Valor preservado (estimativa)", brl(after["value"]),
-          help="Saídas evitadas × custo médio de reposição − custo das intervenções")
-md(
-    f"Nos casos abertos, o sistema esperava {num(view['exits_no_action'], 0)} saídas se nada fosse feito; ocorreram "
-    f"**{after['exits_realized']}**. A diferença, cerca de **{num(after['avoided'], 0)} saídas evitadas**, vale aproximadamente "
-    f"**{brl(after['value'])}** já descontado o custo das intervenções ({brl(view['intervention_cost'])})."
-)
-st.caption(
-    "Estimativa: compara o resultado com o que a rede indica para casos parecidos sem ação, não com um grupo de controle. "
-    "A prova causal vem da comparação entre áreas que adotaram e que ainda não adotaram o sistema, ao longo do tempo. "
-    f"Na empresa inteira, houve {after['company_exits']} saídas voluntárias no período."
-)
+st.divider()
+if results(world, a) is None:
+    st.caption(f"O resultado das decisões aparece na página **4. Resultado em {W} meses**, depois de avançar o tempo.")
+else:
+    st.caption(f"O resultado das decisões está na página **4. Resultado em {W} meses**.")

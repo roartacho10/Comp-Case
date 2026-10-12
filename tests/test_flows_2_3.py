@@ -20,7 +20,7 @@ def run(page, advanced):
     return at.run()
 
 
-@pytest.mark.parametrize("page", ["learning.py", "leadership.py"])
+@pytest.mark.parametrize("page", ["learning.py", "leadership.py", "results.py"])
 def test_pages_before_and_after_window(page):
     for advanced in (False, True):
         at = run(page, advanced)
