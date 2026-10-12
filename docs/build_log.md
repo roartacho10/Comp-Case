@@ -166,4 +166,37 @@ Ao aplicar a mudança na causa "gestor", o sorteio mudou e duas checagens da red
 - Com a semente 7, o sorteio de saídas caiu abaixo da média: em 5 sementes (7 a 11), as saídas ocorridas foram 34, 46, 41, 47 e 45 (média 43, próxima das ~45 esperadas pelo sistema). Uma rodada isolada sugeria, sem razão, que o sistema exagera o risco.
 - **Decisão do autor:** semente da simulação trocada para 11, representativa da média, com a escolha e os resultados das demais sementes registrados na explicação da premissa; e a tela passou a mostrar a faixa provável de saídas (80%) ao lado de cada previsão. Resultado: gestores esperavam 22 (faixa de 16 a 28), o sistema 45 (37 a 53), ocorreram 45.
 
+**Status:** concluída e aprovada pelo autor.
+
+---
+
+## Fase 3 — Fluxo 1: caso do gestor
+
+**Objetivo:** a tela em que o gestor recebe o caso, entende o que os dados indicam, decide e registra a previsão. Textos por modelo fixo (a AI entra na Fase 5, e estes modelos viram a reserva dela).
+
+**Decisões validadas antes da execução**
+
+| Decisão | Escolha | Racional |
+|---|---|---|
+| Tom | **Orientar, não mandar** (pedido do autor): a mensagem explica o que os dados indicam e o que a rede aprendeu, e termina com "a decisão é sua" | O gestor decide; o sistema traz evidência e contexto que ele não tem |
+| Ordem da mensagem | Resumo → por que agora (sinais com evidência e risco) → causa provável → o que a rede aprendeu → sugestão → perguntas → opções → casos parecidos → decisão | Entender, verificar e só então escolher; as perguntas reforçam que a causa é hipótese |
+| Risco | Probabilidade com faixa e base de casos, e "não é uma previsão sobre a pessoa; é o que aconteceu com pessoas em situação parecida" | Nunca rotular; estimativa não é medida |
+| Perguntas | 3 perguntas abertas por causa, em tabela editável (`data/questions.csv`) | Não induzem resposta nem revelam números; editáveis como as demais premissas |
+| Caso escalado | Vai para a liderança acima, explicando que os sinais apontam para a dinâmica de gestão do time e não para uma questão individual, sem adjetivos sobre o gestor | Coerente com "nunca rotular o colaborador nem o gestor" |
+| Quem aparece | Só os 3 personagens, com seletor de qual caso ver | Os demais casos já foram decididos pela simulação |
+| Decisão | Intervenção (sugerida pré-selecionada), causa em que acredita, previsão de 0 a 100% e justificativa obrigatória quando diverge; resposta do gestor e confirmação na conversa | A previsão alimenta a calibração; a justificativa torna a divergência aprendível |
+| Visual | Conversa estilo chat corporativo marcada como "Slack (simulado)", sem marca do Slack | Integração simulada, sem imitar marca de terceiros |
+| Casos parecidos | Sem a coluna de data | A data não ajudava a decisão e confundia |
+
+**O que foi construído**
+
+- Gerador de textos do caso (`src/case_text.py`) a partir dos números do motor, com variações para caso escalado e empate de causa.
+- Página "1. Caso do gestor": seletor do caso, conversa simulada, opções com chance de ficar, custo e retorno esperado com faixas, casos parecidos, formulário de decisão e confirmação.
+- Evidências dos sinais em formato brasileiro; R$ escapado no texto (o Markdown interpretava "R$ … R$" como fórmula).
+
+**Checagens**
+
+- Testes: 28 passando, incluindo: nenhuma mensagem usa rótulos ou tom de comando, todas dizem "a decisão é sua" e "não é uma previsão sobre", o caso escalado explica o roteamento, e divergir sem justificativa é bloqueado.
+- Fluxo percorrido no navegador: caso da Mariana; caso da Lucía com ajuste salarial (bloqueado sem justificativa, registrado com justificativa, resposta e confirmação na conversa).
+
 **Status:** em validação pelo autor.

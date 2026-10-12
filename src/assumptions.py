@@ -18,6 +18,7 @@ SIGNALS_PATH = DATA_DIR / "signals.csv"
 INTERVENTIONS_PATH = DATA_DIR / "interventions.csv"
 PERSONAS_PATH = DATA_DIR / "personas.csv"
 PERSONA_OUTCOMES_PATH = DATA_DIR / "persona_outcomes.csv"
+QUESTIONS_PATH = DATA_DIR / "questions.csv"
 
 
 class Assumptions:
@@ -39,6 +40,7 @@ class Assumptions:
         self.persona_outcomes = (
             persona_outcomes.copy() if persona_outcomes is not None else pd.read_csv(PERSONA_OUTCOMES_PATH)
         )
+        self.questions = pd.read_csv(QUESTIONS_PATH)
         self._values = dict(zip(table["key"], table["value"]))
         self.used: set[str] = set()
 
@@ -57,7 +59,7 @@ class Assumptions:
 
     def fingerprint(self) -> str:
         """Hash of the rules, used to cache generated data and detect stale snapshots."""
-        tables = (self.table, self.signals, self.interventions, self.personas, self.persona_outcomes)
+        tables = (self.table, self.signals, self.interventions, self.personas, self.persona_outcomes, self.questions)
         payload = "".join(t.to_csv(index=False) for t in tables)
         return hashlib.sha256(payload.encode()).hexdigest()[:16]
 

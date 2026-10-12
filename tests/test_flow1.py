@@ -1,0 +1,61 @@
+from pathlib import Path
+
+import pytest
+from streamlit.testing.v1 import AppTest
+
+from src.assumptions import Assumptions
+from src.case_text import build_case_message
+from src.engine import run_engine, signal_evidence
+from src.generator import generate_world
+
+ROOT = Path(__file__).resolve().parents[1]
+FORBIDDEN = ["flight risk", "vai sair", "desengajad", "alto potencial", "baixo desempenho", "gestor ruim",
+             "problemático", "você deve", "é obrigatório", "faça "]
+
+
+@pytest.fixture(scope="module")
+def messages():
+    a = Assumptions.load()
+    w = generate_world(a)
+    eng = run_engine(w.public, a)
+    cases = eng.cases.set_index("employee_id")
+    hris = w.public["hris"].set_index("employee_id")
+    mgrs = w.public["managers"].set_index("manager_id")
+    out = {}
+    for _, p in w.public["personas"].iterrows():
+        emp = p["employee_id"]
+        case = cases.loc[emp].copy()
+        active = [s for s in eng.signals.columns if eng.signals.loc[emp, s]]
+        out[p["persona_id"]] = (case, build_case_message(
+            case, eng.options[eng.options["employee_id"] == emp], signal_evidence(w.public, a, emp, active),
+            eng.network_stats, a, mgrs.loc[hris.loc[emp, "manager_id"], "name"]))
+    return out
+
+
+def test_messages_guide_and_never_label(messages):
+    for pid, (case, msg) in messages.items():
+        text = " ".join(v if isinstance(v, str) else " ".join(v) for v in msg.values()).lower()
+        for word in FORBIDDEN:
+            assert word not in text, (pid, word)
+        assert "a decisão é sua" in text
+        assert "não é uma previsão sobre" in text
+        assert len(msg["questions"]) == 3
+
+
+def test_escalated_message_explains_routing(messages):
+    case, msg = messages["P3"]
+    assert case["escalated"]
+    assert "liderança acima" in msg["intro"] and "não para uma questão individual" in msg["intro"]
+
+
+def test_rejection_requires_justification():
+    at = AppTest.from_file(str(ROOT / "app_pages" / "manager_case.py"), default_timeout=120).run()
+    lucia = next(o for o in at.selectbox[0].options if o.startswith("Lucía"))
+    at.selectbox[0].select(lucia).run()
+    at.radio[0].set_value("Ajuste salarial").run()
+    next(b for b in at.button if b.label == "Registrar decisão").click().run()
+    assert any("caminho diferente da sugestão" in e.value for e in at.error)
+    assert "P3" not in at.session_state["persona_decisions"]
+    at.text_area[0].input("Está abaixo do mercado.").run()
+    next(b for b in at.button if b.label == "Registrar decisão").click().run()
+    assert at.session_state["persona_decisions"]["P3"]["intervention"] == "Ajuste salarial"

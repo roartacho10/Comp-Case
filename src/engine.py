@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
+from src.format import num
 from src.signals import DAYS_PER_MONTH, compute_signals
 
 CAUSES = ["remuneração", "crescimento", "gestor"]
@@ -205,18 +206,18 @@ def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id
     for s in active_signals:
         if s == "compa_below":
             median = bench[(p["level"], p["country"])]
-            ev = (f"Custo anual R$ {p['annual_cost_brl']/1000:.0f} mil contra mediana de mercado de R$ {median/1000:.0f} mil "
-                  f"(compa-ratio {p['annual_cost_brl']/median:.2f}; limiar {a.num('signals.compa_threshold'):.2f})")
+            ev = (f"Custo anual de R$ {p['annual_cost_brl']/1000:.0f} mil, contra mediana de mercado de R$ {median/1000:.0f} mil "
+                  f"(compa-ratio {num(p['annual_cost_brl']/median, 2)}; limiar {num(a.num('signals.compa_threshold'), 2)})")
         elif s == "no_raise":
             months = (t0 - pd.Timestamp(p["last_pay_change_date"])).days / DAYS_PER_MONTH
             ev = f"Última mudança salarial há {months:.0f} meses (limiar: {a.int('signals.no_raise_months')})"
         elif s == "time_in_level":
             years = (t0 - pd.Timestamp(p["last_promotion_date"])).days / 365.25
             ref = a.group("signals.time_in_level_ref")[p["level"]] * a.num("signals.time_in_level_multiple")
-            ev = f"{years:.1f} anos no nível {p['level']} (limiar: {ref:.2f} anos)"
+            ev = f"{num(years)} anos no nível {p['level']} (limiar: {num(ref, 2)} anos)"
         elif s == "tenure_milestone":
             years = (t0 - pd.Timestamp(p["hire_date"])).days / 365.25
-            ev = f"{years:.1f} anos de casa; completa um marco nos próximos {a.int('signals.milestone_window_months')} meses"
+            ev = f"{num(years)} anos de casa; completa um marco de tempo de casa nos próximos {a.int('signals.milestone_window_months')} meses"
         elif s in ("external_offer", "growth_request"):
             ctx = tables["context"]
             rows = ctx[ctx["employee_id"] == employee_id]

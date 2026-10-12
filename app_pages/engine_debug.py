@@ -114,7 +114,6 @@ if len(comps):
         pd.DataFrame({
             "Empresa": comps["company_id"],
             "País": comps["country"],
-            "Decisão em": comps["decision_date"],
             f"Ficou em {W} meses": comps["stayed"].map({True: "sim", False: "não"}),
             "Segue performando": comps["performing"].map({True: "sim", False: "não"}),
         }),
