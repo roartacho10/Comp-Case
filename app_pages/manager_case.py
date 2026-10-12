@@ -1,6 +1,5 @@
 import html
 
-import pandas as pd
 import streamlit as st
 
 from src.app_data import assumptions, load_world
@@ -96,23 +95,15 @@ with right, st.container(border=True):
     st.markdown("\n".join(f"{i}. {q}" for i, q in enumerate(msg["questions"], 1)))
 
     st.markdown("**As opções lado a lado**")
-    table = pd.DataFrame({
-        "": opts["intervention"].eq(case["recommended"]).map({True: "★", False: ""}).values,
-        "Opção": opts["intervention"].values,
-        f"Fica em {W} meses": [pct(r, 0) for r in opts["stay_rate"]],
-        "Custo": [("—" if i == MONITOR else f"{brl(c)} por ano" if rec else "você avalia")
-                  for i, c, rec in zip(opts["intervention"], opts["cost_window"], opts["recurring"])],
-        "Saldo estimado": [("referência" if i == MONITOR else brl(e) if rec
-                            else (f"compensa se custar até {brl(e + c)}" if e + c > 0 else "não compensa"))
-                           for i, e, c, rec in zip(opts["intervention"], opts["ev"], opts["cost_window"], opts["recurring"])],
-    })
-    st.dataframe(table, hide_index=True, width="stretch", column_config={
-        "": st.column_config.TextColumn(width=30),
-        "Opção": st.column_config.TextColumn(width=175),
-        f"Fica em {W} meses": st.column_config.TextColumn(width=120),
-        "Custo": st.column_config.TextColumn(width=140),
-        "Saldo estimado": st.column_config.TextColumn(width=240),
-    })
+    rows = [f"| | Opção | Fica em {W} meses | Custo | Saldo estimado |", "|:-:|---|---|---|---|"]
+    for _, o in opts.iterrows():
+        name, ev, cost, rec = o["intervention"], o["ev"], o["cost_window"], o["recurring"]
+        star = "★" if name == case["recommended"] else ""
+        cost_txt = "—" if name == MONITOR else f"{brl(cost)} por ano" if rec else "você avalia"
+        balance = ("referência" if name == MONITOR else brl(ev) if rec
+                   else f"compensa se custar até {brl(ev + cost)}" if ev + cost > 0 else "não compensa")
+        rows.append(f"| {star} | {name} | {pct(o['stay_rate'], 0)} | {cost_txt} | {balance} |")
+    md("\n".join(rows))
     st.caption(
         "★ opção sugerida. Saldo estimado: o que a empresa tende a economizar evitando a saída (reposição e substituto a valor de mercado), "
         "menos o custo da opção, no tempo em que a pessoa ainda deve ficar. Para ações cujo custo você conhece melhor, "

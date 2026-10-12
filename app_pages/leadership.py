@@ -37,13 +37,14 @@ with st.container(border=True):
 
 # Value at risk -----------------------------------------------------------------------
 st.subheader(f"Risco em {month_label(t0)}")
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Colaboradores", f"{view['employees']:,}".replace(",", "."))
-c2.metric("Casos abertos", view["cases"], help="Pessoas com 2 ou mais sinais da mesma causa")
-c3.metric(f"Saídas esperadas nos casos, sem ação ({W} meses)", num(view["exits_no_action"], 0))
-c4.metric("Perda esperada, sem ação", brl(view["loss"]), help="Saídas esperadas × custo de reposição (75% do custo anual)")
+c1, c2, c3 = st.columns(3)
+c1.metric("Casos abertos", view["cases"], help="Pessoas com 2 ou mais sinais da mesma causa")
+c2.metric("Saídas esperadas, sem ação", num(view["exits_no_action"], 0),
+          help=f"Nos casos abertos, em {W} meses, se nada for feito")
+c3.metric("Perda esperada, sem ação", brl(view["loss"]), help="Saídas esperadas × custo de reposição (75% do custo anual)")
+employees = f"{view['employees']:,}".replace(",", ".")
 md(
-    f"Se nada for feito, os {view['cases']} casos abertos devem gerar cerca de **{num(view['exits_no_action'], 0)} saídas** "
+    f"Na empresa de {employees} pessoas, se nada for feito, os {view['cases']} casos abertos devem gerar cerca de **{num(view['exits_no_action'], 0)} saídas** "
     f"em {W} meses, com perda esperada de **{brl(view['loss'])}** em reposição; cerca de metade em saídas arrependidas "
     f"({brl(view['regretted_loss'])}). Com as decisões tomadas, o sistema estima {num(view['exits_with_decisions'], 0)} saídas "
     f"e perda de {brl(view['loss_with_decisions'])}, para um custo de intervenções de {brl(view['intervention_cost'])}. "
@@ -52,39 +53,36 @@ md(
 
 # Where the risk is -------------------------------------------------------------------
 st.subheader("Onde está o risco")
-left, right = st.columns([3, 2], gap="large")
-with left:
-    st.markdown("**Casos abertos por área e causa provável**")
-    ac = view["area_cause"]
-    grid = pd.MultiIndex.from_product([sorted(ac["area"].unique()), CAUSES],
-                                      names=["area", "cause"])
-    ac = ac.set_index(["area", "cause"]).reindex(grid, fill_value=0).reset_index()
-    base = alt.Chart(ac).encode(
-        x=alt.X("cause:N", title=None, sort=CAUSES, axis=alt.Axis(labelAngle=0, orient="top")),
-        y=alt.Y("area:N", title=None),
-    )
-    heat = base.mark_rect(cornerRadius=6, stroke="#FFFFFF", strokeWidth=2).encode(
-        color=alt.Color("cases:Q", scale=alt.Scale(range=["#FDEBED", ACCENT]), legend=None),
-        tooltip=[alt.Tooltip("area:N", title="Área"), alt.Tooltip("cause:N", title="Causa"),
-                 alt.Tooltip("cases:Q", title="Casos")],
-    )
-    labels = base.mark_text(fontSize=13).encode(
-        text="cases:Q",
-        color=alt.condition(alt.datum.cases > ac["cases"].max() * 0.55, alt.value("#FFFFFF"), alt.value("#141414")),
-    )
-    st.altair_chart((heat + labels).properties(height=260), width="stretch")
-with right:
-    st.markdown("**Times com maior concentração de casos**")
-    teams = view["teams"].head(8)
-    st.dataframe(pd.DataFrame({
-        "Time": teams["team_id"],
-        "Área": teams["area"],
-        "Pessoas": teams["people"],
-        "Casos": teams["cases"],
-        "% do time": [pct(x, 0) for x in teams["share"]],
-        "Causa predominante": teams["cause"],
-    }), hide_index=True, width="stretch")
-    st.caption("Ajuda a liderança a decidir onde apoiar primeiro os gestores com mais casos abertos.")
+st.markdown("**Casos abertos por área e causa provável**")
+ac = view["area_cause"]
+grid = pd.MultiIndex.from_product([sorted(ac["area"].unique()), CAUSES],
+                                  names=["area", "cause"])
+ac = ac.set_index(["area", "cause"]).reindex(grid, fill_value=0).reset_index()
+base = alt.Chart(ac).encode(
+    x=alt.X("cause:N", title=None, sort=CAUSES, axis=alt.Axis(labelAngle=0, orient="top")),
+    y=alt.Y("area:N", title=None, axis=alt.Axis(labelLimit=200)),
+)
+heat = base.mark_rect(cornerRadius=6, stroke="#FFFFFF", strokeWidth=2).encode(
+    color=alt.Color("cases:Q", scale=alt.Scale(range=["#FDEBED", ACCENT]), legend=None),
+    tooltip=[alt.Tooltip("area:N", title="Área"), alt.Tooltip("cause:N", title="Causa"),
+             alt.Tooltip("cases:Q", title="Casos")],
+)
+labels = base.mark_text(fontSize=13).encode(
+    text="cases:Q",
+    color=alt.condition(alt.datum.cases > ac["cases"].max() * 0.55, alt.value("#FFFFFF"), alt.value("#141414")),
+)
+st.altair_chart((heat + labels).properties(height=260), width="stretch")
+st.markdown("**Times com maior concentração de casos**")
+teams = view["teams"].head(8)
+st.dataframe(pd.DataFrame({
+    "Time": teams["team_id"],
+    "Área": teams["area"],
+    "Pessoas": teams["people"],
+    "Casos": teams["cases"],
+    "% do time": [pct(x, 0) for x in teams["share"]],
+    "Causa predominante": teams["cause"],
+}), hide_index=True, width="stretch")
+st.caption("Ajuda a liderança a decidir onde apoiar primeiro os gestores com mais casos abertos.")
 
 # What is being done ------------------------------------------------------------------
 st.subheader("O que está sendo feito")
