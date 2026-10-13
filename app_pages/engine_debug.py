@@ -7,11 +7,11 @@ from src.format import brl, num, pct, pp, replacement_rule
 from src.prediction import label as prediction_label
 from src.prediction import scale as prediction_scale
 from src.signals import CAUSES
+from src import ai
 from src.state import results
-from src.ui import synthetic_data_banner
+from src.ui import dataframe
 from src.periods import OUTCOME_WINDOW_MONTHS
 
-synthetic_data_banner()
 st.title("Bastidores do motor")
 st.caption(
     "Página de bastidores (fora do menu; acesso por link direto): mostra o motor de regras funcionando, sem interface final e sem AI, "
@@ -31,6 +31,14 @@ W = OUTCOME_WINDOW_MONTHS
 st.session_state.setdefault("persona_decisions", {})
 st.session_state.setdefault("advanced", False)
 
+# Live AI switch (kept off the product screens) ----------------------------------
+has_key = ai.available()
+st.toggle("Textos escritos por AI ao vivo", value=has_key and st.session_state.get("ai_enabled", True),
+          disabled=not has_key, key="ai_toggle",
+          on_change=lambda: st.session_state.update(ai_enabled=st.session_state["ai_toggle"]))
+st.caption("Com a AI desligada ou indisponível, as telas usam os textos padrão revisados."
+           if has_key else "AI indisponível: chave não configurada. As telas usam os textos padrão revisados.")
+
 # Overview --------------------------------------------------------------------
 st.subheader("Visão geral em T0")
 c1, c3, c4 = st.columns(3)
@@ -40,7 +48,7 @@ c4.metric(f"Saída voluntária média em {W} meses", pct(engine.company_exit_win
 by = cases.groupby(["cause", "recommended"]).size().unstack(fill_value=0)
 by.index.name, by.columns.name = "Causa provável", None
 st.caption("Casos por causa provável (linhas) e intervenção recomendada (colunas)")
-st.dataframe(by, width="stretch")
+dataframe(by, width="stretch")
 
 # Case ------------------------------------------------------------------------
 st.subheader("Caso")
@@ -59,7 +67,7 @@ st.markdown(f"**{case['name']}** · {case['level']} · {case['area']} · {case['
 st.markdown("**Sinais**")
 active = [s for s in engine.signals.columns if engine.signals.loc[emp, s]]
 ev = pd.DataFrame(signal_evidence(tables, a, emp, active))
-st.dataframe(
+dataframe(
     ev.rename(columns=dict(description="Sinal", cause="Causa", source="Fonte", evidence="Evidência"))[
         ["Sinal", "Causa", "Fonte", "Evidência"]
     ],
@@ -96,7 +104,7 @@ view = pd.DataFrame({
     "Valor esperado no horizonte": [f"{brl(e)} ({brl(lo)} a {brl(hi)})" if i != MONITOR else "referência"
                                     for e, lo, hi, i in zip(opts["ev"], opts["ev_lo"], opts["ev_hi"], opts["intervention"])],
 })
-st.dataframe(view, hide_index=True, width="stretch")
+dataframe(view, hide_index=True, width="stretch")
 st.caption(
     "Valor esperado = custo esperado de não agir − custo esperado com a intervenção, mês a mês no horizonte: "
     f"custo da intervenção, reposição de quem sai ({replacement_rule(a)}) e diferença de mercado paga ao substituto. "
@@ -107,7 +115,7 @@ st.caption(
 comps = comparable_cases(tables["network_cases"], a, case["cause"], case["level"], case["recommended"])
 if len(comps):
     st.markdown(f"**Casos comparáveis na rede** ({case['recommended']}, {case['cause']}, nível {case['level']})")
-    st.dataframe(
+    dataframe(
         pd.DataFrame({
             "Empresa": comps["company_id"],
             "País": comps["country"],
@@ -193,11 +201,11 @@ else:
             "Resultado": "ficou" if r["stayed"] else f"saiu no mês {int(r['exit_month'])}",
             "O que aconteceu": r["note"],
         })
-    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
     st.markdown(f"**Aprendizado: taxa de permanência em {W} meses por causa e intervenção**")
     rates = learn["rates"]
-    st.dataframe(pd.DataFrame({
+    dataframe(pd.DataFrame({
         "Causa": rates["cause"],
         "Intervenção": rates["intervention"],
         "Rede antes": [f"{pct(x)} (n={format(int(n), ',').replace(',', '.')})" for x, n in zip(rates["network_before"], rates["n"])],
@@ -211,7 +219,7 @@ else:
     calib = learn["calibration"]
     deciders = set(personas["decision_maker_id"])
     calib = calib.assign(order=~calib["decision_maker_id"].isin(deciders)).sort_values(["order", "n"], ascending=[True, False])
-    st.dataframe(pd.DataFrame({
+    dataframe(pd.DataFrame({
         "Gestor": calib["decision_maker_name"] + calib["decision_maker_id"].isin(deciders).map({True: " ★", False: ""}),
         "Casos": calib["n"],
         "Previsão do gestor": [pct(x, 0) for x in calib["predicted"]],

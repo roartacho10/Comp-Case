@@ -47,9 +47,9 @@ def test_personas_suggestions_follow_their_cause(messages):
 
 
 def test_rejection_requires_justification():
-    at = AppTest.from_file(str(ROOT / "app_pages" / "manager_case.py"), default_timeout=120).run()
-    lucia = next(o for o in at.selectbox[0].options if o.startswith("Lucía"))
-    at.selectbox[0].select(lucia).run()
+    at = AppTest.from_file(str(ROOT / "app_pages" / "manager_case.py"), default_timeout=120)
+    at.session_state["persona"] = "P3"  # chosen by the demo script in the sidebar
+    at.run()
     at.radio[0].set_value("Ajuste salarial").run()
     next(b for b in at.button if b.label == "Registrar decisão").click().run()
     assert any("Registre a sua previsão" in e.value for e in at.error)

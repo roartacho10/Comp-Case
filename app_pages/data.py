@@ -2,9 +2,8 @@ import pandas as pd
 import streamlit as st
 
 from src.app_data import load_world
-from src.ui import synthetic_data_banner
+from src.ui import dataframe
 
-synthetic_data_banner()
 st.title("Como os dados foram gerados")
 st.write(
     "Todos os dados do protótipo são gerados a partir de uma base de **premissas determinísticas**. "
@@ -38,7 +37,7 @@ with tab_assumptions:
     )[["Grupo", "O que é", "Valor", "Unidade", "Racional do valor", "Origem", "Chave"]]
     origins = sorted(table["Origem"].unique())
     chosen = st.multiselect("Filtrar por origem", origins, default=origins)
-    st.dataframe(
+    dataframe(
         table[table["Origem"].isin(chosen)],
         hide_index=True,
         width="stretch",
@@ -52,8 +51,8 @@ with tab_assumptions:
                "Os períodos de 12 meses (resultado de cada decisão e histórico do cliente) são fixos, e não premissas: "
                "todas as taxas do sistema se referem ao mesmo ano.")
     with st.expander("Catálogo de sinais e de intervenções"):
-        st.dataframe(world["signals"], hide_index=True, width="stretch")
-        st.dataframe(world["interventions"], hide_index=True, width="stretch")
+        dataframe(world["signals"], hide_index=True, width="stretch")
+        dataframe(world["interventions"], hide_index=True, width="stretch")
 
 with tab_checks:
     passed = int(checks["ok"].sum())
@@ -62,7 +61,7 @@ with tab_checks:
     view = checks.assign(status=checks["ok"].map({True: "✓", False: "✗"}))[
         ["status", "grupo", "checagem", "meta", "obtido", "nota"]
     ]
-    st.dataframe(
+    dataframe(
         view,
         hide_index=True,
         width="stretch",
@@ -95,4 +94,4 @@ with tab_tables:
         df = df.head(sample_size)
     else:
         st.caption(f"{len(df):,} linhas".replace(",", "."))
-    st.dataframe(df, hide_index=True, width="stretch", height=520)
+    dataframe(df, hide_index=True, width="stretch", height=520)

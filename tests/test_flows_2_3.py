@@ -20,7 +20,7 @@ def run(page, advanced):
     return at.run()
 
 
-@pytest.mark.parametrize("page", ["learning.py", "leadership.py", "results.py"])
+@pytest.mark.parametrize("page", ["learning.py", "leadership.py"])
 def test_pages_before_and_after_window(page):
     for advanced in (False, True):
         at = run(page, advanced)
@@ -30,7 +30,7 @@ def test_pages_before_and_after_window(page):
 def test_learning_places_each_persona_in_its_quadrant():
     at = run("learning.py", True)
     html = " ".join(m.value for m in at.markdown)
-    assert "Retorno para quem decidiu" in " ".join(h.value for h in at.subheader)
+    assert at.title[0].value == "Retorno aos gestores"
     # Mariana followed and stayed; Diego followed and left; Lucía diverged and left.
     assert "Mariana Costa" in html and "Diego Ramírez" in html and "Lucía Fernández" in html
     assert "um resultado ruim não torna a decisão ruim" in html

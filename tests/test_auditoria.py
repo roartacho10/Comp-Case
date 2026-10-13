@@ -254,11 +254,10 @@ def test_achado_evidencia_especifica_por_sinal(base):
 
 
 def test_achado_times_respeitam_o_grupo_minimo(base):
-    """A regra de privacidade vale para times (a legenda diz "times com menos de N pessoas não aparecem")."""
+    """A regra de privacidade vale para times: times com menos de N pessoas não aparecem."""
     a, w, eng, ctx, sim = base
     view = at_t0(dict(engine=eng, public=w.public), a, sim)
     assert (view["teams"]["people"] >= a.int("privacy.min_group_size")).all()
-    assert "times com menos de" in (ROOT / "app_pages" / "leadership.py").read_text()
 
 
 def test_achado_brl_na_virada_de_mil_para_milhao():
@@ -281,7 +280,7 @@ COMBOS = [{p: dict(intervention=i, cause="crescimento", prediction=0.3, justific
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("page", ["learning.py", "results.py", "leadership.py"])
+@pytest.mark.parametrize("page", ["learning.py", "leadership.py"])
 @pytest.mark.parametrize("combo", range(len(COMBOS)))
 def test_invariante_paginas_com_cada_decisao(page, combo):
     from streamlit.testing.v1 import AppTest

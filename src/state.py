@@ -7,7 +7,7 @@ import json
 import pandas as pd
 import streamlit as st
 
-from src import ai, simulation
+from src import simulation
 from src.assumptions import Assumptions
 from src.periods import OUTCOME_WINDOW_MONTHS
 
@@ -17,6 +17,8 @@ MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", 
 def init() -> None:
     st.session_state.setdefault("persona_decisions", {})
     st.session_state.setdefault("advanced", False)
+    st.session_state.setdefault("visited", set())
+    st.session_state.setdefault("persona", "P1")
 
 
 def month_label(date: pd.Timestamp) -> str:
@@ -28,30 +30,68 @@ def dates(a: Assumptions) -> tuple[pd.Timestamp, pd.Timestamp]:
     return t0, t0 + pd.DateOffset(months=OUTCOME_WINDOW_MONTHS)
 
 
-def sidebar_controls(a: Assumptions) -> None:
+GUIDE_URL = "https://claude.ai/artifact/8mfpRg2sGhpGHZge4M8tvZ"
+
+
+def demo_sidebar(a: Assumptions, pages: dict, current) -> None:
+    """The demo script in the sidebar: one step per screen, in order, each showing what that user would see."""
+    from src.app_data import load_world
+
     init()
+    ss = st.session_state
+    personas = load_world()["public"]["personas"]
     w = OUTCOME_WINDOW_MONTHS
     t0, t1 = dates(a)
-    now = t1 if st.session_state["advanced"] else t0
+    advanced = ss["advanced"]
+    page = current.url_path
+    moment = ss.get("lead_moment", "after" if advanced else "now")
+
+    steps = [dict(key=f"case_{p['persona_id']}", label=f"Caso {'da' if p['name'].split()[0][-1] == 'a' else 'do'} "
+                  f"{p['name'].split()[0]}", page="caso", persona=p["persona_id"],
+                  done=p["persona_id"] in ss["persona_decisions"],
+                  current=page == "caso" and ss.get("persona", "P1") == p["persona_id"])
+             for _, p in personas.iterrows()]
+    steps += [
+        dict(key="lead_now", label="Painel da liderança, hoje", page="lideranca", moment="now",
+             done="lead_now" in ss["visited"], current=page == "lideranca" and moment == "now"),
+        dict(key="advance", label=f"Avançar {w} meses", done=advanced, current=False, disabled=advanced),
+        dict(key="followup", label="Retorno aos gestores", page="retorno", done="followup" in ss["visited"],
+             current=page == "retorno", disabled=not advanced),
+        dict(key="lead_after", label=f"Painel da liderança, {w} meses depois", page="lideranca", moment="after",
+             done="lead_after" in ss["visited"], current=page == "lideranca" and moment == "after",
+             disabled=not advanced),
+    ]
     with st.sidebar:
-        st.markdown(f'Hoje: <span class="time-chip">{month_label(now)}</span>', unsafe_allow_html=True)
-        if st.button(f"Avançar {w} meses", type="primary", disabled=st.session_state["advanced"], width="stretch"):
-            st.session_state["advanced"] = True
-            st.rerun()
-        if st.button("Reiniciar", width="stretch"):
-            st.session_state["persona_decisions"] = {}
-            st.session_state["advanced"] = False
-            st.session_state.pop("results_cache", None)
-            st.rerun()
+        st.markdown(f'Hoje: <span class="time-chip">{month_label(t1 if advanced else t0)}</span>', unsafe_allow_html=True)
+        st.page_link(pages["home"], label="Início")
+        st.markdown("**Roteiro da demonstração**")
+        for n, step in enumerate(steps, start=1):
+            label = f"{'✓' if step['done'] else n}  {step['label']}"
+            if st.button(label, key=f"step_{step['key']}", width="stretch", disabled=step.get("disabled", False),
+                         type="primary" if step["current"] else "secondary"):
+                if step["key"] == "advance":
+                    ss["advanced"] = True
+                    ss["visited"].add("followup")
+                    st.switch_page(pages["retorno"])
+                if not step["key"].startswith("case_"):
+                    ss["visited"].add(step["key"])
+                if "persona" in step:
+                    ss["persona"] = step["persona"]
+                if "moment" in step:
+                    ss["lead_moment"] = step["moment"]
+                st.switch_page(pages[step["page"]])
+        if st.button("Reiniciar", key="step_reset", width="stretch"):
+            for k in ("results_cache", "lead_moment"):
+                ss.pop(k, None)
+            ss.update(persona_decisions={}, advanced=False, visited=set(), persona="P1")
+            st.switch_page(pages["home"])
         st.divider()
-        has_key = ai.available()
-        st.toggle("Textos escritos por AI ao vivo", value=has_key, disabled=not has_key, key="ai_on")
-        st.caption("Com a AI desligada ou indisponível, a tela usa os textos padrão revisados."
-                   if has_key else "AI indisponível: chave não configurada. A tela usa os textos padrão revisados.")
-        decided = len(st.session_state["persona_decisions"])
-        if not st.session_state["advanced"]:
-            st.caption(f"Decisões registradas nos casos dos personagens: {decided} de 3. "
-                       "Sem decisão, o caso fica como 'monitorar'.")
+        st.caption(f"Demonstração com dados fictícios · [Como funciona]({GUIDE_URL})")
+
+
+def mark_visited(step: str) -> None:
+    init()
+    st.session_state["visited"].add(step)
 
 
 def results(world: dict, a: Assumptions) -> dict | None:
@@ -87,11 +127,5 @@ def current_decisions(world: dict) -> pd.DataFrame:
 
 
 def ai_on() -> bool:
-    return bool(st.session_state.get("ai_on", True))
-
-
-def ai_badge(result) -> None:
-    if result.source == "ai":
-        st.caption("✦ Escrito por AI a partir dos dados do caso; os números vêm do motor.")
-    else:
-        st.caption(f"Texto padrão ({result.reason}).")
+    """Live AI texts on (default) or off; the switch lives on the backstage page."""
+    return bool(st.session_state.get("ai_enabled", True))

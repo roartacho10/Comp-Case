@@ -418,3 +418,17 @@ Decisão do autor: o "custo de referência" de R$ 5 mil por caso confundia mais 
 | R$ 5 mil por caso (`cost.growth`); no caso do gestor, "você estima", com a perda evitada como teto do investimento | ~20 horas do gestor por caso (`cost.growth_hours`), convertidas pelo custo-hora de quem decide (custo anual ÷ 2.000 horas; para o time de People e na rede, o de um gestor típico) | O custo é o tempo de quem decide, que o sistema já conhece. Dá de R$ 3 a 6 mil por caso, mostrados ao lado das horas; a tabela de opções passa a ter custo, perda que evita e saldo também para carreira e projeto |
 
 Efeito no roteiro padrão: sugestões 78 ajuste, 82 carreira e projeto, 3 monitorar; custo pago R$ 1,4 mi; valor preservado R$ 4,3 mi (~R$ 4,1 por real). Diego: "Isso toma cerca de 20 horas do seu tempo ao longo do ano (...), o equivalente a cerca de R$ 3 mil", saldo de ~R$ 39 mil.
+
+## O app como produto
+
+Decisão do autor: o app mostra o que cada usuário veria no produto; o "por quê" de cada escolha fica no guia "Anatomia do protótipo" (HTML), com link na barra lateral.
+
+| Antes | Agora | Racional |
+|---|---|---|
+| Menu com cinco páginas explicativas, aviso de dados sintéticos em todas, seções "Onde entra a AI" e "O que é simulado" | Barra lateral com o roteiro da demonstração em ordem: casos da Mariana, do Diego e da Lucía; painel da liderança hoje; avançar 12 meses; retorno aos gestores; painel 12 meses depois. Cada passo ganha ✓ ao ser concluído. Aviso discreto no rodapé ("Demonstração com dados fictícios") | Quem avalia sente o produto; a explicação não compete com ele |
+| Página "Retorno e aprendizado" com quadrantes, calibração e taxas aprendidas | "Retorno aos gestores": as três mensagens, uma embaixo da outra. A calibração virou uma linha no painel da liderança; as taxas aprendidas ficam nos bastidores | O gestor vê o retorno do seu caso; a liderança vê a calibração |
+| "Visão da liderança" e "Resultado em 12 meses" em páginas separadas | Um painel, em dois momentos | É a mesma tela, antes e depois |
+| Selo "escrito por AI / texto padrão", seletor de personagem, legendas de método, "Empresa (fictícia)" | Retirados das telas; o botão da AI foi para os bastidores; o Slack mostra "Empresa B2B SaaS" | Elementos de demonstração, não de produto |
+| Tabelas com números à direita e texto à esquerda | Todas alinhadas à esquerda | Leitura uniforme |
+
+"Como os dados foram gerados" (`/dados`) e os bastidores (`/bastidores`) seguem acessíveis por link direto. Testes: 89 na suíte principal (incluindo o roteiro no navegador, agora pela barra lateral) e 28 demorados, todos passando.

@@ -7,11 +7,6 @@ import streamlit as st
 
 ACCENT = "#EF3F50"
 
-SYNTHETIC_DATA_NOTICE = (
-    "**Dados sintéticos e ilustrativos.** Gerados por regras explícitas de causa e efeito; "
-    "não representam pessoas, empresas ou resultados reais."
-)
-
 CSS = f"""
 <style>
 h1, h2, h3 {{ letter-spacing: -0.02em; }}
@@ -37,6 +32,7 @@ div[data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid #E5E5E5; bor
 .quad {{border-radius:12px; padding:10px 12px; min-height:110px; border:1px solid #E5E5E5; background:#FFFFFF;}}
 .quad .title {{font-size:0.8rem; color:#6B6B6B; margin-bottom:6px;}}
 .quad .who {{font-weight:600;}}
+.step-done {{color:#1E7B45;}}
 .time-chip {{display:inline-block; background:#FDEBED; color:{ACCENT}; border-radius:999px; padding:2px 10px; font-weight:500;}}
 </style>
 """
@@ -46,15 +42,26 @@ def apply_style() -> None:
     st.markdown(CSS, unsafe_allow_html=True)
 
 
-def synthetic_data_banner() -> None:
-    """Render the notice that must appear at the top of every page."""
-    st.info(SYNTHETIC_DATA_NOTICE, icon="ℹ️")
+def text_df(df):
+    """Every cell (and the index) as text, so all columns align the same way (left)."""
+    out = df.copy()
+    for col in out.columns:
+        out[col] = ["—" if v is None or (isinstance(v, float) and v != v) else str(v) for v in out[col]]
+    out.index = out.index.map(str)
+    return out
 
 
-def under_construction(phase: str, description: str) -> None:
-    """Placeholder for flows that will be built in later phases."""
-    st.caption(f"Em construção — {phase}")
-    st.write(description)
+def dataframe(df, **kwargs) -> None:
+    st.dataframe(text_df(df), **kwargs)
+
+
+def table(columns: dict) -> None:
+    """A table with every cell as text, so all columns align the same way (left)."""
+    import pandas as pd
+
+    df = pd.DataFrame({k: ["—" if v is None or (isinstance(v, float) and v != v) else str(v) for v in vals]
+                       for k, vals in columns.items()})
+    st.dataframe(df, hide_index=True, width="stretch")
 
 
 def md(text: str) -> None:

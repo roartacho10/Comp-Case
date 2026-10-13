@@ -55,10 +55,9 @@ def test_undecided_personas_are_neither_followed_nor_diverged(base):
     at.session_state["persona_decisions"] = {}
     at.session_state["advanced"] = True
     at.run()
-    assert any("Sem decisão registrada" in c.value for c in at.caption)
-    quadrants = " ".join(m.value for m in at.markdown if 'class="quad"' in m.value)
-    for name in ("Mariana Costa", "Diego Ramírez", "Lucía Fernández"):
-        assert name not in quadrants
+    text = " ".join(m.value for m in at.markdown)
+    assert text.count("Não houve decisão registrada") == 3
+    assert "Você seguiu a sugestão" not in text and "em vez da sugestão" not in text
 
 
 def test_salary_adjustment_cost_follows_the_distance_to_market(base):

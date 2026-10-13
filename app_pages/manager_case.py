@@ -11,16 +11,10 @@ from src.prediction import label as prediction_label
 from src.prediction import scale as prediction_scale
 from src.signals import CAUSES
 from src import ai
-from src.state import ai_badge, ai_on
-from src.ui import md, message_header, synthetic_data_banner
+from src.state import ai_on, init
+from src.ui import md, message_header
 from src.periods import OUTCOME_WINDOW_MONTHS
 
-synthetic_data_banner()
-st.title("1. Caso do gestor")
-st.caption(
-    "O gestor recebe o caso numa conversa de Slack (simulado; sem integração real), com o contexto do que os dados "
-    "indicam. A decisão é dele, e a previsão registrada agora é comparada com o resultado depois."
-)
 
 world = load_world()
 a = assumptions()
@@ -31,18 +25,10 @@ cases = engine.cases.set_index("employee_id")
 personas = tables["personas"].set_index("persona_id")
 hris = tables["hris"].set_index("employee_id")
 
-st.session_state.setdefault("persona_decisions", {})
-st.session_state.setdefault("advanced", False)
+init()
 
-
-
-# Whose case -------------------------------------------------------------------
-options_map = {}
-for pid, p in personas.iterrows():
-    c = cases.loc[p["employee_id"]]
-    options_map[f"{p['name']} · mensagem para {c['decision_maker_name']}, gestor(a) do time"] = pid
-label = st.selectbox("Ver o caso de", list(options_map))
-pid = options_map[label]
+# Whose case: chosen by the demo script in the sidebar ---------------------------
+pid = st.session_state["persona"]
 emp = personas.loc[pid, "employee_id"]
 case = cases.loc[emp].copy()
 case["name"] = hris.loc[emp, "name"]
@@ -72,7 +58,7 @@ with left:
         for n in ["Comp · Retenção", "RH · People", f"Liderança · {case['area']}"]
     )
     st.markdown(
-        f'<div class="fake-sidebar"><div class="ws">Empresa (fictícia)</div>'
+        f'<div class="fake-sidebar"><div class="ws">Empresa B2B SaaS</div>'
         f'<div class="sec">Canais</div><div class="item"># geral</div><div class="item"># {html.escape(case["area"].lower())}</div>'
         f'<div class="item"># anúncios</div><div class="sec">Mensagens diretas</div>{dms}'
         f'<div class="sec">Você</div><div class="item">{html.escape(decider)}</div></div>',
@@ -86,8 +72,7 @@ with right, st.container(border=True):
     st.markdown("**O que chamou atenção**")
     md("\n".join(f"- {s}" for s in msg["signals"]))
     if note_reading is not None and note_reading.source == "ai" and note_reading.value.get("quote"):
-        st.caption(f"✦ A anotação da conversa de carreira foi lida por AI, que destacou: "
-                   f"\u201c{note_reading.value['quote']}\u201d")
+        st.caption(f"✦ Trecho da última conversa de carreira: \u201c{note_reading.value['quote']}\u201d")
     md(msg["risk"])
 
     md(f"**O motivo mais provável:** {msg['cause']}")
@@ -103,7 +88,7 @@ with right, st.container(border=True):
     years = case["horizon_years"]
     years_txt = "cerca de 1 ano" if years < 1.5 else f"cerca de {int(years + 0.5)} anos"
     exit_now = case["exit_window_no_action"]
-    rows = [f"| | Opção | Fica em {W} meses | Custo | Perda que evita | Saldo |", "|:-:|---|---|---|---|---|"]
+    rows = [f"| | Opção | Fica em {W} meses | Custo | Perda que evita | Saldo |", "|:--|:--|:--|:--|:--|:--|"]
     notes = []
     for _, o in opts.iterrows():
         name, rec = o["intervention"], o["recurring"]
@@ -137,8 +122,6 @@ with right, st.container(border=True):
     st.caption(f"★ opção sugerida. O resultado é medido em {W} meses.")
 
     md(msg["closing"])
-    ai_badge(written)
-    st.caption(f"{case['name'].split()[0]} não vê esta mensagem nem nenhum número.")
 
     # Decision ------------------------------------------------------------------
     registered = st.session_state["persona_decisions"].get(pid)

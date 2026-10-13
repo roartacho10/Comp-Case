@@ -49,18 +49,10 @@ def _settle(page, text=None):
     assert page.locator('[data-testid="stException"]').count() == 0
 
 
-def _nav(page, label, wait):
-    page.locator('[data-testid="stSidebarNav"]').get_by_text(label, exact=True).click()
+def _step(page, label, wait):
+    """Click a step of the demo script in the sidebar."""
+    page.locator('[data-testid="stSidebar"]').get_by_role("button").filter(has_text=label).first.click()
     _settle(page, wait)
-
-
-def _pick(page, prefix):
-    box = page.locator('[data-testid="stSelectbox"]').first
-    box.scroll_into_view_if_needed()
-    box.click()
-    page.keyboard.type(prefix)
-    page.keyboard.press("Enter")
-    _settle(page, "Sua decisão")
 
 
 def _predict(page, text="Provavelmente fica"):
@@ -81,16 +73,16 @@ def test_demo_script(base_url):
             pytest.skip(f"Chromium indisponível: {exc}")
         page = browser.new_page(viewport={"width": 1280, "height": 1600})
         page.goto(base_url)
-        _settle(page, "Como navegar")
+        _settle(page, "Roteiro da demonstração")
 
-        _nav(page, "1. Caso do gestor", "Sua decisão")
+        _step(page, "Caso da Mariana", "Sua decisão")
         _register(page, "Registre a sua previsão")        # the prediction is required
         _predict(page, "Quase certo que fica")
         _register(page)                                   # Mariana: follows the suggestion
-        _pick(page, "Diego")
+        _step(page, "Caso do Diego", "Sua decisão")
         _predict(page)
         _register(page)                                   # Diego: follows the suggestion
-        _pick(page, "Lucía")
+        _step(page, "Caso da Lucía", "Sua decisão")
         page.get_by_text("Ajuste salarial", exact=True).last.click()
         _predict(page)
         _register(page, "conte em uma frase o porquê")   # diverging without a reason is blocked
@@ -98,20 +90,19 @@ def test_demo_script(base_url):
         page.wait_for_timeout(300)
         _register(page, "Você seguiu um caminho diferente da sugestão")
 
-        page.get_by_role("button", name="Avançar 12 meses").click()
-        _settle(page, "out/2027")
-
-        _nav(page, "2. Retorno e aprendizado", "Retorno para quem decidiu")
-        body = page.inner_text("body")
-        assert "Mariana continua no time" in body
-        assert "um resultado ruim não torna a decisão ruim" in body
-        assert "em vez da sugestão" in body
-
-        _nav(page, "3. Visão da liderança", "Onde está o risco")
+        _step(page, "Painel da liderança, hoje", "Onde está o risco")
         body = page.inner_text("[data-testid='stMain']")
         for name in ("Mariana", "Diego", "Lucía"):
             assert name not in body
 
-        _nav(page, "4. Resultado em 12 meses", "Saídas evitadas")
-        _nav(page, "Como os dados foram gerados", "premissas determinísticas")
+        _step(page, "Avançar 12 meses", "Retorno aos gestores")
+        body = page.inner_text("[data-testid='stMain']")
+        assert "Mariana continua no time" in body
+        assert "um resultado ruim não torna a decisão ruim" in body
+        assert "em vez da sugestão" in body
+
+        _step(page, "Painel da liderança, 12 meses depois", "Saídas evitadas")
+        assert "Previsões dos gestores" in page.inner_text("[data-testid='stMain']")
+        page.goto(base_url + "/dados")
+        _settle(page, "premissas determinísticas")
         browser.close()

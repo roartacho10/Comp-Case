@@ -8,11 +8,13 @@ Protótipo construído para o case *Forward Deployed* da Comp. É um sistema que
 
 ## Como navegar
 
-1. **Caso do gestor.** Escolha uma das três pessoas e leia a mensagem que o gestor recebe no Slack (simulado): o que chamou atenção, o motivo mais provável, o que os dados sugerem e as opções lado a lado. Registre a decisão e a sua previsão.
-2. **Avançar 12 meses**, na barra lateral. O sistema simula o que acontece depois das decisões, nos três casos e em todos os outros casos abertos da empresa.
-3. **Retorno e aprendizado.** O retorno para cada gestor, as previsões comparadas com o resultado e o que o sistema aprendeu.
-4. **Visão da liderança.** Onde está o risco, quanto valor está em jogo e o que está sendo feito, sem nomes.
-5. **Resultado em 12 meses.** Saídas evitadas, valor preservado e quanto cada real investido retornou.
+O app mostra o produto como cada usuário o veria; a barra lateral é o roteiro da demonstração, em ordem:
+
+1. **Casos da Mariana, do Diego e da Lucía.** A mensagem que cada gestor recebe no Slack (simulado): o que chamou atenção, o motivo mais provável, o que os dados sugerem e as opções lado a lado. Registre a decisão e a sua previsão.
+2. **Painel da liderança, hoje.** Onde está o risco, quanto valor está em jogo e o que está sendo feito, sem nomes.
+3. **Avançar 12 meses.** O sistema simula o que acontece depois das decisões, nos três casos e em todos os outros casos abertos da empresa.
+4. **Retorno aos gestores.** O resultado de cada caso, no Slack.
+5. **Painel da liderança, 12 meses depois.** Saídas evitadas, valor preservado, seguir × divergir da sugestão e previsões dos gestores contra o resultado.
 
 | Pessoa | Situação | O que observar |
 |---|---|---|
@@ -20,12 +22,12 @@ Protótipo construído para o case *Forward Deployed* da Comp. É um sistema que
 | Diego Ramírez · Produto | Muito tempo sem promoção, projeto encerrado, perto de um marco de tempo de casa | Uma boa decisão nem sempre garante um bom resultado |
 | Lucía Fernández · Customer Success | Muito tempo sem promoção e um pedido de crescimento sem plano | Divergir da sugestão exige uma justificativa, que entra no aprendizado |
 
-A página **Como os dados foram gerados** mostra as premissas, as checagens e as tabelas. A página `/bastidores` (fora do menu) mostra o motor de regras sem interface final.
+O "por quê" de cada etapa está no guia "Anatomia do protótipo", com link na barra lateral. Fora do roteiro, por link direto, `/dados` mostra as premissas, as checagens e as tabelas, e `/bastidores` mostra o motor sem interface final, as taxas aprendidas e o botão que liga ou desliga os textos da AI.
 
 ## O que o protótipo mostra, ligado ao documento
 
 - **Seção 4.1 (a solução):** o ciclo contínuo disparado por sinais, e não pelo calendário; a intervenção escolhida pela causa do risco; o gestor decide e registra a previsão antes de agir; o resultado ajusta as recomendações e mede a calibração de quem decide.
-- **Seção 4.2 (os fluxos):** caso do gestor, retorno e aprendizado e visão da liderança, mais uma página com o resultado em 12 meses.
+- **Seção 4.2 (os fluxos):** caso do gestor, retorno ao gestor e painel da liderança (hoje e 12 meses depois).
 - **Seção 4.3 (a construção):** feita em fases, com validação antes de cada uma; histórico em [`docs/build_log.md`](docs/build_log.md).
 
 ## Como os números são calculados
@@ -49,7 +51,7 @@ A AI (Claude, pela API da Anthropic, chamada pelo servidor do app) faz o que reg
 
 O cálculo fica num motor de regras transparente. Risco, valor de cada opção e recomendação vêm das taxas observadas na rede da Comp e são reestimados a cada caso fechado: na rede, no cliente e na calibração de cada gestor. Assim os números são auditáveis e a vantagem está nos dados e no aprendizado, não no modelo de AI, que qualquer concorrente pode usar. Numa versão completa, a AI também leria as justificativas de quem diverge da sugestão e as entrevistas de desligamento, para confirmar ou corrigir a causa atribuída.
 
-A AI recebe só os fatos já calculados pelo motor. Antes de aparecer, cada texto passa por quatro checagens: formato, **todo número do texto existe nos fatos recebidos**, nenhum termo vetado (rótulos, tom de comando, jargão) e a frase "a decisão é sua" na mensagem do caso. Se falhar, se não houver chave ou se a chamada demorar, a tela usa o texto padrão revisado e diz o motivo. As regras estão em [`prompts/`](prompts/). Os textos aprovados ficam guardados no servidor, e cada sessão tem um limite de chamadas.
+A AI recebe só os fatos já calculados pelo motor. Antes de aparecer, cada texto passa por quatro checagens: formato, **todo número do texto existe nos fatos recebidos**, nenhum termo vetado (rótulos, tom de comando, jargão) e a frase "a decisão é sua" na mensagem do caso. Se falhar, se não houver chave ou se a chamada demorar, a tela usa o texto padrão revisado. As regras estão em [`prompts/`](prompts/). Os textos aprovados ficam guardados no servidor, e cada sessão tem um limite de chamadas.
 
 Para ativar, coloque a chave nos secrets do Streamlit (`ANTHROPIC_API_KEY = "..."`). Nunca no código.
 
@@ -100,7 +102,7 @@ pytest -m slow                    # testes demorados: outras sementes do mundo e
 
 ```
 app.py            # configuração e navegação
-app_pages/        # uma página por fluxo, página de dados e bastidores
+app_pages/        # telas do produto (caso, retorno, painel), dados e bastidores
 data/             # premissas (editáveis), dados gerados e verdade oculta
 prompts/          # regras da AI
 scripts/          # geração dos dados
