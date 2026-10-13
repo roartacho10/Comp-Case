@@ -6,7 +6,7 @@ from src.assumptions import Assumptions
 from src.checks import run_checks
 from src.generator import generate_world
 from src.signals import compute_signals
-from src.world_store import FINGERPRINT_FILE, GENERATED_DIR, HIDDEN_DIR, snapshot_files, write_snapshot
+from src.world_store import FINGERPRINT_FILE, GENERATED_DIR, HIDDEN_DIR, snapshot_files
 
 ROOT = Path(__file__).resolve().parents[1]
 

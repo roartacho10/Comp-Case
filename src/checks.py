@@ -14,6 +14,7 @@ from src.assumptions import Assumptions
 from src.generator import World
 from src.personas import persona_signals
 from src.signals import CAUSES, compute_signals
+from src.periods import HISTORY_MONTHS, OUTCOME_WINDOW_MONTHS
 
 
 def _tol(p: float, n: int) -> float:
@@ -101,7 +102,7 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     # Exits ---------------------------------------------------------------------
     former = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")]
     turnover = len(former) / n
-    exp_turnover = world.notes["expected_turnover"] * a.num("history.months") / 12
+    exp_turnover = world.notes["expected_turnover"] * HISTORY_MONTHS / 12
     add("Saídas", "Turnover voluntário nos últimos 12 meses", f"{_pct(exp_turnover)} ± 1,0 p.p.", _pct(turnover),
         abs(turnover - exp_turnover) <= 0.01, "Seção 3.3: ~15% ao ano")
     reg = former["regretted"].astype(bool).mean()
@@ -117,7 +118,7 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     net = pub["network_cases"]
     companies = pub["network_companies"]
     employees = int(companies["employees"].sum())
-    years = (a.num("network.months") - a.num("outcome.window_months")) / 12
+    years = (a.num("network.months") - OUTCOME_WINDOW_MONTHS) / 12
     expected_cases = int(round(employees * world.notes["case_rate"] * years))
     add("Rede", "Colaboradores nos clientes da rede (informativo)", "—", f"{employees:,}".replace(",", "."), True)
     add("Rede", "Casos fechados na rede", f"{expected_cases:,}".replace(",", "."), f"{len(net):,}".replace(",", "."),

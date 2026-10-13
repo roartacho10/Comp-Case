@@ -1,4 +1,4 @@
-"""The world's clock: what happens in the outcome window (premissa outcome.window_months) after the decisions.
+"""The world's clock: what happens in the 12 months (OUTCOME_WINDOW_MONTHS) after the decisions.
 
 This module plays the role of reality, so it may read the hidden truth (the true cause of each
 person). The engine and the interface never do. Outcomes follow the world rules; the three personas
@@ -16,6 +16,7 @@ import pandas as pd
 from src.assumptions import Assumptions
 from src.engine import MONITOR, EngineResult
 from src.prediction import nearest
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 NO_CAUSE = "nenhuma"
 
@@ -49,7 +50,7 @@ def _effect(a: Assumptions, intervention: str, cause: str) -> float:
 def _p_window(a: Assumptions, cause: str) -> float:
     """Exit probability within the outcome window, assuming a constant exit rate over the year."""
     annual = a.num("exit.annual_prob_no_cause") if cause == NO_CAUSE else a.num("exit.annual_prob_with_cause")
-    return 1 - (1 - annual) ** (a.num("outcome.window_months") / 12)
+    return 1 - (1 - annual) ** (OUTCOME_WINDOW_MONTHS / 12)
 
 
 def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -> pd.DataFrame:
@@ -87,12 +88,16 @@ def simulated_decisions(ctx: SimContext, engine: EngineResult, a: Assumptions) -
             recommended=case["recommended"], intervention=chosen, followed=chosen == case["recommended"],
             manager_prediction=prediction, system_prediction=float(opts.loc[(case["employee_id"], chosen), "stay_rate"]),
             cost_window=float(opts.loc[(case["employee_id"], chosen), "cost_window"]), justification="", origin="simulado",
+            decided=True,
         ))
     return pd.DataFrame(rows)
 
 
 def persona_decision_rows(ctx: SimContext, engine: EngineResult, persona_decisions: dict) -> pd.DataFrame:
     """Persona decisions registered in the interface; undecided personas default to monitoring."""
+    from src.engine import check_personas_are_cases
+
+    check_personas_are_cases(engine, ctx.personas)
     cases = engine.cases.set_index("employee_id")
     opts = engine.options.set_index(["employee_id", "intervention"])
     rows = []
@@ -108,7 +113,7 @@ def persona_decision_rows(ctx: SimContext, engine: EngineResult, persona_decisio
             system_prediction=float(opts.loc[(p["employee_id"], chosen), "stay_rate"]),
             cost_window=float(opts.loc[(p["employee_id"], chosen), "cost_window"]),
             justification=d.get("justification", "" if d else "Sem decisão registrada: monitorar"),
-            origin="personagem" if d else "personagem (sem decisão)",
+            origin="personagem" if d else "personagem (sem decisão)", decided=bool(d),
         ))
     return pd.DataFrame(rows)
 
@@ -116,7 +121,7 @@ def persona_decision_rows(ctx: SimContext, engine: EngineResult, persona_decisio
 def advance_window(ctx: SimContext, decisions: pd.DataFrame, a: Assumptions) -> pd.DataFrame:
     """Outcome after the outcome window for every active employee."""
     rng = np.random.default_rng([a.int("general.simulation_seed"), 2])
-    window = a.int("outcome.window_months")
+    window = OUTCOME_WINDOW_MONTHS
     chosen = decisions.set_index("employee_id")["intervention"].to_dict()
     script = ctx.persona_outcomes.set_index(["persona_id", "intervention"])
     persona_of = dict(zip(ctx.personas["employee_id"], ctx.personas["persona_id"]))
@@ -173,19 +178,24 @@ def learning(engine: EngineResult, decisions: pd.DataFrame, outcomes: pd.DataFra
 
     # Calibration of each decision maker and of the system, on the same cases.
     # Cases without a registered forecast count in the outcome but not in the manager's expected exits.
-    closed = closed.assign(_mgr_exit=1 - closed["manager_prediction"])
+    has_forecast = closed["manager_prediction"].notna()
+    closed = closed.assign(_mgr_exit=1 - closed["manager_prediction"], _has_forecast=has_forecast,
+                           _exit_with_forecast=(~closed["stayed"].astype(bool)) & has_forecast)
     calib = closed.groupby(["decision_maker_id", "decision_maker_name"], dropna=False).agg(
         n=("stayed", "size"), predicted=("manager_prediction", "mean"),
         system=("system_prediction", "mean"), realized=("stayed", "mean"),
-        exits_expected_manager=("_mgr_exit", "sum"),
+        exits_expected_manager=("_mgr_exit", "sum"), n_forecast=("_has_forecast", "sum"),
+        exits_realized_forecast=("_exit_with_forecast", "sum"),
     ).reset_index()
     calib["bias_pp"] = (calib["predicted"] - calib["realized"]) * 100
     calib["exits_expected_system"] = (1 - calib["system"]) * calib["n"]
     calib["exits_realized"] = (1 - calib["realized"]) * calib["n"]
     calib["system_bias_pp"] = (calib["system"] - calib["realized"]) * 100
 
+    decided = closed[closed["decided"]]
     summary = pd.DataFrame([dict(
-        cases=len(closed), followed=closed["followed"].mean(), stayed=closed["stayed"].mean(),
+        cases=len(closed), followed=decided["followed"].mean(), undecided=int((~closed["decided"]).sum()),
+        forecasts=int(has_forecast.sum()), exits_realized_forecast=int(closed["_exit_with_forecast"].sum()), stayed=closed["stayed"].mean(),
         performing=closed["performing"].mean(), cost_window=closed["cost_window"].sum(),
         manager_predicted=closed["manager_prediction"].mean(), system_predicted=closed["system_prediction"].mean(),
         exits_expected_manager=(1 - closed["manager_prediction"]).sum(),

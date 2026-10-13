@@ -27,6 +27,10 @@ if _state["fingerprint"] != _fingerprint:
         del sys.modules[name]
     st.cache_data.clear()
     _state["fingerprint"] = _fingerprint
+# A session that was open during an update must not reuse results computed by the previous version.
+if st.session_state.get("code_fingerprint") != _fingerprint:
+    st.session_state.pop("results_cache", None)
+    st.session_state["code_fingerprint"] = _fingerprint
 
 from src.app_data import assumptions  # noqa: E402  (imported after the reload guard)
 from src.state import sidebar_controls  # noqa: E402

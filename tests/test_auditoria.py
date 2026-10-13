@@ -25,6 +25,7 @@ from src.engine import MONITOR, run_engine, signal_evidence  # noqa: E402
 from src.format import brl  # noqa: E402
 from src.generator import generate_world  # noqa: E402
 from src.leadership import after_window, at_t0  # noqa: E402
+from src.periods import OUTCOME_WINDOW_MONTHS  # noqa: E402
 from src.prediction import scale  # noqa: E402
 from src.summaries import leadership_summary  # noqa: E402
 
@@ -181,27 +182,24 @@ def test_achado_resumo_da_lideranca_segue_a_fracao_arrependida(base):
     a, w, eng, ctx, sim = base
     edited = _edited(a, **{"exit.regretted_share": 0.3})
     view = at_t0(dict(engine=eng, public=w.public), edited, sim)
-    text, _ = leadership_summary(view, edited.int("outcome.window_months"))
+    text, _ = leadership_summary(view, OUTCOME_WINDOW_MONTHS)
     assert "metade" not in text
 
 
-def test_achado_custo_rotulado_por_ano_e_anual():
-    """A tela mostra o custo com o rótulo '/ano': precisa ser o anual, qualquer que seja a janela."""
-    a = _edited(Assumptions.load(), **{"outcome.window_months": 6})
-    eng = run_engine(generate_world(a).public, a)
+def test_achado_custo_rotulado_por_ano_e_anual(base):
+    """A tela mostra o custo com o rótulo '/ano': precisa ser o custo anual da regra do ajuste salarial."""
+    from src.interventions import annual_cost
+
+    a, w, eng, *_ = base
     rec = eng.options[eng.options["recurring"]]
-    salary = eng.cases.set_index("employee_id").loc[rec["employee_id"], "salary"].values
-    annual = np.round(a.num("cost.compensation_share") * salary, -2)
+    cases = eng.cases.set_index("employee_id").loc[rec["employee_id"]]
+    annual = np.round(annual_cost(a, "Ajuste salarial", cases["salary"].values, cases["market_median"].values), -2)
     assert np.allclose(rec["cost_annual"].values, annual)
 
 
-def test_achado_turnover_antes_e_depois_no_mesmo_periodo():
-    """'Nos W meses anteriores' usa o histórico inteiro de 12 meses, mesmo com W = 6."""
-    a = _edited(Assumptions.load(), **{"outcome.window_months": 6})
-    w = generate_world(a)
-    eng = run_engine(w.public, a)
-    ctx = simulation.make_context(w, a)
-    sim = simulation.simulated_decisions(ctx, eng, a)
+def test_achado_turnover_antes_e_depois_no_mesmo_periodo(base):
+    """Turnover antes e depois medido em períodos de mesmo tamanho (a janela fixa)."""
+    a, w, eng, ctx, sim = base
     dec, out, learn = _close(ctx, eng, sim, a, {})
     world = dict(engine=eng, public=w.public)
     view = at_t0(world, a, dec)
@@ -209,7 +207,7 @@ def test_achado_turnover_antes_e_depois_no_mesmo_periodo():
     hris = w.public["hris"]
     t0 = a.date("general.reference_date")
     exits = pd.to_datetime(hris["exit_date"])
-    last_w = ((t0 - exits).dt.days <= a.int("outcome.window_months") * 30.4375).sum()
+    last_w = ((t0 - exits).dt.days <= OUTCOME_WINDOW_MONTHS * 30.4375).sum()
     assert after["turnover_before"] == pytest.approx(last_w / (hris["status"] == "ativo").sum())
 
 
@@ -218,7 +216,7 @@ def test_achado_resumo_nao_cita_a_causa_gestao_retirada(base):
     a, w, eng, ctx, sim = base
     view = at_t0(dict(engine=eng, public=w.public), a, sim)
     view["teams"] = view["teams"].assign(share=1.0)
-    text, _ = leadership_summary(view, a.int("outcome.window_months"))
+    text, _ = leadership_summary(view, OUTCOME_WINDOW_MONTHS)
     assert "gestão" not in text
 
 

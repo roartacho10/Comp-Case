@@ -7,7 +7,9 @@ import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
+from src.interventions import is_recurring
 from src.signals import DAYS_PER_MONTH
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 
 def at_t0(world: dict, a: Assumptions, decisions: pd.DataFrame) -> dict:
@@ -34,13 +36,17 @@ def at_t0(world: dict, a: Assumptions, decisions: pd.DataFrame) -> dict:
     teams["share"] = teams["cases"] / teams["people"]
     teams = teams.sort_values(["share", "cases"], ascending=False).reset_index()
 
-    by_intervention = d.groupby("intervention").agg(cases=("intervention", "size"), cost=("cost_window", "sum"),
-                                                   followed=("followed", "mean")).reset_index()
+    by_intervention = d.groupby("intervention").agg(cases=("intervention", "size"), cost=("cost_window", "sum")).reset_index()
+    # Share that followed the suggestion, among decided cases; "—" when no case had this option as the suggestion.
+    dec = d[d["decided"]]
+    by_intervention["followed"] = [
+        dec.loc[dec["intervention"] == i, "followed"].mean() if (d["recommended"] == i).any() else float("nan")
+        for i in by_intervention["intervention"]]
     return dict(
         employees=len(active), cases=len(cases), exits_no_action=exits_no_action, loss=loss,
         regretted_loss=loss * a.num("exit.regretted_share"), regretted_share=a.num("exit.regretted_share"), exits_with_decisions=exits_with_decisions,
         loss_with_decisions=loss_with_decisions, intervention_cost=float(d["cost_window"].sum()),
-        followed=float(d["followed"].mean()), area_cause=area_cause, teams=teams, by_intervention=by_intervention,
+        followed=float(d.loc[d["decided"], "followed"].mean()), area_cause=area_cause, teams=teams, by_intervention=by_intervention,
         turnover_12m=_turnover(hris, a),
     )
 
@@ -50,7 +56,7 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
     closed = learn["closed"]
     s = learn["summary"].iloc[0]
     cases = world["engine"].cases.set_index("employee_id")
-    window = a.int("outcome.window_months")
+    window = OUTCOME_WINDOW_MONTHS
     replacement = (a.num("cost.replacement_share") * cases["salary"]).reindex(closed["employee_id"]).to_numpy()
     expected_exit = cases.loc[closed["employee_id"], "exit_window_no_action"].to_numpy()
     exited = (~closed["stayed"].astype(bool)).to_numpy(dtype=float)
@@ -58,8 +64,7 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
     # Each case weighs by its own replacement cost: (chance of leaving with no action − left or not) × replacement.
     saved = float(((expected_exit - exited) * replacement).sum())
     # Cost actually paid: recurring costs (salary adjustment) only while the person stayed; one-off costs in full.
-    recurring = closed["intervention"].map(
-        dict(zip(a.interventions["intervention"], a.interventions["cost_rule"] == "share_of_annual_cost"))).fillna(False)
+    recurring = closed["intervention"].map({i: is_recurring(a, i) for i in a.interventions["intervention"]}).fillna(False)
     months_paid = closed["exit_month"].astype(float).fillna(window).clip(upper=window).where(~closed["stayed"], window)
     cost_paid = float(np.where(recurring, closed["cost_window"] * months_paid / window, closed["cost_window"]).sum())
 
@@ -68,7 +73,7 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
     by_cause = c.groupby("cause").agg(cases=("employee_id", "size"), expected=("no_action", "sum"),
                                       realized=("stayed", lambda x: int((~x).sum()))).reset_index()
     by_cause["avoided"] = by_cause["expected"] - by_cause["realized"]
-    followed = c.groupby("followed")["stayed"].agg(["mean", "size"])
+    followed = c[c["decided"]].groupby("followed")["stayed"].agg(["mean", "size"])  # no decision: neither
 
     hris = world["public"]["hris"]
     t0 = a.date("general.reference_date")

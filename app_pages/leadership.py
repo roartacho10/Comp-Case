@@ -4,6 +4,7 @@ import streamlit as st
 
 from src.app_data import assumptions, load_world
 from src.format import brl, cost_note, num, pct, share_words
+from src.interventions import reference_costs
 from src.leadership import at_t0
 from src.signals import CAUSES
 from src.state import current_decisions, dates, month_label, results
@@ -11,13 +12,14 @@ from src import ai
 from src.state import ai_badge, ai_on
 from src.summaries import leadership_summary
 from src.ui import ACCENT, md, synthetic_data_banner
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 synthetic_data_banner()
 st.title("3. Visão da liderança")
 
 world = load_world()
 a = assumptions()
-W = a.int("outcome.window_months")
+W = OUTCOME_WINDOW_MONTHS
 t0, t1 = dates(a)
 st.caption(
     "Onde a empresa corre maior risco de perder valor por saídas evitáveis, o que está sendo feito e com que resultado. "
@@ -87,8 +89,7 @@ st.caption("Ajuda a liderança a decidir onde apoiar primeiro os gestores com ma
 # What is being done ------------------------------------------------------------------
 st.subheader("O que está sendo feito")
 bi = view["by_intervention"]
-fixed = a.interventions[(a.interventions["cost_rule"] == "fixed") & (a.interventions["cost_key"] != "")]
-unit = {r["intervention"]: a.num(r["cost_key"]) for _, r in fixed.iterrows() if a.num(r["cost_key"]) > 0}
+unit = reference_costs(a)
 st.dataframe(pd.DataFrame({
     "Intervenção": bi["intervention"],
     "Casos": bi["cases"],

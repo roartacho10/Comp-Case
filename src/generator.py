@@ -19,9 +19,11 @@ import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
+from src.interventions import annual_cost as intervention_annual_cost
 from src.names import unique_name
 from src.prediction import scale
 from src.signals import CAUSES, DAYS_PER_MONTH, DAYS_PER_YEAR, milestone_active, milestones
+from src.periods import HISTORY_MONTHS, OUTCOME_WINDOW_MONTHS
 
 NO_CAUSE, EXTERNAL = "nenhuma", "externa"
 IC, TEAM_MANAGER, LEADER = "Individual", "Gestor de time", "Liderança"
@@ -240,8 +242,8 @@ def generate_world(a: Assumptions) -> World:
     # 5. Exit history -----------------------------------------------------------
     p_no, p_yes = a.num("exit.annual_prob_no_cause"), a.num("exit.annual_prob_with_cause")
     expected_turnover = float(np.mean(np.where(cause == NO_CAUSE, p_no, p_yes)))
-    hist_days = a.num("history.months") * DAYS_PER_MONTH
-    n_hist = int(round(n * expected_turnover * a.num("history.months") / 12))
+    hist_days = HISTORY_MONTHS * DAYS_PER_MONTH
+    n_hist = int(round(n * expected_turnover * HISTORY_MONTHS / 12))
     exit_rows = [(team_ids[rng.integers(len(team_ids))], rng.uniform(5, hist_days - 5)) for _ in range(n_hist)]
 
     ic_level_dist = {k: v for k, v in a.distribution("population.level").items() if k != MANAGER_LEVEL}
@@ -349,20 +351,6 @@ def cause_probabilities(a: Assumptions) -> dict[str, float]:
     return probs
 
 
-def intervention_effect(a: Assumptions, intervention: str, true_cause: str) -> float:
-    """Reduction in exit probability: right cause, wrong cause, or no action."""
-    target = a.interventions.set_index("intervention").loc[intervention, "target_cause"]
-    if target == "":
-        return 0.0
-    return a.num("intervention.effect_right") if target == true_cause else a.num("intervention.effect_wrong")
-
-
-def intervention_cost(a: Assumptions, intervention: str, annual_cost: float) -> float:
-    row = a.interventions.set_index("intervention").loc[intervention]
-    value = a.num(row["cost_key"])
-    return round(value * annual_cost, -2) if row["cost_rule"] == "share_of_annual_cost" else value
-
-
 def _trunc_normal_vec(rng, mean, sd, lo, hi) -> np.ndarray:
     """Vectorized truncated normal: rejection sampling, uniform fallback for the rare leftovers."""
     lo, hi = np.asarray(lo, dtype=float), np.asarray(hi, dtype=float)
@@ -389,7 +377,11 @@ def generate_network(a: Assumptions, rng, case_rate: float):
     min_signals = a.int("case.min_signals_same_cause")
     n_companies = a.int("network.n_companies")
     max_months = a.num("network.months")
-    window = a.num("outcome.window_months")
+    if max_months <= OUTCOME_WINDOW_MONTHS:
+        raise ValueError(f"A premissa network.months ({max_months:.0f}) precisa ser maior que a janela fixa de "
+                         f"{OUTCOME_WINDOW_MONTHS} meses: só decisões tomadas há mais de {OUTCOME_WINDOW_MONTHS} meses "
+                         "têm resultado conhecido.")
+    window = OUTCOME_WINDOW_MONTHS
     min_months = window  # a case only closes after the outcome window
 
     country_dist = a.distribution("population.country")
@@ -478,10 +470,11 @@ def generate_network(a: Assumptions, rng, case_rate: float):
     prediction = levels[np.abs(raw_prediction[:, None] - levels[None, :]).argmin(axis=1)]
     exit_month = np.where(stayed, np.nan, rng.integers(1, int(window) + 1, n_cases))
 
-    cost_rule = dict(zip(inter["intervention"], inter["cost_rule"]))
-    cost_value = {k: a.num(v) for k, v in zip(inter["intervention"], inter["cost_key"])}
-    cost = np.array([round(cost_value[x] * ac, -2) if cost_rule[x] == "share_of_annual_cost" else cost_value[x]
-                     for x, ac in zip(chosen, annual_cost)])
+    median = np.array([medians[l] for l in level]) * np.array([factors[c] for c in country])
+    cost = np.zeros(n_cases)
+    for name in inter["intervention"]:
+        mask = chosen == name
+        cost[mask] = np.round(intervention_annual_cost(a, name, annual_cost[mask], median[mask]), -2)
 
     weights = companies["employees"] / companies["employees"].sum()
     days = rng.uniform(min_months * DAYS_PER_MONTH, max_months * DAYS_PER_MONTH, n_cases).round().astype(int)

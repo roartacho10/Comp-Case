@@ -12,6 +12,7 @@ from src.signals import CAUSES
 from src import ai
 from src.state import ai_badge, ai_on
 from src.ui import md, message_header, synthetic_data_banner
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 synthetic_data_banner()
 st.title("1. Caso do gestor")
@@ -24,7 +25,7 @@ world = load_world()
 a = assumptions()
 engine = world["engine"]
 tables = world["public"]
-W = a.int("outcome.window_months")
+W = OUTCOME_WINDOW_MONTHS
 cases = engine.cases.set_index("employee_id")
 personas = tables["personas"].set_index("persona_id")
 hris = tables["hris"].set_index("employee_id")

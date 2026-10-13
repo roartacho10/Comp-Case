@@ -36,9 +36,9 @@ def num(x, digits=1) -> str:
 
 def cost_note(a) -> str:
     """How intervention costs are counted: fixed-cost actions use the reference premise."""
-    inter = a.interventions
-    fixed = inter[(inter["cost_rule"] == "fixed") & (inter["cost_key"] != "")]
-    parts = [f"{r['intervention'].lower()} é estimado em {brl(a.num(r['cost_key']))} por caso (tempo de gestor e mentoria)"
-             for _, r in fixed.iterrows() if a.num(r["cost_key"]) > 0]
+    from src.interventions import reference_costs
+
+    parts = [f"{name.lower()} é estimado em {brl(cost)} por caso (tempo de gestor e mentoria)"
+             for name, cost in reference_costs(a).items()]
     return ("O custo do ajuste salarial é o valor pago no período; o de " + "; o de ".join(parts) +
             ", porque o custo real depende de cada gestor.") if parts else ""

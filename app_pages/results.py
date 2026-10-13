@@ -9,11 +9,12 @@ from src import ai
 from src.state import ai_badge, ai_on
 from src.summaries import results_summary
 from src.ui import md, synthetic_data_banner
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 synthetic_data_banner()
 world = load_world()
 a = assumptions()
-W = a.int("outcome.window_months")
+W = OUTCOME_WINDOW_MONTHS
 t0, t1 = dates(a)
 st.title(f"4. Resultado em {W} meses")
 st.caption(f"O que as decisões tomadas em {month_label(t0)} produziram até {month_label(t1)}, para a empresa.")

@@ -9,6 +9,7 @@ import streamlit as st
 
 from src import ai, simulation
 from src.assumptions import Assumptions
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
 
@@ -24,12 +25,12 @@ def month_label(date: pd.Timestamp) -> str:
 
 def dates(a: Assumptions) -> tuple[pd.Timestamp, pd.Timestamp]:
     t0 = a.date("general.reference_date")
-    return t0, t0 + pd.DateOffset(months=a.int("outcome.window_months"))
+    return t0, t0 + pd.DateOffset(months=OUTCOME_WINDOW_MONTHS)
 
 
 def sidebar_controls(a: Assumptions) -> None:
     init()
-    w = a.int("outcome.window_months")
+    w = OUTCOME_WINDOW_MONTHS
     t0, t1 = dates(a)
     now = t1 if st.session_state["advanced"] else t0
     with st.sidebar:

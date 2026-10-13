@@ -10,10 +10,11 @@ from __future__ import annotations
 import pandas as pd
 
 from src.assumptions import Assumptions
-from src.engine import MONITOR
+from src.engine import MONITOR, PEOPLE_TEAM
 from src.format import brl, num, pct
 from src.prediction import label as prediction_label
 from src.prediction import sentence
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 CAUSE_PHRASE = {
     "remuneração": "remuneração",
@@ -25,8 +26,11 @@ def _first(name: str | None) -> str:
     return name.split()[0] if name else ""
 
 
-def _thousands(n: int) -> str:
-    return f"{n:,}".replace(",", ".")
+def _greeting(case: pd.Series) -> str:
+    """First name of the decision maker; the People team is greeted as a team."""
+    if case.get("decision_maker_id") == PEOPLE_TEAM[0]:
+        return "time de People"
+    return _first(case["decision_maker_name"])
 
 
 def _times(ratio: float) -> str:
@@ -60,10 +64,13 @@ def build_case_message(
     a: Assumptions,
 ) -> dict:
     """Plain-language case message. Only numbers that change the decision; the detail stays on the engine page."""
-    window = a.int("outcome.window_months")
-    person, decider = _first(case["name"]), _first(case["decision_maker_name"])
+    window = OUTCOME_WINDOW_MONTHS
+    person, decider = _first(case["name"]), _greeting(case)
     opts = options.set_index("intervention")
     rec = case["recommended"]
+    raise_name = next((i for i in opts.index if i != MONITOR and opts.loc[i, "recurring"]), None)
+    equity = ("Essa conta olha só o custo de perder a pessoa: equidade salarial e a política da empresa podem justificar "
+              "o ajuste mesmo assim. ")
 
     intro = (
         f"Oi, {decider}. Os dados desta semana trouxeram um ponto de atenção sobre **{case['name']}** "
@@ -99,9 +106,14 @@ def build_case_message(
                  if gap >= 0.05 * case["salary"] else ".")
 
     if rec == MONITOR:
+        why = ""
+        if case["cause"] == "remuneração" and raise_name:
+            why = (f"Levar {person} para perto do mercado custaria cerca de {brl(opts.loc[raise_name, 'cost_annual'])} por "
+                   f"ano, mais do que a perda que o ajuste evita no tempo em que {person} ainda deve ficar ({years_txt}). "
+                   f"{loss_txt} {equity}")
         suggestion = (
-            "Pelas contas do sistema, nenhuma das ações tende a compensar o custo neste caso. A sugestão é acompanhar de "
-            f"perto e, se {person} for peça-chave, reduzir a dependência (distribuir conhecimento, preparar alguém para a "
+            f"Pelas contas do sistema, nenhuma das ações tende a compensar o custo neste caso. {why}A sugestão é acompanhar "
+            f"de perto e, se {person} for peça-chave, reduzir a dependência (distribuir conhecimento, preparar alguém para a "
             "função). **A decisão é sua: você conhece o contexto que os dados não mostram.**"
         )
     else:
@@ -109,7 +121,7 @@ def build_case_message(
         exit_with = 1 - o["stay_rate"]
         effect = f"de {pct(exit_now, 0)} para {pct(exit_with, 0)}"
         if o["recurring"]:
-            yearly = a.num(a.interventions.set_index("intervention").loc[rec, "cost_key"]) * case["salary"]
+            yearly = o["cost_annual"]
             suggestion = (
                 f"Considerar um ajuste salarial. Ele custa cerca de {brl(yearly)} por ano. {loss_txt} "
                 f"Em casos parecidos, o ajuste reduziu as saídas {effect} em {window} meses. Somando custos e ganhos no "
@@ -125,8 +137,13 @@ def build_case_message(
                                        f"(o seu tempo e o de outras pessoas para desenhar e acompanhar o escopo, e tirar "
                                        f"{person} do que faz hoje), e você o estima melhor do que nós."),
             }.get(rec, f"{rec}. Isso tem custo, e você o estima melhor do que nós.")
+            cross = ""
+            if case["cause"] == "remuneração" and raise_name:
+                cross = (f"O ajuste salarial custaria cerca de {brl(opts.loc[raise_name, 'cost_annual'])} por ano para levar "
+                         f"{person} para perto do mercado, mais do que a perda que ele evita; por isso a sugestão é um "
+                         f"caminho de custo menor, ainda que de efeito menor. {equity}")
             suggestion = (
-                f"{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses. "
+                f"{cross}{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses. "
                 f"{loss_txt} Por isso, **a iniciativa compensa enquanto o custo total ficar abaixo de cerca de "
                 f"{brl(break_even)}**{hours_txt}. A decisão é sua: você conhece o contexto que os dados não mostram."
             )
@@ -141,7 +158,7 @@ def build_case_message(
 
 
 def confirmation_message(decision: dict, case: pd.Series, a: Assumptions) -> str:
-    window = a.int("outcome.window_months")
+    window = OUTCOME_WINDOW_MONTHS
     text = (
         f"Registrado: **{decision['intervention'].lower()}**. Sua previsão para os próximos {window} meses: "
         f"{prediction_label(decision['prediction'], a).lower()}."
@@ -167,8 +184,8 @@ def quadrant(followed: bool, stayed: bool) -> str:
 def outcome_message(closed: pd.Series, case: pd.Series, options: pd.DataFrame, decider_calib: pd.Series | None,
                     a: Assumptions) -> str:
     """Follow-up sent to the decision maker after the window. Same guiding tone, no blame."""
-    window = a.int("outcome.window_months")
-    person, decider = _first(case["name"]), _first(case["decision_maker_name"])
+    window = OUTCOME_WINDOW_MONTHS
+    person, decider = _first(case["name"]), _greeting(case)
     opts = options.set_index("intervention")
     chosen, rec = closed["intervention"], case["recommended"]
     stayed = bool(closed["stayed"])
@@ -201,9 +218,13 @@ def outcome_message(closed: pd.Series, case: pd.Series, options: pd.DataFrame, d
         text += ("Deu certo: o seu contexto pode ter acrescentado algo que os dados não viam. " if stayed else
                  "A sugestão tinha mais chance, mas nenhuma opção garantia o resultado. ")
     text += "O caso entra no aprendizado da base da Comp."
-    if decider_calib is not None and decider_calib["n"] > 1:
+    if decider_calib is not None and decider_calib["n_forecast"] > 1:
+        # Same basis on both sides: only the cases in which this decision maker registered a forecast.
+        k = int(decider_calib["n_forecast"])
         expected = decider_calib["exits_expected_manager"]
-        realized = int(round(decider_calib["exits_realized"]))
-        text += (f" Somando os seus {int(decider_calib['n'])} casos deste ciclo, as suas previsões indicavam "
-                 f"{num(expected)} {'saída' if expected < 2 else 'saídas'}; ocorreram {realized}.")
+        realized = int(decider_calib["exits_realized_forecast"])
+        basis = (f"Somando os seus {k} casos deste ciclo" if k == int(decider_calib["n"])
+                 else f"Nos {k} casos deste ciclo em que você registrou previsão")
+        text += (f" {basis}, as suas previsões indicavam {num(expected)} {'saída' if expected < 2 else 'saídas'}; "
+                 f"ocorreram {realized}.")
     return text

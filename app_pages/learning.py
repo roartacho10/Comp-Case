@@ -9,6 +9,7 @@ from src.state import dates, month_label, results
 from src import ai
 from src.state import ai_badge, ai_on
 from src.ui import md, message_header, synthetic_data_banner
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 synthetic_data_banner()
 st.title("2. Retorno e aprendizado")
@@ -16,7 +17,7 @@ st.title("2. Retorno e aprendizado")
 world = load_world()
 a = assumptions()
 engine = world["engine"]
-W = a.int("outcome.window_months")
+W = OUTCOME_WINDOW_MONTHS
 t0, t1 = dates(a)
 st.caption(
     f"{W} meses depois das decisões: o que aconteceu, como as previsões se compararam com o resultado e o que o "
@@ -63,9 +64,12 @@ for col, (pid, p) in zip(cols, personas.iterrows()):
 st.subheader("Decisão e resultado são coisas diferentes")
 st.caption("Decisões são avaliadas pela qualidade da informação e do raciocínio no momento em que foram tomadas, "
            "e não só pelo resultado, que também depende de fatores externos.")
-placed = {}
+placed, undecided = {}, []
 for pid, p in personas.iterrows():
     c = closed.loc[p["employee_id"]]
+    if not c["decided"]:
+        undecided.append(hris.loc[p["employee_id"], "name"])
+        continue
     placed.setdefault((bool(c["followed"]), bool(c["stayed"])), []).append(hris.loc[p["employee_id"], "name"])
 header = st.columns([1, 2, 2])
 header[1].markdown("**A pessoa ficou**")
@@ -80,6 +84,10 @@ for followed, row_label in ((True, "Seguiu a sugestão"), (False, "Divergiu da s
             unsafe_allow_html=True,
         )
 
+if undecided:
+    st.caption(f"Sem decisão registrada: {', '.join(undecided)}. O caso ficou só em acompanhamento e não entra "
+               "nem como sugestão seguida nem como divergência.")
+
 # 3. Calibration -----------------------------------------------------------------
 st.subheader("Previsões contra o que aconteceu")
 lo_m, hi_m = s["exits_range_manager"]
@@ -93,6 +101,8 @@ md(
     f"(faixa provável de {lo_m} a {hi_m}), o sistema esperava {s['exits_expected_system']:.0f} ({lo_s} a {hi_s}) e ocorreram "
     f"**{int(s['exits_realized'])}**. Os gestores tendem a subestimar o risco do próprio time; registrar a previsão antes de "
     "agir é o que permite medir isso e, com o tempo, ponderar recomendações pela calibração de quem decide."
+    + (f" Os casos sem decisão registrada ({int(s['undecided'])}) não têm previsão do gestor; nos casos com previsão, "
+       f"ocorreram {int(s['exits_realized_forecast'])} saídas." if s["undecided"] else "")
 )
 levels = ", ".join(f"{lbl.lower()} = {pct(v, 0)}" for lbl, v in prediction_scale(a))
 st.caption("Faixa provável: onde o número de saídas cai em 80% das vezes se as probabilidades previstas estiverem certas. "

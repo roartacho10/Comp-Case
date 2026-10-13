@@ -7,7 +7,7 @@ import streamlit as st
 from src import simulation
 from src.assumptions import Assumptions
 from src.checks import run_checks
-from src.engine import run_engine
+from src.engine import check_personas_are_cases, run_engine
 from src.generator import generate_world
 
 
@@ -16,6 +16,7 @@ def _load(fingerprint: str):
     a = Assumptions.load()
     world = generate_world(a)
     engine = run_engine(world.public, a)
+    check_personas_are_cases(engine, world.public["personas"], a)
     context = simulation.make_context(world, a)
     return dict(
         assumptions=a.table,

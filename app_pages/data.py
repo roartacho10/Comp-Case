@@ -48,7 +48,9 @@ with tab_assumptions:
             "Racional do valor": st.column_config.TextColumn(width="large"),
         },
     )
-    st.caption(f"{len(table)} premissas. Editáveis em `data/assumptions.csv`; qualquer mudança regenera os dados.")
+    st.caption(f"{len(table)} premissas. Editáveis em `data/assumptions.csv`; qualquer mudança regenera os dados. "
+               "Os períodos de 12 meses (resultado de cada decisão e histórico do cliente) são fixos, e não premissas: "
+               "todas as taxas do sistema se referem ao mesmo ano.")
     with st.expander("Catálogo de sinais e de intervenções"):
         st.dataframe(world["signals"], hide_index=True, width="stretch")
         st.dataframe(world["interventions"], hide_index=True, width="stretch")

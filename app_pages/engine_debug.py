@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 
-from src import simulation
 from src.app_data import assumptions, load_world
 from src.engine import MONITOR, comparable_cases, signal_evidence
 from src.format import brl, num, pct, pp
@@ -10,6 +9,7 @@ from src.prediction import scale as prediction_scale
 from src.signals import CAUSES
 from src.state import results
 from src.ui import synthetic_data_banner
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 synthetic_data_banner()
 st.title("Bastidores do motor")
@@ -26,7 +26,7 @@ cases = engine.cases.set_index("employee_id")
 options = engine.options
 personas = ctx.personas.set_index("persona_id")
 tables = world["public"]
-W = a.int("outcome.window_months")
+W = OUTCOME_WINDOW_MONTHS
 
 st.session_state.setdefault("persona_decisions", {})
 st.session_state.setdefault("advanced", False)
@@ -186,7 +186,8 @@ else:
         r = closed.loc[p["employee_id"]]
         rows.append({
             "Personagem": f"{pid} · {p['name']}",
-            "Decisão": r["intervention"] + (" (seguiu)" if r["followed"] else " (divergiu)"),
+            "Decisão": r["intervention"] + (" (sem decisão)" if not r["decided"] else " (seguiu)" if r["followed"]
+                                            else " (divergiu)"),
             "Previsão do gestor": prediction_label(r["manager_prediction"], a),
             "Previsão do sistema": pct(r["system_prediction"], 0),
             "Resultado": "ficou" if r["stayed"] else f"saiu no mês {int(r['exit_month'])}",

@@ -14,7 +14,9 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.format import num
+from src.interventions import annual_cost, is_recurring
 from src.signals import CAUSES, DAYS_PER_MONTH, compute_signals
+from src.periods import HISTORY_MONTHS, OUTCOME_WINDOW_MONTHS
 
 MONITOR = "Monitorar"
 PEOPLE_TEAM = ("RH", "Time de People (RH)")  # decides the cases of leaders who have no superior
@@ -86,10 +88,10 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
     is_case = top >= min_signals
 
     # Client history: annual voluntary exit rate over the recorded history, converted to the outcome window.
-    history = a.num("history.months")
+    history = HISTORY_MONTHS
     former = hris[(hris["status"] == "desligado") & (hris["exit_type"] == "voluntário")]
     recent = former[(t0 - pd.to_datetime(former["exit_date"])).dt.days <= history * DAYS_PER_MONTH]
-    window = a.num("outcome.window_months")
+    window = OUTCOME_WINDOW_MONTHS
     annual_rate = min(0.99, len(recent) / len(active) * 12 / history)
     company_exit_window = 1 - (1 - annual_rate) ** (window / 12)
 
@@ -118,6 +120,12 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
 
         # Risk if nothing is done: same cause and same number of signals (monitored cases).
         st_k = stats[(stats["attributed_cause"] == cause) & (stats["n_signals"] == k)].set_index("intervention")
+        if MONITOR not in st_k.index:
+            raise ValueError(
+                f"A rede não tem casos de {cause} com {k} sinais em que nada foi feito, então não há como medir o risco "
+                "sem ação. Isso acontece quando todos os gestores seguem a sugestão (premissa "
+                "behavior.follow_recommendation igual a 1). Numa solução real, um pequeno grupo de controle ou o "
+                "histórico de antes do sistema cumpre esse papel.")
         base = st_k.loc[MONITOR]
         exit_w = 1 - base["stay_rate"]
         hazard = -(12 / window) * np.log(1 - exit_w)  # annual
@@ -142,7 +150,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             pool_exit = np.clip(1 - sample(row["stayed"], row["n"]), 1e-4, 0.9999)
             reduction = 0.0 if name == MONITOR else 1 - pool_exit / pool_monitor
             stay_case = 1 - base_draws * (1 - reduction)
-            recurring = name in inter.index and inter.loc[name, "cost_rule"] == "share_of_annual_cost"
+            recurring = name != MONITOR and is_recurring(a, name)
             h1 = h0 * (1 - reduction)
             if name == MONITOR:
                 ev = benefit = np.zeros(draws)
@@ -151,9 +159,9 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 paths = np.repeat(np.broadcast_to(h1, (draws,))[:, None], months, axis=1)
                 if not recurring:
                     paths[:, one_off_months:] = h0[:, None]
-                rate_cost = a.num(inter.loc[name, "cost_key"])
-                rec_cost = rate_cost * salary if recurring else 0.0
-                one_cost = 0.0 if recurring else rate_cost
+                cost_per_year_or_case = float(annual_cost(a, name, salary, median))
+                rec_cost = cost_per_year_or_case if recurring else 0.0
+                one_cost = 0.0 if recurring else cost_per_year_or_case
                 ev = base_cost - _cost_of_path(paths, months, salary, median, a, rec_cost, one_cost)
                 benefit = base_cost - _cost_of_path(paths, months, salary, median, a, 0.0, 0.0)
                 cost_total = round(rec_cost * horizon_years, -2) if recurring else one_cost
@@ -198,6 +206,17 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
     )
 
 
+def check_personas_are_cases(engine: EngineResult, personas: pd.DataFrame, a: Assumptions | None = None) -> None:
+    """The scripted personas must open a case; otherwise the demo has nothing to show. Fails with a clear message."""
+    missing = personas[~personas["employee_id"].isin(engine.cases["employee_id"])]
+    if len(missing):
+        names = ", ".join(missing["name"])
+        raise ValueError(
+            f"Com as premissas atuais, {names} não abre(m) caso: é preciso ter pelo menos "
+            f"{a.int('case.min_signals_same_cause') if a else 'o mínimo de'} sinais da mesma causa. Revise "
+            "data/personas.csv ou a premissa case.min_signals_same_cause.")
+
+
 def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id: str, active_signals: list[str]) -> list[dict]:
     """Evidence for each active signal, built only from raw data: a technical version (for the engine page)
     and a plain-language version (for the manager)."""
@@ -218,8 +237,8 @@ def signal_evidence(tables: dict[str, pd.DataFrame], a: Assumptions, employee_id
             gap = 1 - p["annual_cost_brl"] / median
             ev = (f"Custo anual de R$ {p['annual_cost_brl']/1000:.0f} mil, contra mediana de mercado de R$ {median/1000:.0f} mil "
                   f"(compa-ratio {num(p['annual_cost_brl']/median, 2)}; limiar {num(a.num('signals.compa_threshold'), 2)})")
-            plain = (f"ganha R$ {p['annual_cost_brl']/1000:.0f} mil por ano; empresas parecidas pagam em média "
-                     f"R$ {median/1000:.0f} mil para o mesmo cargo e senioridade ({gap*100:.0f}% abaixo).")
+            plain = (f"recebe R$ {p['annual_cost_brl']/1000:.0f} mil por ano em salário e encargos; empresas parecidas "
+                     f"pagam em média R$ {median/1000:.0f} mil para o mesmo cargo e senioridade ({gap*100:.0f}% abaixo).")
         elif s == "no_raise":
             months = (t0 - pd.Timestamp(p["last_pay_change_date"])).days / DAYS_PER_MONTH
             ev = f"Última mudança salarial há {months:.0f} meses (limiar: {a.int('signals.no_raise_months')})"

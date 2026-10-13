@@ -1,10 +1,10 @@
 import streamlit as st
 
-from src.app_data import assumptions
 from src.ui import synthetic_data_banner
+from src.periods import OUTCOME_WINDOW_MONTHS
 
 synthetic_data_banner()
-W = assumptions().int("outcome.window_months")
+W = OUTCOME_WINDOW_MONTHS
 
 st.title("Retenção com aprendizado")
 st.write(
