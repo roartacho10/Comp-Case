@@ -77,11 +77,11 @@ with right, st.container(border=True):
 
     md(f"**O motivo mais provável:** {msg['cause']}")
 
-    st.markdown("**O que os dados sugerem**")
-    md(msg["suggestion"])
-
     st.markdown("**Perguntas que podem ajudar na conversa**")
     st.markdown("\n".join(f"{i}. {q}" for i, q in enumerate(msg["questions"], 1)))
+
+    st.markdown("**O que os dados sugerem**")
+    md(msg["suggestion"])
 
     st.markdown("**As opções lado a lado**")
     first = case["name"].split()[0]

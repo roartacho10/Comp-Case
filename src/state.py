@@ -65,8 +65,8 @@ def demo_sidebar(a: Assumptions, pages: dict, current) -> None:
         st.markdown(f'Hoje: <span class="time-chip">{month_label(t1 if advanced else t0)}</span>', unsafe_allow_html=True)
         st.page_link(pages["home"], label="Início")
         st.markdown("**Roteiro da demonstração**")
-        for n, step in enumerate(steps, start=1):
-            label = f"{'✓' if step['done'] else n}  {step['label']}"
+        for step in steps:
+            label = f"✓ {step['label']}" if step["done"] else step["label"]
             if st.button(label, key=f"step_{step['key']}", width="stretch", disabled=step.get("disabled", False),
                          type="primary" if step["current"] else "secondary"):
                 if step["key"] == "advance":
