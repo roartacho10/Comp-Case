@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 from src.assumptions import Assumptions
-from src.interventions import annual_cost as intervention_annual_cost
+from src.interventions import annual_cost as intervention_annual_cost, fallback_hourly
 from src.names import unique_name
 from src.prediction import scale
 from src.signals import CAUSES, DAYS_PER_MONTH, DAYS_PER_YEAR, milestone_active, milestones
@@ -471,10 +471,11 @@ def generate_network(a: Assumptions, rng, case_rate: float):
     exit_month = np.where(stayed, np.nan, rng.integers(1, int(window) + 1, n_cases))
 
     median = np.array([medians[l] for l in level]) * np.array([factors[c] for c in country])
+    hourly = fallback_hourly(a, np.array([factors[c] for c in country]))  # a typical manager's time in that country
     cost = np.zeros(n_cases)
     for name in inter["intervention"]:
         mask = chosen == name
-        cost[mask] = np.round(intervention_annual_cost(a, name, annual_cost[mask], median[mask]), -2)
+        cost[mask] = np.round(intervention_annual_cost(a, name, annual_cost[mask], median[mask], hourly[mask]), -2)
 
     weights = companies["employees"] / companies["employees"].sum()
     days = rng.uniform(min_months * DAYS_PER_MONTH, max_months * DAYS_PER_MONTH, n_cases).round().astype(int)

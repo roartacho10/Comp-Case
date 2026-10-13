@@ -14,7 +14,7 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.format import num
-from src.interventions import annual_cost, is_recurring, replacement_share, tenure_years
+from src.interventions import annual_cost, fallback_hourly, hours, is_recurring, replacement_share, tenure_years
 from src.signals import CAUSES, DAYS_PER_MONTH, compute_signals
 from src.periods import HISTORY_MONTHS, OUTCOME_WINDOW_MONTHS
 
@@ -133,6 +133,9 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
         salary = float(person["annual_cost_brl"])
         median = float(bench[(person["level"], person["country"])])
         tenure = tenure_years(person["hire_date"], t0)
+        # The decision maker's hour (annual cost / working hours); a typical manager's for the People team.
+        hourly = (float(active.loc[decider, "annual_cost_brl"]) / a.num("general.work_hours_per_year")
+                  if decider in active.index else float(fallback_hourly(a)))
         replacement = replacement_share(a, tenure) * salary
 
         # Effect of each intervention: pooled over the number of signals of the same cause (more cases,
@@ -160,9 +163,9 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 paths = np.repeat(np.broadcast_to(h1, (draws,))[:, None], months, axis=1)
                 if not recurring:
                     paths[:, one_off_months:] = h0[:, None]
-                cost_per_year_or_case = float(annual_cost(a, name, salary, median))
+                cost_per_year_or_case = float(annual_cost(a, name, salary, median, hourly))
                 rec_cost = cost_per_year_or_case if recurring else 0.0
-                one_cost = 0.0 if recurring else cost_per_year_or_case
+                one_cost = 0.0 if recurring else round(cost_per_year_or_case, -2)
                 ev = base_cost - _cost_of_path(paths, months, salary, median, replacement, a, rec_cost, one_cost)
                 benefit = base_cost - _cost_of_path(paths, months, salary, median, replacement, a, 0.0, 0.0)
                 cost_total = round(rec_cost * horizon_years, -2) if recurring else one_cost
@@ -177,6 +180,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 network_stay_rate=float(row["stayed"] / row["n"]), n=int(row["n"]),
                 reduction=float(np.median(reduction)) if name != MONITOR else 0.0,
                 cost_window=cost_window, cost_annual=cost_annual, cost_horizon=cost_total, recurring=bool(recurring),
+                hours=(hours(a, name) or np.nan) if name != MONITOR else np.nan,
                 ev=float(np.median(ev)), expected_cost=float(np.median(benefit - ev)),
                 benefit=float(np.median(ev) + np.median(benefit - ev)), ev_lo=float(np.quantile(ev, (1 - level) / 2)),
                 ev_hi=float(np.quantile(ev, 1 - (1 - level) / 2)),
@@ -190,8 +194,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             employee_id=emp, name=person["name"], area=person["area"], team_id=person["team_id"], level=person["level"],
             country=person["country"], role=person["role"], decision_maker_id=decider,
             decision_maker_name=managers.loc[decider, "name"] if decider in managers.index else PEOPLE_TEAM[1],
-            decision_maker_hourly_cost=(float(active.loc[decider, "annual_cost_brl"]) / a.num("general.work_hours_per_year")
-                                        if decider in active.index else np.nan),
+            decision_maker_hourly_cost=hourly,
             cause=cause, tied_causes=", ".join(tied), tie=len(tied) > 1,
             n_signals=k, signals=", ".join(s for s in signals.columns if signals.loc[emp, s]),
             exit_window_no_action=float(exit_w), exit_window_lo=float(1 - base["stay_hi"]), exit_window_hi=float(1 - base["stay_lo"]),

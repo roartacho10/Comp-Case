@@ -4,7 +4,6 @@ import streamlit as st
 
 from src.app_data import assumptions, load_world
 from src.format import brl, cost_note, num, pct, replacement_rule, share_words
-from src.interventions import reference_costs
 from src.leadership import at_t0
 from src.signals import CAUSES
 from src.state import current_decisions, dates, month_label, results
@@ -89,12 +88,10 @@ st.caption("Ajuda a liderança a decidir onde apoiar primeiro os gestores com ma
 # What is being done ------------------------------------------------------------------
 st.subheader("O que está sendo feito")
 bi = view["by_intervention"]
-unit = reference_costs(a)
 st.dataframe(pd.DataFrame({
     "Intervenção": bi["intervention"],
     "Casos": bi["cases"],
-    f"Custo em {W} meses": [brl(x) + (f" (estimado: {brl(unit[i])} por caso)" if unit.get(i) else "")
-                            for x, i in zip(bi["cost"], bi["intervention"])],
+    f"Custo em {W} meses": [brl(x) for x in bi["cost"]],
     "Seguiram a sugestão": [pct(x, 0) for x in bi["followed"]],
 }), hide_index=True, width="stretch")
 st.caption(cost_note(a))

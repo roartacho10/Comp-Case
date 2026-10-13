@@ -408,3 +408,13 @@ Alternativas avaliadas com o autor antes da execução: 50% fixo (perda de R$ 9,
 A mensagem do caso passa a dizer o que se perde: "repor custaria cerca de R$ 266 mil (contratar, o tempo até a nova pessoa render e o conhecimento de 4 anos e meio de casa)".
 
 Efeito no roteiro padrão: reposição média nos casos de 94%; perda esperada sem ação de R$ 13,4 mi (antes R$ 10,5 mi); o ajuste deixa de compensar em 6 dos 84 casos de remuneração (antes 14); saídas evitadas ~22; reposição evitada R$ 5,7 mi; custo pago R$ 1,4 mi; valor preservado R$ 4,2 mi (~R$ 3,9 por real); ficaram 81% quando seguiu e 55% quando divergiu; Mariana: ajuste de R$ 35 mil por ano, saldo de ~R$ 29 mil. Semente da simulação conferida de novo (sementes 1 a 20: 26 a 53 saídas, média 41,5; a 14 dá 42).
+
+## Custo de carreira e projeto em horas do gestor
+
+Decisão do autor: o "custo de referência" de R$ 5 mil por caso confundia mais do que ajudava. Zerar o custo foi descartado, porque uma ação sem custo sempre compensa (o sistema deixaria de sugerir monitorar em qualquer caso) e o retorno por real subiria só por deixar de contar um custo real.
+
+| Antes | Agora | Racional |
+|---|---|---|
+| R$ 5 mil por caso (`cost.growth`); no caso do gestor, "você estima", com a perda evitada como teto do investimento | ~20 horas do gestor por caso (`cost.growth_hours`), convertidas pelo custo-hora de quem decide (custo anual ÷ 2.000 horas; para o time de People e na rede, o de um gestor típico) | O custo é o tempo de quem decide, que o sistema já conhece. Dá de R$ 3 a 6 mil por caso, mostrados ao lado das horas; a tabela de opções passa a ter custo, perda que evita e saldo também para carreira e projeto |
+
+Efeito no roteiro padrão: sugestões 78 ajuste, 82 carreira e projeto, 3 monitorar; custo pago R$ 1,4 mi; valor preservado R$ 4,3 mi (~R$ 4,1 por real). Diego: "Isso toma cerca de 20 horas do seu tempo ao longo do ano (...), o equivalente a cerca de R$ 3 mil", saldo de ~R$ 39 mil.

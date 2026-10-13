@@ -1,9 +1,10 @@
 import html
 
+import pandas as pd
 import streamlit as st
 
 from src.app_data import assumptions, load_world
-from src.case_text import build_case_message, confirmation_message, hours_of
+from src.case_text import build_case_message, confirmation_message
 from src.engine import MONITOR, signal_evidence
 from src.format import brl, pct
 from src.prediction import label as prediction_label
@@ -115,23 +116,21 @@ with right, st.container(border=True):
             cost_txt = f"{brl(cost_r)} ({brl(o['cost_annual'])}/ano)"
             avoided, balance = brl(cost_r + ev_r), brl(ev_r)
         else:
-            cost_txt = "você estima"
-            avoided = brl(o["benefit"]) if o["benefit"] > 0 else "—"
-            balance = f"positivo se custar menos de {brl(o['benefit'])}" if o["benefit"] > 0 else "não compensa"
-            if o["benefit"] > 0:
-                h = hours_of(o["benefit"], case, a)
+            cost_r, ev_r = round(o["expected_cost"], -3), round(o["ev"], -3)
+            hours_txt = f" (~{int(o['hours'])} h do seu tempo)" if pd.notna(o["hours"]) else ""
+            cost_txt = f"{brl(cost_r)}{hours_txt}"
+            avoided, balance = brl(cost_r + ev_r), brl(ev_r)
+            if pd.notna(o["hours"]):
                 notes.append(
-                    f"**{name}:** reduz a chance de saída de {pct(exit_now, 0)} para {pct(1 - o['stay_rate'], 0)} e evita cerca "
-                    f"de {brl(o['benefit'])} em perda esperada. Esse é o máximo que vale investir: se o seu tempo, a mentoria e "
-                    f"tirar {first} do que faz hoje custarem menos que isso, compensa."
-                    + (f" {brl(o['benefit'])} equivalem a cerca de {h} horas do seu tempo." if h else "")
+                    f"**{name}:** o custo é o seu tempo: cerca de {int(o['hours'])} horas ao longo do ano (conversa, plano e "
+                    f"acompanhamento), convertidas pelo seu custo-hora. Se você prevê investir bem mais do que isso, o saldo diminui."
                 )
         rows.append(f"| {star} | {name} | {pct(o['stay_rate'], 0)} | {cost_txt} | {avoided} | {balance} |")
     md("\n".join(rows))
     md(
         f"**Como ler:** saldo = perda que evita − custo, no tempo em que {first} ainda deve ficar ({years_txt}). A perda que "
-        f"evita vem da redução na chance de saída, aplicada ao custo de perder {first}: reposição e substituto contratado "
-        "a valor de mercado."
+        f"evita vem da redução na chance de saída, aplicada ao custo de perder {first}: reposição (maior para quem tem mais tempo de "
+        "casa) e substituto contratado a valor de mercado."
     )
     for note in notes:
         md(note)

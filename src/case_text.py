@@ -47,15 +47,6 @@ def _in_ten(p: float) -> str:
     return f"{max(1, int(round(p * 10)))} em cada 10 pessoas"
 
 
-def hours_of(value: float, case: pd.Series, a: Assumptions) -> int | None:
-    """A value in hours of the decision maker's time (their annual cost / working hours per year)."""
-    hourly = case.get("decision_maker_hourly_cost")
-    if hourly is None or pd.isna(hourly) or hourly <= 0 or value <= 0:
-        return None
-    h = value / hourly
-    return int(round(h / 5) * 5) if h >= 20 else max(1, int(round(h)))
-
-
 def tenure_phrase(years: float) -> str:
     """What the substitute does not bring, in words: the knowledge of the person's years in the company."""
     if years < 1:
@@ -138,23 +129,23 @@ def build_case_message(
                 "**A decisão é sua: você conhece o contexto que os dados não mostram.**"
             )
         else:
-            break_even = o["benefit"]
-            h = hours_of(break_even, case, a)
-            hours_txt = f", o equivalente a cerca de {h} horas do seu tempo" if h else ""
+            h = o["hours"]
+            time_txt = (f"Isso toma cerca de {int(h)} horas do seu tempo ao longo do ano (conversa, plano e acompanhamento), "
+                        f"o equivalente a cerca de {brl(o['cost_window'])}." if pd.notna(h)
+                        else f"Isso custa cerca de {brl(o['cost_window'])}.")
             action = {
-                "Carreira e projeto": ("Conversar sobre um próximo passo de carreira e um novo projeto. Isso tem custo "
-                                       f"(o seu tempo e o de outras pessoas para desenhar e acompanhar o escopo, e tirar "
-                                       f"{person} do que faz hoje), e você o estima melhor do que nós."),
-            }.get(rec, f"{rec}. Isso tem custo, e você o estima melhor do que nós.")
+                "Carreira e projeto": "Conversar sobre um próximo passo de carreira e um novo projeto.",
+            }.get(rec, f"{rec}.")
             cross = ""
             if case["cause"] == "remuneração" and raise_name:
                 cross = (f"O ajuste salarial custaria cerca de {brl(opts.loc[raise_name, 'cost_annual'])} por ano para levar "
                          f"{person} para perto do mercado, mais do que a perda que ele evita; por isso a sugestão é um "
                          f"caminho de custo menor, ainda que de efeito menor. {equity}")
             suggestion = (
-                f"{cross}{action} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses. "
-                f"{loss_txt} Por isso, **a iniciativa compensa enquanto o custo total ficar abaixo de cerca de "
-                f"{brl(break_even)}**{hours_txt}. A decisão é sua: você conhece o contexto que os dados não mostram."
+                f"{cross}{action} {time_txt} Em casos parecidos, esse caminho reduziu as saídas {effect} em {window} meses. "
+                f"{loss_txt} Somando custos e ganhos no tempo em que {person} ainda deve ficar ({years_txt}), a iniciativa "
+                f"se paga e sobram cerca de {brl(o['ev'])}. "
+                "**A decisão é sua: você conhece o contexto que os dados não mostram.**"
             )
 
     questions = a.questions[a.questions["cause"] == case["cause"]].sort_values("order")["question"].tolist()

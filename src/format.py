@@ -35,13 +35,12 @@ def num(x, digits=1) -> str:
 
 
 def cost_note(a) -> str:
-    """How intervention costs are counted: fixed-cost actions use the reference premise."""
-    from src.interventions import reference_costs
+    """How intervention costs are counted (raise paid while the person stays; career action in manager hours)."""
+    from src.interventions import hours
 
-    parts = [f"{name.lower()} é estimado em {brl(cost)} por caso (tempo de gestor e mentoria)"
-             for name, cost in reference_costs(a).items()]
-    return ("O custo do ajuste salarial é o valor pago no período; o de " + "; o de ".join(parts) +
-            ", porque o custo real depende de cada gestor.") if parts else ""
+    parts = [f"o de {name.lower()} é o tempo de quem decide, cerca de {num(h, 0)} horas por caso, pelo custo-hora de cada um"
+             for name in a.interventions["intervention"] if (h := hours(a, name))]
+    return "O custo do ajuste salarial é o valor pago enquanto a pessoa ficou" + ("; " + "; ".join(parts) if parts else "") + "."
 
 
 def replacement_rule(a) -> str:

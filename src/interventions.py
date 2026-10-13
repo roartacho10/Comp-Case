@@ -2,7 +2,8 @@
 
 - raise_to_market: salary adjustment that brings the person to a target share of the market median, with a
   minimum raise (premises cost.raise_target_compa and cost.raise_min_share). Paid every year while the person stays.
-- fixed: a fixed reference cost per case (premise in cost_key), paid once.
+- manager_hours: hours of the decision maker's time (premise in cost_key) at their hourly cost, paid once.
+- fixed: a fixed cost per case (premise in cost_key), paid once.
 
 Also the cost of losing someone (replacement), which grows with tenure.
 """
@@ -16,6 +17,7 @@ from src.assumptions import Assumptions
 
 RAISE_RULE = "raise_to_market"
 FIXED_RULE = "fixed"
+HOURS_RULE = "manager_hours"
 
 
 def _row(a: Assumptions, intervention: str):
@@ -26,23 +28,31 @@ def is_recurring(a: Assumptions, intervention: str) -> bool:
     return _row(a, intervention)["cost_rule"] == RAISE_RULE
 
 
-def annual_cost(a: Assumptions, intervention: str, salary, median):
-    """Cost of the intervention per year (recurring) or per case (fixed). Works on numbers or arrays."""
+def fallback_hourly(a: Assumptions, country_factor=1.0):
+    """Hourly cost of a typical manager (market median for managers), when the decision maker's own cost is unknown."""
+    return a.num("market.median.Gestor") * np.asarray(country_factor, dtype=float) / a.num("general.work_hours_per_year")
+
+
+def hours(a: Assumptions, intervention: str) -> float | None:
+    """Hours of the decision maker's time the intervention takes, if its cost is counted in hours."""
+    row = _row(a, intervention)
+    return a.num(row["cost_key"]) if row["cost_rule"] == HOURS_RULE else None
+
+
+def annual_cost(a: Assumptions, intervention: str, salary, median, hourly=None):
+    """Cost of the intervention per year (recurring) or per case (one-off). Works on numbers or arrays.
+    `hourly` is the decision maker's cost per hour (a typical manager's when not given)."""
     row = _row(a, intervention)
     if row["cost_rule"] == RAISE_RULE:
         to_target = a.num("cost.raise_target_compa") * np.asarray(median, dtype=float) - np.asarray(salary, dtype=float)
         minimum = a.num(row["cost_key"]) * np.asarray(salary, dtype=float)
         return np.maximum(to_target, minimum)
+    if row["cost_rule"] == HOURS_RULE:
+        rate = fallback_hourly(a) if hourly is None else np.asarray(hourly, dtype=float)
+        return a.num(row["cost_key"]) * rate + 0 * np.asarray(salary, dtype=float)
     if row["cost_rule"] == FIXED_RULE:
         return a.num(row["cost_key"]) + 0 * np.asarray(salary, dtype=float)
     raise ValueError(f"Regra de custo desconhecida em data/interventions.csv: {row['cost_rule']}")
-
-
-def reference_costs(a: Assumptions) -> dict[str, float]:
-    """Fixed reference costs above zero (e.g. carreira e projeto), used to label estimated totals."""
-    inter = a.interventions
-    fixed = inter[inter["cost_rule"] == FIXED_RULE]
-    return {r["intervention"]: a.num(r["cost_key"]) for _, r in fixed.iterrows() if a.num(r["cost_key"]) > 0}
 
 
 def tenure_years(hire_date, on) -> np.ndarray | float:

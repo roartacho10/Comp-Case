@@ -1,4 +1,4 @@
 intervention,target_cause,cost_rule,cost_key
 Ajuste salarial,remuneração,raise_to_market,cost.raise_min_share
-Carreira e projeto,crescimento,fixed,cost.growth
+Carreira e projeto,crescimento,manager_hours,cost.growth_hours
 Monitorar,,fixed,cost.monitor
