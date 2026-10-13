@@ -17,7 +17,7 @@ def at_t0(world: dict, a: Assumptions, decisions: pd.DataFrame) -> dict:
     cases = engine.cases.copy()
     hris = world["public"]["hris"]
     active = hris[hris["status"] == "ativo"]
-    replacement = a.num("cost.replacement_share") * cases["salary"]
+    replacement = cases["replacement_cost"]
     exits_no_action = float(cases["exit_window_no_action"].sum())
     loss = float((cases["exit_window_no_action"] * replacement).sum())
     d = decisions.set_index("employee_id")
@@ -57,7 +57,7 @@ def after_window(world: dict, a: Assumptions, t0_view: dict, results: dict) -> d
     s = learn["summary"].iloc[0]
     cases = world["engine"].cases.set_index("employee_id")
     window = OUTCOME_WINDOW_MONTHS
-    replacement = (a.num("cost.replacement_share") * cases["salary"]).reindex(closed["employee_id"]).to_numpy()
+    replacement = cases["replacement_cost"].reindex(closed["employee_id"]).to_numpy()
     expected_exit = cases.loc[closed["employee_id"], "exit_window_no_action"].to_numpy()
     exited = (~closed["stayed"].astype(bool)).to_numpy(dtype=float)
     avoided = t0_view["exits_no_action"] - s["exits_realized"]

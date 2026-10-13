@@ -392,3 +392,19 @@ Revisão de todo o código, das 163 mensagens de caso, de todas as decisões pos
 Semente da simulação conferida de novo: com as sementes 1 a 20, as saídas nos casos abertos variaram de 26 a 53 (média 42); a 14 dá 42 e segue representativa.
 
 Testes: 90 na suíte principal (novos em `tests/test_review.py`) e 37 demorados, todos passando; dados regerados conferem com o retrato do repositório.
+
+---
+
+## Custo de reposição pelo tempo de casa
+
+Decisão do autor depois de rever a premissa por princípios. Os 75% fixos somavam ~20% de vaga aberta, o que é contagem dupla (enquanto a vaga está aberta, a empresa deixa de pagar o salário), e ignoravam que quem está há mais tempo produz acima do que custa.
+
+| Antes | Agora | Racional |
+|---|---|---|
+| Reposição de 75% do custo anual para todos (`cost.replacement_share`) | 50% para quem acabou de entrar, mais 10 pontos por ano de casa, até 100% a partir de 5 anos (`cost.replacement_base`, `cost.replacement_per_tenure_year`, `cost.replacement_max`), numa única função em `src/interventions.py` | Os 50% somam contratar (~15%), rampa de 6 meses a meio rendimento (~25%) e tempo do gestor e do time (~10%). Cada ano de casa acrescenta conhecimento da empresa que o substituto não traz. A perda anual com saídas arrependidas fica em R$ 14,2 mi, em linha com a seção 3.3 |
+
+Alternativas avaliadas com o autor antes da execução: 50% fixo (perda de R$ 9,2 mi e o ajuste da Mariana deixava de compensar), 5 pontos por ano (efeito do tempo de casa fraco), 15 pontos por ano (quase todos no teto; R$ 15,9 mi) e ajuste salarial até 100% da mediana. O último foi descartado porque, no protótipo, o efeito do ajuste não depende do tamanho: levar a 100% dobra o custo sem reter mais, o ajuste passa a compensar em só 21 dos 84 casos e o caso da Mariana quebra.
+
+A mensagem do caso passa a dizer o que se perde: "repor custaria cerca de R$ 266 mil (contratar, o tempo até a nova pessoa render e o conhecimento de 4 anos e meio de casa)".
+
+Efeito no roteiro padrão: reposição média nos casos de 94%; perda esperada sem ação de R$ 13,4 mi (antes R$ 10,5 mi); o ajuste deixa de compensar em 6 dos 84 casos de remuneração (antes 14); saídas evitadas ~22; reposição evitada R$ 5,7 mi; custo pago R$ 1,4 mi; valor preservado R$ 4,2 mi (~R$ 3,9 por real); ficaram 81% quando seguiu e 55% quando divergiu; Mariana: ajuste de R$ 35 mil por ano, saldo de ~R$ 29 mil. Semente da simulação conferida de novo (sementes 1 a 20: 26 a 53 saídas, média 41,5; a 14 dá 42).

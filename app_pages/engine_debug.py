@@ -3,7 +3,7 @@ import streamlit as st
 
 from src.app_data import assumptions, load_world
 from src.engine import MONITOR, comparable_cases, signal_evidence
-from src.format import brl, num, pct, pp
+from src.format import brl, num, pct, pp, replacement_rule
 from src.prediction import label as prediction_label
 from src.prediction import scale as prediction_scale
 from src.signals import CAUSES
@@ -99,7 +99,7 @@ view = pd.DataFrame({
 st.dataframe(view, hide_index=True, width="stretch")
 st.caption(
     "Valor esperado = custo esperado de não agir − custo esperado com a intervenção, mês a mês no horizonte: "
-    f"custo da intervenção, reposição de quem sai ({pct(a.num('cost.replacement_share'), 0)} do custo anual) e diferença de mercado paga ao substituto. "
+    f"custo da intervenção, reposição de quem sai ({replacement_rule(a)}) e diferença de mercado paga ao substituto. "
     "A chance de ficar combina o risco deste caso (mesma causa e número de sinais) com o efeito de cada intervenção "
     f"na rede (mesma causa). O resultado é verificado em {W} meses; o restante do horizonte é extrapolação."
 )

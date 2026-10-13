@@ -14,7 +14,7 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.format import num
-from src.interventions import annual_cost, is_recurring
+from src.interventions import annual_cost, is_recurring, replacement_share, tenure_years
 from src.signals import CAUSES, DAYS_PER_MONTH, compute_signals
 from src.periods import HISTORY_MONTHS, OUTCOME_WINDOW_MONTHS
 
@@ -57,9 +57,8 @@ def network_stats(network: pd.DataFrame, a: Assumptions) -> pd.DataFrame:
     return stats
 
 
-def _cost_of_path(h_paths, months, salary, median, a: Assumptions, recurring, one_off):
+def _cost_of_path(h_paths, months, salary, median, replacement, a: Assumptions, recurring, one_off):
     """Expected cost over the horizon for monthly hazard paths (draws x months)."""
-    replacement = a.num("cost.replacement_share") * salary
     gap = max(0.0, a.num("cost.replacement_hire_compa") * median - salary)  # per year, paid to the substitute
     dt = 1 / 12
     survive = np.ones(h_paths.shape[0])
@@ -133,6 +132,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
         months = max(1, int(round(horizon_years * 12)))
         salary = float(person["annual_cost_brl"])
         median = float(bench[(person["level"], person["country"])])
+        tenure = tenure_years(person["hire_date"], t0)
+        replacement = replacement_share(a, tenure) * salary
 
         # Effect of each intervention: pooled over the number of signals of the same cause (more cases,
         # less noise). Uncertainty comes from Beta posteriors on the network counts.
@@ -143,7 +144,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
 
         base_draws = np.clip(1 - sample(base["stayed"], base["n"]), 1e-4, 0.9999)
         h0 = -(12 / window) * np.log(1 - base_draws)
-        base_cost = _cost_of_path(np.repeat(h0[:, None], months, axis=1), months, salary, median, a, 0.0, 0.0)
+        base_cost = _cost_of_path(np.repeat(h0[:, None], months, axis=1), months, salary, median, replacement, a, 0.0, 0.0)
         pool_monitor = np.clip(1 - sample(pooled.loc[MONITOR, "stayed"], pooled.loc[MONITOR, "n"]), 1e-4, 0.9999)
 
         for name, row in pooled.iterrows():
@@ -162,8 +163,8 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
                 cost_per_year_or_case = float(annual_cost(a, name, salary, median))
                 rec_cost = cost_per_year_or_case if recurring else 0.0
                 one_cost = 0.0 if recurring else cost_per_year_or_case
-                ev = base_cost - _cost_of_path(paths, months, salary, median, a, rec_cost, one_cost)
-                benefit = base_cost - _cost_of_path(paths, months, salary, median, a, 0.0, 0.0)
+                ev = base_cost - _cost_of_path(paths, months, salary, median, replacement, a, rec_cost, one_cost)
+                benefit = base_cost - _cost_of_path(paths, months, salary, median, replacement, a, 0.0, 0.0)
                 cost_total = round(rec_cost * horizon_years, -2) if recurring else one_cost
                 cost_window = round(rec_cost * window / 12, -2) if recurring else one_cost
                 cost_annual = round(rec_cost, -2) if recurring else one_cost
@@ -196,6 +197,7 @@ def run_engine(tables: dict[str, pd.DataFrame], a: Assumptions) -> EngineResult:
             exit_window_no_action=float(exit_w), exit_window_lo=float(1 - base["stay_hi"]), exit_window_hi=float(1 - base["stay_lo"]),
             exit_window_n=int(base["n"]), risk_multiple=float(exit_w / company_exit_window) if company_exit_window else np.nan,
             horizon_years=float(horizon_years), salary=salary, market_median=median,
+            tenure_years=float(tenure), replacement_cost=float(replacement),
             recommended=recommended, recommended_ev=float(opts.loc[recommended, "ev"]),
             system_stay=float(opts.loc[recommended, "stay_rate"]),
         ))

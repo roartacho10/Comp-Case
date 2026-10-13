@@ -42,3 +42,13 @@ def cost_note(a) -> str:
              for name, cost in reference_costs(a).items()]
     return ("O custo do ajuste salarial é o valor pago no período; o de " + "; o de ".join(parts) +
             ", porque o custo real depende de cada gestor.") if parts else ""
+
+
+def replacement_rule(a) -> str:
+    """The replacement-cost rule in words, derived from the premises."""
+    base, step, cap = (a.num("cost.replacement_base"), a.num("cost.replacement_per_tenure_year"),
+                       a.num("cost.replacement_max"))
+    years = (cap - base) / step if step > 0 else 0
+    y = f"{years:.1f}".replace(".", ",").removesuffix(",0")
+    return (f"{pct(base, 0)} do custo anual para quem acabou de entrar, mais {pct(step, 0).replace('%', '')} pontos por ano "
+            f"de casa, até {pct(cap, 0)} a partir de {y} anos")

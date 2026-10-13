@@ -130,3 +130,17 @@ def test_personas_that_stop_being_cases_fail_with_a_clear_message():
     w = generate_world(a)
     with pytest.raises(ValueError, match="não abre"):
         check_personas_are_cases(run_engine(w.public, a), w.public["personas"], a)
+
+
+def test_replacement_cost_grows_with_tenure(base):
+    from src.interventions import replacement_share
+    a, w, eng, *_ = base
+    b, step, cap = (a.num("cost.replacement_base"), a.num("cost.replacement_per_tenure_year"), a.num("cost.replacement_max"))
+    assert replacement_share(a, 0) == pytest.approx(b)
+    assert replacement_share(a, 2) == pytest.approx(b + 2 * step)
+    assert replacement_share(a, 30) == pytest.approx(cap)
+    cases = eng.cases
+    expected = replacement_share(a, cases["tenure_years"]) * cases["salary"]
+    assert cases["replacement_cost"].to_numpy() == pytest.approx(expected.to_numpy())
+    _, msg = _message(a, w, eng, w.public["personas"].set_index("persona_id").loc["P1", "employee_id"])
+    assert "anos e meio de casa" in msg["suggestion"]

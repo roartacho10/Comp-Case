@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from src.app_data import assumptions, load_world
-from src.format import brl, cost_note, num, pct, share_words
+from src.format import brl, cost_note, num, pct, replacement_rule, share_words
 from src.interventions import reference_costs
 from src.leadership import at_t0
 from src.signals import CAUSES
@@ -43,7 +43,7 @@ c1, c2, c3 = st.columns(3)
 c1.metric("Casos abertos", view["cases"], help=f"Pessoas com {a.int('case.min_signals_same_cause')} ou mais sinais da mesma causa")
 c2.metric("Saídas esperadas, sem ação", num(view["exits_no_action"], 0),
           help=f"Nos casos abertos, em {W} meses, se nada for feito")
-c3.metric("Perda esperada, sem ação", brl(view["loss"]), help=f"Saídas esperadas × custo de reposição ({pct(a.num('cost.replacement_share'), 0)} do custo anual)")
+c3.metric("Perda esperada, sem ação", brl(view["loss"]), help=f"Saídas esperadas × custo de reposição ({replacement_rule(a)})")
 employees = f"{view['employees']:,}".replace(",", ".")
 md(
     f"Na empresa de {employees} pessoas, se nada for feito, os {view['cases']} casos abertos devem gerar cerca de **{num(view['exits_no_action'], 0)} saídas** "

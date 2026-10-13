@@ -56,6 +56,14 @@ def hours_of(value: float, case: pd.Series, a: Assumptions) -> int | None:
     return int(round(h / 5) * 5) if h >= 20 else max(1, int(round(h)))
 
 
+def tenure_phrase(years: float) -> str:
+    """What the substitute does not bring, in words: the knowledge of the person's years in the company."""
+    if years < 1:
+        return "o pouco que a pessoa já aprendeu sobre a empresa"
+    whole = int(years)
+    return f"o conhecimento de {'1 ano' if whole == 1 else f'{whole} anos'}{' e meio' if years - whole >= 0.5 else ''} de casa"
+
+
 def build_case_message(
     case: pd.Series,
     options: pd.DataFrame,
@@ -97,11 +105,12 @@ def build_case_message(
                       "as perguntas abaixo podem ajudar.")
 
     exit_now = case["exit_window_no_action"]
-    replacement = a.num("cost.replacement_share") * case["salary"]
+    replacement = case["replacement_cost"]
     gap = max(0.0, a.num("cost.replacement_hire_compa") * case["market_median"] - case["salary"])
     years = case["horizon_years"]
     years_txt = "cerca de 1 ano" if years < 1.5 else f"cerca de {int(years + 0.5)} anos"
-    loss_txt = f"Se {person} sair, repor custaria cerca de {brl(replacement)} (recrutamento, vaga aberta e tempo até a nova pessoa render)"
+    loss_txt = (f"Se {person} sair, repor custaria cerca de {brl(replacement)} (contratar, o tempo até a nova pessoa render e "
+                f"{tenure_phrase(case['tenure_years'])})")
     loss_txt += (f", e o substituto seria contratado pelo valor de mercado, {brl(gap)} por ano acima do salário atual."
                  if gap >= 0.05 * case["salary"] else ".")
 

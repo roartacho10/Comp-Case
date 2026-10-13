@@ -12,6 +12,7 @@ import pandas as pd
 
 from src.assumptions import Assumptions
 from src.generator import World
+from src.interventions import replacement_share, tenure_years
 from src.personas import persona_signals
 from src.signals import CAUSES, compute_signals
 from src.periods import HISTORY_MONTHS, OUTCOME_WINDOW_MONTHS
@@ -110,7 +111,9 @@ def run_checks(world: World, a: Assumptions) -> pd.DataFrame:
     tol = _tol(reg_target, len(former))
     add("Saídas", "Fração de saídas arrependidas", f"{_pct(reg_target)} ± {_pct(tol)}", _pct(reg), abs(reg - reg_target) <= tol,
         "Seção 3.3: metade arrependida")
-    loss = (former.loc[former["regretted"].astype(bool), "annual_cost_brl"] * a.num("cost.replacement_share")).sum()
+    regretted = former[former["regretted"].astype(bool)]
+    tenure_at_exit = [tenure_years(h, e) for h, e in zip(regretted["hire_date"], regretted["exit_date"])]
+    loss = (regretted["annual_cost_brl"] * replacement_share(a, tenure_at_exit)).sum()
     add("Saídas", "Custo de reposição das saídas arrependidas em 12 meses (informativo)", "Seção 3.3: ~R$ 14 mi",
         _brl_m(loss), True)
 
