@@ -34,7 +34,7 @@ O motor de regras (sem AI) lê só o que o sistema enxerga: os dados brutos do c
 
 - **Caso:** abre com 2 ou mais sinais da mesma causa. A causa provável é a que tem mais sinais; em empate, as duas aparecem e a decisão fica com o gestor.
 - **Risco:** a taxa de saída em 12 meses, na rede, de casos com a mesma causa e o mesmo número de sinais em que nada foi feito.
-- **Valor de cada opção:** o que a empresa economiza evitando a saída (reposição e substituto contratado a valor de mercado), menos o custo da opção, no tempo em que a pessoa ainda deve ficar (até 5 anos). O efeito de ações pontuais dura 12 meses; o do ajuste salarial dura enquanto ele é pago.
+- **Valor de cada opção:** o que a empresa economiza evitando a saída (reposição e substituto contratado a valor de mercado), menos o custo da opção, no tempo em que a pessoa ainda deve ficar (até 5 anos). O efeito de ações pontuais dura 12 meses; o do ajuste salarial dura enquanto ele é pago. O ajuste leva a pessoa a 90% da mediana de mercado (com mínimo de 5%), então custa mais para quem está mais longe do mercado; em alguns casos, ele não compensa e a sugestão é outra.
 - **Sugestão:** a opção de maior valor, se for positivo; senão, monitorar. Para ações cujo custo o gestor conhece melhor (carreira e projeto), o sistema mostra a perda que a ação evita, que é o máximo que vale investir, também em horas do tempo do gestor. Nos totais, essas ações entram com um custo de referência de R$ 5 mil por caso.
 - **Resultado:** a simulação aplica as mesmas regras do mundo aos 12 meses seguintes. Os três personagens seguem um roteiro por decisão.
 - **Previsão do gestor:** uma frase, e não um percentual (quase certo que fica, provavelmente fica, provavelmente sai, quase certo que sai), convertida em chance de ficar pela escala das premissas.
@@ -61,7 +61,7 @@ Toda regra do mundo sintético está em uma base editável, e nenhum número de 
 - [`data/signals.csv`](data/signals.csv) e [`data/interventions.csv`](data/interventions.csv): catálogos de sinais (causa e fonte) e de intervenções (causa que atacam e regra de custo).
 - [`data/personas.csv`](data/personas.csv), [`data/persona_outcomes.csv`](data/persona_outcomes.csv) e [`data/questions.csv`](data/questions.csv): os três personagens, o roteiro de cada um por decisão e as perguntas de conversa.
 
-Os dados em `data/generated/` são **derivados** dessas tabelas e não são editados à mão: mudou a premissa, rode `scripts/generate_data.py`. Quarenta checagens comparam os dados gerados com as premissas, e um teste garante que o retrato commitado é exatamente o que as premissas atuais geram. A verdade oculta (causa de cada pessoa) fica em `data/hidden/`, visível para auditoria, mas lida só pelo gerador, pela simulação e pelas checagens; outro teste garante isso.
+O app gera o mundo a partir das premissas ao iniciar (alguns segundos, uma vez por versão). Os arquivos em `data/generated/` são um retrato desse mundo para auditoria, derivados das premissas e nunca editados à mão: mudou a premissa, rode `scripts/generate_data.py` para atualizar o retrato. Os períodos de 12 meses (resultado de cada decisão e histórico do cliente) são fixos, e não premissas, para que todas as taxas se refiram ao mesmo ano. Quarenta checagens comparam os dados gerados com as premissas, e um teste garante que o retrato commitado é exatamente o que as premissas atuais geram. A verdade oculta (causa de cada pessoa) fica em `data/hidden/`, visível para auditoria, mas lida só pelo gerador, pela simulação e pelas checagens; outro teste garante isso.
 
 ## Limitações e simplificações
 
@@ -69,6 +69,8 @@ Os dados em `data/generated/` são **derivados** dessas tabelas e não são edit
 - O Slack é uma imagem da conversa, sem integração; não há integração com HRIS.
 - Duas causas tratáveis: remuneração e crescimento. Problemas na relação com a gestão são uma causa possível na solução, mas ficaram fora do protótipo.
 - O aprendizado usa regras simples e transparentes, sem modelo treinado.
+- O risco sem ação é medido nos casos da rede em que nada foi feito, e o efeito de cada intervenção, como se a escolha do gestor fosse aleatória (no protótipo ela é, por construção). Na vida real, quanto mais os gestores seguem a sugestão, menos casos sem ação sobram para medir, e a escolha do gestor carrega informação que os dados não veem. A solução completa precisa de um pequeno grupo de controle (ou do histórico de antes do sistema) e da implantação escalonada por área.
+- O efeito do ajuste salarial não depende do tamanho do ajuste.
 - A checagem de números garante que todo número citado pela AI existe nos fatos recebidos, mas não que ele esteja associado ao indicador certo. O risco é baixo, porque cada mensagem trata de uma pessoa e a AI reescreve um texto padrão que já traz os números no lugar; a defesa completa seria a AI devolver o texto com marcadores e o sistema inserir os números.
 - A visão do colaborador, as flags de priorização e a redução de dependência ficam descritas no documento, não construídas.
 

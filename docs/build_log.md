@@ -369,3 +369,26 @@ O autor pediu a outros modelos uma auditoria do código, com um relatório de ac
 | Checagens que falham em 3 de 58 sementes | Variação estatística esperada | Registrado |
 
 Os testes da auditoria entraram na suíte (`tests/test_auditoria.py`); três foram ajustados à correção escolhida. Suíte principal: 81 testes; testes demorados (outras sementes e todas as páginas com cada decisão): 37, com `pytest -m slow`. Todos passando.
+
+---
+
+## Revisão final do código, das premissas e das regras
+
+Revisão de todo o código, das 163 mensagens de caso, de todas as decisões possíveis dos três personagens (39 cenários) e de 26 premissas editadas uma a uma. As correções foram aprovadas pelo autor antes da execução.
+
+| Achado | Correção | Racional |
+|---|---|---|
+| Personagem sem decisão aparecia como "divergiu" no quadro da página 2 e na comparação da página 4 | Casos sem decisão ficam fora das duas comparações e aparecem como "sem decisão" | Quem avalia pode avançar sem decidir; o quadro não pode contradizer o retorno |
+| Com as premissas anteriores, a sugestão era sempre a intervenção da causa: o cálculo econômico nunca mudava uma decisão | Ajuste salarial leva a pessoa a 90% da mediana de mercado, com mínimo de 5% (premissas `cost.raise_target_compa` e `cost.raise_min_share`), em vez de 10% fixo para todos. Em 14 dos 84 casos de remuneração o ajuste não compensa; a mensagem mostra o custo e lembra que equidade e política salarial podem justificá-lo | Mais realista (quem está longe do mercado custa mais para ajustar) e mostra a lógica econômica funcionando. A Mariana mantém a sugestão de ajuste (R$ 35 mil por ano, saldo de ~R$ 16 mil) |
+| Risco sem ação medido só nos casos em que o gestor não seguiu a sugestão; com adesão de 100%, o motor quebrava | Mensagem clara; limite registrado no README, no documento de mudanças e no guia | A solução real precisa de grupo de controle ou do histórico de antes do sistema |
+| Janela de 24 meses, mínimo de 3 sinais e adesão de 100% quebravam com erro técnico | Janela de resultado e histórico fixos em 12 meses (`src/periods.py`), deixando de ser premissas; mensagens claras para `network.months` ≤ 12 e para personagem que deixa de ser caso | Todas as taxas se referem ao mesmo ano; nenhuma edição de premissa termina em erro técnico |
+| Retorno dizia "Somando os seus 4 casos" quando um não tinha previsão | Previsões e saídas comparadas nos mesmos casos | Comparação justa |
+| Casos enviados ao RH começavam com "Oi, Time." | Saudação ao time de People | Texto correto |
+| "Seguiram a sugestão" mostrava 0% para opção nunca sugerida | Mostra "—" | Evita parecer erro |
+| Sessão aberta durante uma atualização podia reaproveitar resultado antigo | Resultado descartado quando o código ou os dados mudam | Robustez |
+| Código sem uso e termo "ganha" para custo anual | Removido; regras de custo das intervenções reunidas em `src/interventions.py`; evidência diz "salário e encargos" | Limpeza e precisão |
+| Guia "Anatomia" dizia que o app lê os CSV | Corrigido: o app regera o mundo a partir das premissas; os CSV são retrato para auditoria | Precisão |
+
+Semente da simulação conferida de novo: com as sementes 1 a 20, as saídas nos casos abertos variaram de 26 a 53 (média 42); a 14 dá 42 e segue representativa.
+
+Testes: 90 na suíte principal (novos em `tests/test_review.py`) e 37 demorados, todos passando; dados regerados conferem com o retrato do repositório.
